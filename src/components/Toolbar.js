@@ -1,5 +1,5 @@
 import React,{ useState } from "react"
-
+import { Link } from "react-router-dom"
 
 const Toolbar = () => {
 
@@ -23,28 +23,34 @@ const Toolbar = () => {
     border: '2px solid royalblue',
   };
 
-  const buttonStyle = {
+  const toolbarButtonStyle = {
     backgroundColor: 'lightblue',
     color: 'blue',
-    // flex set to 1 so each button takes upt equal width
-    width: '200%',
+    width: '125%', 
     height: '10%',
     border: '2px solid blue',
-    padding: '10px 10px',
     borderRadius: '10px',
     textAlign: 'center',
     fontSize: '16px',
-    // changes the currsor to pointer when hovering
     cursor: 'pointer',
+    boxSizing: 'border-box',
+    textDecoration: 'none',
+    fontWeight: 'bold',
+    fontFamily: 'Arial, sans-serif',
+    // Use flexbox to center text
+    display: 'flex', 
+    // Center text vertically
+    alignItems: 'center', 
+    justifyContent: 'center',
   };
 
   return (
     <div style={divStyle}>
-      <button style={buttonStyle}>Test</button>
-      <button style={buttonStyle}>Test</button>
-      <button style={buttonStyle}>Test</button>
-      <button style={buttonStyle}>Test</button>
-      <button style={buttonStyle}>Test</button>
+      <Link style={toolbarButtonStyle}>Button 1</Link>
+      <Link style={toolbarButtonStyle}>Button 2</Link>
+      <Link style={toolbarButtonStyle}>Button 3</Link>
+      <Link style={toolbarButtonStyle}>Button 4</Link>
+      <Link style={toolbarButtonStyle}>Button 5</Link>
     </div>
   );
 }

@@ -3,11 +3,17 @@ import { Link, Outlet } from "react-router-dom"
 
 const Toolbar = () => {
 
-  const width = window.innerWidth;
-  const height = window.innerHeight;
+  // state to keep track of hover event
+  const [hovered, setHovered] = useState(null);
 
-  console.log('Window width: ${width}, Window height: ${height}px');
-  
+  const handleMouseEnter = (buttonId) =>{
+    setHovered(buttonId)
+  }
+
+  const handleMouseLeave = () => {
+    setHovered(null)
+  }
+
   const divStyle = {
     backgroundColor: 'skyblue',
     width: '5%',
@@ -28,9 +34,9 @@ const Toolbar = () => {
     zIndex: '10',
   };
 
-  const toolbarButtonStyle = {
-    backgroundColor: 'lightblue',
-    color: 'blue',
+  const toolbarButtonStyle = (buttonId) => ({
+    backgroundColor: hovered === buttonId ? 'lightgrey' : 'lightblue',
+    color: hovered === buttonId ? 'white' : 'blue',
     width: '125%', 
     height: '10%',
     border: '2px solid blue',
@@ -47,15 +53,53 @@ const Toolbar = () => {
     // Center text vertically
     alignItems: 'center', 
     justifyContent: 'center',
-  };
+    hover: 'grey',
+    // this adds a smother transition on hover events
+    transition: 'background-color 0.3s, color 0.3s'
+  });
 
   return (
     <div style={divStyle}>
-      <Link style={toolbarButtonStyle} to="Page1">Button 1</Link>
-      <Link style={toolbarButtonStyle} to="Page2">Button 2</Link>
-      <Link style={toolbarButtonStyle} to="Page3">Button 3</Link>
-      <Link style={toolbarButtonStyle} to="Page4">Button 4</Link>
-      <Link style={toolbarButtonStyle} to="Page5">Button 5</Link>
+      <Link
+        style={toolbarButtonStyle('Button1')}
+        to="Page1"
+        onMouseEnter={() => handleMouseEnter('Button1')}
+        onMouseLeave={handleMouseLeave}
+      >
+        Button 1
+      </Link>
+      <Link
+        style={toolbarButtonStyle('Button2')}
+        to="Page2"
+        onMouseEnter={() => handleMouseEnter('Button2')}
+        onMouseLeave={handleMouseLeave}
+      >
+        Button 2
+      </Link>
+      <Link
+        style={toolbarButtonStyle('Button3')} 
+        to="Page3"
+        onMouseEnter={() => handleMouseEnter('Button3')}
+        onMouseLeave={handleMouseLeave}
+      >
+        Button 3
+      </Link>
+      <Link
+        style={toolbarButtonStyle('Button4')}
+        to="Page4"
+        onMouseEnter={() => handleMouseEnter('Button4')}
+        onMouseLeave={handleMouseLeave}
+      >
+        Button 4
+      </Link>
+      <Link
+        style={toolbarButtonStyle('Button5')} 
+        to="Page5"
+        onMouseEnter={() => handleMouseEnter('Button5')}
+        onMouseLeave={handleMouseLeave}
+      >
+        Button 5
+      </Link>
     </div>
   );
 }

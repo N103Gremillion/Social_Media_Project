@@ -6,54 +6,56 @@ import Page2 from './pages/Page2';
 import Page3 from './pages/Page3';
 import Page4 from './pages/Page4';
 import Page5 from './pages/Page5';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider, Outlet} from 'react-router-dom';
 
+// this will help to render the Toolbar on every page and its appropritae child path (page)
+const Dashboard = () =>  {
 
-function App() {
+  const dashboardStyle = {
+    marginLeft: '7%',
+    padding: '20px',
+    height: '100vh',
+    boxSizing: 'border-box',
+    overflow: 'auto',
+  };
+
   return (
-      <div>
-
-        {/* render the appropiate pages/elements */}
-        <RouterProvider router={router} />
-
-      </div>
-
+    <div>
+      <Toolbar/>
+      <Outlet/>
+    </div>
   );
 }
 
 {/* routing for each of the pages in the app */}
 const router = createBrowserRouter([
-  {
-    // note: / is root path (entery point)
-    path: '/',
-    element: <Toolbar/>,
-    // if there is an error add it to the root component
-    errorElement: <ErrorPage/>,
-  },
-  {
-    // note: / is root path (entery point)
-    path: '/pages/Page1',
-    element: <Page1/>,
-    // if there is an error add it to the root component
-    errorElement: <ErrorPage/>,
-  },
-  {
-    path: '/pages/Page2',
-    element: <Page2 />,
-  },
-  {
-    path: '/pages/Page3',
-    element: <Page3 />,
-  },
-  {
-    path: '/pages/Page4',
-    element: <Page4 />,
-  },
-  {
-    path: '/pages/Page5',
-    element: <Page5 />,
-  },
+  // note: / is root path (entery point)
+  {path: '/', 
+  element: <Dashboard/>, 
+  errorElement: <ErrorPage/>,
+  children: [
+
+      {path: 'Page1', element: <Page1/>},
+      {path: 'Page2', element: <Page2/>},
+      {path: 'Page3', element: <Page3/>},
+      {path: 'Page4', element: <Page4/>},
+      {path: 'Page5', element: <Page5/>}, 
+      
+    ]
+  } 
 ]);
+
+function App() {
+  return (
+    <div>
+      {/* render the appropiate pages/elements */}
+      <RouterProvider router={router} />
+
+    </div>
+  );
+}
+
+
 
 export default App;
 

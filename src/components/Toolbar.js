@@ -1,5 +1,5 @@
 import React,{ useState } from "react"
-import { Link } from "react-router-dom"
+import { Link, Outlet } from "react-router-dom"
 
 const Toolbar = () => {
 
@@ -21,6 +21,11 @@ const Toolbar = () => {
     justifyContent: 'space-evenly',
     flexDirection: 'column',
     border: '2px solid royalblue',
+    position: 'fixed',
+    top: '0',
+    left: '0',
+    // make sure it renders on top of pages
+    zIndex: '10',
   };
 
   const toolbarButtonStyle = {
@@ -46,11 +51,11 @@ const Toolbar = () => {
 
   return (
     <div style={divStyle}>
-      <Link style={toolbarButtonStyle}>Button 1</Link>
-      <Link style={toolbarButtonStyle}>Button 2</Link>
-      <Link style={toolbarButtonStyle}>Button 3</Link>
-      <Link style={toolbarButtonStyle}>Button 4</Link>
-      <Link style={toolbarButtonStyle}>Button 5</Link>
+      <Link style={toolbarButtonStyle} to="Page1">Button 1</Link>
+      <Link style={toolbarButtonStyle} to="Page2">Button 2</Link>
+      <Link style={toolbarButtonStyle} to="Page3">Button 3</Link>
+      <Link style={toolbarButtonStyle} to="Page4">Button 4</Link>
+      <Link style={toolbarButtonStyle} to="Page5">Button 5</Link>
     </div>
   );
 }

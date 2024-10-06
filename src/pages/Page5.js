@@ -1,14 +1,20 @@
 import React from "react"
 
 const Page5 = () => {
-  
   return (
     <div>
-      <p>
-        This is page 5
-      </p>
+      <div style={{ 
+        width: '100vw', 
+        height: '100vh', 
+        backgroundColor: 'orange', 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center' 
+      }}>
+        <h1>This is Page 5</h1>
+      </div>
     </div>
   );
-}
+};
 
 export default Page5

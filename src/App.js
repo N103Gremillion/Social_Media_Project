@@ -1,14 +1,31 @@
-import React from 'react';
+import React, { useState } from 'react';
+import MainFeedPage from './pages/MainFeedPage';
+import Post from './pages/Post';
 
-function App() {
+const App = () => {
+
+  const examplePost = {
+    title: "Hello World",
+    content: "this is the first of my posts asdlkfjasdklfjasdl;kfjsd;lfsdkfjasdklfjasdfkljasdfkl;asdjfl;kasdf",
+    author: "Nathan Gremillion",
+    date: "October 6th 2024"
+  };
+
   return (
     <div>
-      {/* render the appropiate pages/elements */}
-      Hello World???
-
+      {/* <MainFeedPage/> */}
+      <MainFeedPage/>
+      <Post
+        title={examplePost.title}
+        content={examplePost.content}
+        author={examplePost.author}
+        date={examplePost.date}
+      />
+      {/* button to update the post */}
+      {/* <button onClick={updatePost}>Update Post</button> */}
     </div>
   );
-}
+};
 
 
 

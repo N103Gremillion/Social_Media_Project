@@ -7,7 +7,7 @@ interface DeleteConfirmationModalProps {
   onConfirm: () => void;
 }
 
-const DefaultConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({
+const DefaultConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({ 
   show,
   onHide,
   onConfirm,

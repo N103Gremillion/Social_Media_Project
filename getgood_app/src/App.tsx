@@ -1,8 +1,10 @@
-import Goal from "./components/Goal"
+import MyGoalsPage from './pages/MyGoalsPage'
 
 function App() {
   return (
-  <div><Goal /></div>
+  <div>
+    <MyGoalsPage /> 
+  </div>
   )
 }
 export default App;

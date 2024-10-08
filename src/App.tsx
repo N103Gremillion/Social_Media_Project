@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import MainFeedPage from './pages/MainFeedPage';
 import Post from './pages/Post';
+import MainFeedPage from './pages/MainFeedPage';
 
 const App = () => {
 

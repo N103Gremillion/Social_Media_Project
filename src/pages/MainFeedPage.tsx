@@ -1,8 +1,8 @@
 import React from "react";
 
-const MainFeedPage = () => {
+const MainFeedPage : React.FC = () => {
 
-  const mainDivStyle = {
+  const mainDivStyle : React.CSSProperties = {
     backgroundColor: 'lightyellow',
     width: '100%',
     height: '100vh',

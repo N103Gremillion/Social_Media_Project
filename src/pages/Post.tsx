@@ -1,6 +1,6 @@
 import React from "react";
 
-const Post = ({title, content, author, date}) => {
+const Post : React.FC<{title : string; content : string; author : string, date : string}>  = ({title, content, author, date}) => {
   
   const postStyle = {
     border: '1px solid black',
@@ -14,19 +14,19 @@ const Post = ({title, content, author, date}) => {
   }
 
   const titleStyle = {
-    fontSize: '1.5',
+    fontSize: '1.5rem',
     margin: '8px',
   };
 
   const contentStyle = {
-    fontSize: '1',
+    fontSize: '1rem',
     margin: '8px',
   };
 
   const footerStyle = {
     display: 'flex',
     justifyContent: 'space-between',
-    fontSize: '0.8',
+    fontSize: '0.8rem',
     color: 'blue',
   };
 

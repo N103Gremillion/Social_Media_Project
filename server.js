@@ -85,6 +85,32 @@ app.post('/addUser', (req,res) => {
 	});
 });
 
+app.post('/changeUserName', (req,res) => {
+	const {userId, newName} = req.body;
+
+	const changeNameQuery = 'update users set name = ? where id = ?';
+
+	pool.query(changeNameQuery, [newName, userId], (error,results) => {
+		if (error) {
+			return res.status(500).json({ error: error.message });
+		}
+		res.status(201).json({ success: true });
+	});
+});
+
+app.post('/changeUserPassword', (req,res) => {
+	const {userId, newPassword} = req.body;
+
+	const changeNameQuery = 'update users set password = ? where id = ?';
+
+	pool.query(changeNameQuery, [newPassword, userId], (error,results) => {
+		if (error) {
+			return res.status(500).json({ error: error.message });
+		}
+		res.status(201).json({ success: true });
+	});
+});
+
 app.post('/addGoal', (req,res) => {
 	const { userId, goalName, goalDescription, goalStartDate, goalEndDate } = req.body;
 

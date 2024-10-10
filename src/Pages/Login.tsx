@@ -13,7 +13,9 @@ const Login = () => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
 
-    const handleLogin = () => {};
+    const handleLogin = () => {
+        alert(username + " " + password)
+    }
 
     return (
         <>

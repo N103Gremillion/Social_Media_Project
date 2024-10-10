@@ -13,7 +13,9 @@ const SignUp = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
-    const handleSignUp = () => {};
+    const handleSignUp = () => {
+        alert(username + " " + email + " " + password)
+    }
 
     return (
         <>
@@ -45,8 +47,9 @@ const SignUp = () => {
                         id="email"
                         name="email"
                         label="Email Address"
+                        type= "email"
                         value={email}
-                        onChange={(e) => setEmail(e.   target.value)}
+                        onChange={(e) => setEmail(e. target.value)}
                     />
 
                     <TextField

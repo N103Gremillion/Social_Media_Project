@@ -6,61 +6,27 @@ import {
     Avatar,
     Dialog,
     DialogTitle,
-    List,
-    ListItem,
-    ListItemButton,
-    ListItemText
+    DialogActions,
+    DialogContent,
+    TextField
 } from "@mui/material";
 import PersonIcon from "@mui/icons-material/Person"
 import { blue } from "@mui/material/colors"
-import React from "react";
+import React, { useState } from "react";
 
-export interface PromptProps {
-    openUser: boolean
-    userValue: string
-    onClose: (value: string) => void
-}
-
-function Prompt(props: PromptProps) {
-    const {onClose, userValue, openUser} = props
-
-    const handleClose = () => {
-        onClose(userValue)
-    }
-
-    const handleClickUser = (value: string) => {
-        onClose(value)
-    }
-
-    return (
-        <Dialog onClose={handleClose} open={openUser}>
-            <DialogTitle>Choose User</DialogTitle>
-            <List>
-                {username.map((username) => (
-                    <ListItem key={username}>
-                        <ListItemButton onClick={() => handleClickUser(username)}>
-                            <ListItemText primary={username} />
-                        </ListItemButton>
-                    </ListItem>
-                ))}
-            </List>
-        </Dialog>
-    )
-}
-const username = ['User1', 'User2']
+const username = 'User1'
 
 const AccountManagement = () => {
-    const [openUser, setOpenUser] = React.useState(false)
+    const [openUser, setOpenUser] = useState(false)
 
-    const [userValue, setUserValue] = React.useState(username[0])
+    const [userValue, setUserValue] = useState(username)
 
     const handleClickUser = () => {
         setOpenUser(true)
     }
 
-    const CloseUser = (value: string) => {
+    const handleCloseUser = () => {
         setOpenUser(false)
-        setUserValue(value)
     }
 
     return (
@@ -89,11 +55,36 @@ const AccountManagement = () => {
                             variant="contained" onClick={handleClickUser}
                             sx={{ mt: 2}}
                         >Change Username</Button>
-                        <Prompt
-                            userValue={userValue}
-                            openUser={openUser}
-                            onClose={CloseUser}
-                        />
+                        <Dialog 
+                            open={openUser}
+                            onClose={handleCloseUser}
+                            PaperProps={{
+                                component: 'form',
+                                onSubmit: (event: React.FormEvent<HTMLFormElement>) => {
+                                    event.preventDefault()
+                                    const formData = new FormData(event.currentTarget)
+                                    const formJson = Object.fromEntries((formData as any).entries())
+                                    const username = formJson.username
+                                    setUserValue(username)
+                                    handleCloseUser()
+                                }
+                            }}
+                
+                        >
+                            <DialogTitle>Change User</DialogTitle>
+                            <DialogContent>
+                                <TextField
+                                    id="name"
+                                    name="username"
+                                    label="Username"
+                                    fullWidth
+                                />
+                            </DialogContent>
+                            <DialogActions>
+                                <Button onClick={handleCloseUser}>Cancel</Button>
+                                <Button type="submit">Confirm</Button>
+                            </DialogActions>
+                        </Dialog>
                     
                         <Button
                             variant="contained"

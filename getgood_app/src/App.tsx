@@ -17,11 +17,20 @@ const dashboardStyle : React.CSSProperties = {
   overflow: 'auto',
 };
 
+const pageContentStyle: React.CSSProperties = {
+  width: '93%',
+  padding: '20px',
+  boxSizing: 'border-box',
+  overflow: 'auto',
+};
+
 const Dashboard  = () => {
   return (
     <div style={dashboardStyle}>   
-      <Toolbar /> 
-      <Outlet />
+      <Toolbar />
+      <div style={pageContentStyle}>
+        <Outlet />
+      </div> 
     </div>
   );
 };

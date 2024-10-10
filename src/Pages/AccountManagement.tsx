@@ -15,11 +15,15 @@ import { blue } from "@mui/material/colors"
 import React, { useState } from "react";
 
 const username = 'User1'
+const password = "acmjkewoc"
 
 const AccountManagement = () => {
     const [openUser, setOpenUser] = useState(false)
+    const [openPassword, setOpenPassword] = useState(false)
+    const [openAvatar, setOpenAvatar] = useState(false)
 
     const [userValue, setUserValue] = useState(username)
+    const [passwordValue, setPasswordValue] = useState(password)
 
     const handleClickUser = () => {
         setOpenUser(true)
@@ -27,6 +31,22 @@ const AccountManagement = () => {
 
     const handleCloseUser = () => {
         setOpenUser(false)
+    }
+
+    const handleClickPassword = () => {
+        setOpenPassword(true)
+    }
+
+    const handleClosePassword = () => {
+        setOpenPassword(false)
+    }
+
+    const handleClickAvatar = () => {
+        setOpenAvatar(true)
+    }
+
+    const handleCloseAvatar = () => {
+        setOpenAvatar(false)
     }
 
     return (
@@ -87,9 +107,40 @@ const AccountManagement = () => {
                         </Dialog>
                     
                         <Button
-                            variant="contained"
+                            variant="contained" onClick={handleClickPassword}
                             sx={{mt: 2}}
                         >Change Password</Button>
+                        
+                        <Dialog 
+                            open={openPassword}
+                            onClose={handleClosePassword}
+                            PaperProps={{
+                                component: 'form',
+                                onSubmit: (event: React.FormEvent<HTMLFormElement>) => {
+                                    event.preventDefault()
+                                    const formData = new FormData(event.currentTarget)
+                                    const formJson = Object.fromEntries((formData as any).entries())
+                                    const password = formJson.username
+                                    setPasswordValue(password)
+                                    handleClosePassword()
+                                }
+                            }}
+                
+                        >
+                            <DialogTitle>Change User</DialogTitle>
+                            <DialogContent>
+                                <TextField
+                                    id="password"
+                                    name="password"
+                                    label="Password"
+                                    fullWidth
+                                />
+                            </DialogContent>
+                            <DialogActions>
+                                <Button onClick={handleClosePassword}>Cancel</Button>
+                                <Button type="submit">Confirm</Button>
+                            </DialogActions>
+                        </Dialog>
                         
                         <Button
                             variant="contained"

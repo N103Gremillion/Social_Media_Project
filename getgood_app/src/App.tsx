@@ -1,20 +1,17 @@
-
-const Dashboard = () =>  {
-
-  const dashboardStyle : React.CSSProperties = {
-    marginLeft: '7%',
-    padding: '20px',
-    height: '100vh',
-    boxSizing: 'border-box',
-    overflow: 'auto',
-  };
-
-=======
 import React from "react";
 import MyGoalsPage from "./pages/MyGoalsPage";
 import Toolbar from "./components/Toolbar";
 import ErrorPage from "./pages/ErrorPage";
 import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom";
+
+
+const dashboardStyle : React.CSSProperties = {
+  marginLeft: '7%',
+  padding: '20px',
+  height: '100vh',
+  boxSizing: 'border-box',
+  overflow: 'auto',
+};
 
 const Dashboard = () => {
   return (
@@ -32,7 +29,6 @@ const router = createBrowserRouter([
     errorElement: <ErrorPage />,
     children: [{ path: "MyGoalsPage", element: <MyGoalsPage /> }],
   },
->>>>>>> myGoals
 ]);
 
 function App() {

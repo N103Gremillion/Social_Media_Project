@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import "bootstrap/dist/css/bootstrap.min.css";
 import DeleteConfirmationModal from "./DeleteConfirmationModal";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 function Goal() {
   const [showModal, setShowModal] = useState(false);

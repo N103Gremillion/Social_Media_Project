@@ -4,6 +4,7 @@ import Toolbar from "./components/Toolbar";
 import ErrorPage from "./pages/ErrorPage";
 import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
+import AccountManagement from "./pages/AccountManagement";
 import CreateGoalPage from "./pages/CreateGoalPage";
 import { createBrowserRouter, RouterProvider, Outlet} from "react-router-dom";
 
@@ -16,9 +17,9 @@ const dashboardStyle : React.CSSProperties = {
   overflow: 'auto',
 };
 
-const Dashboard = () => {
+const Dashboard  = () => {
   return (
-    <div>   
+    <div style={dashboardStyle}>   
       <Toolbar /> 
       <Outlet />
     </div>
@@ -26,7 +27,8 @@ const Dashboard = () => {
 };
 
 const router = createBrowserRouter([
-  {path: "/", element: <Login />},
+  {path: "/", element: <Login />, errorElement: <ErrorPage />
+  },
   
 
   {path: "/SignUp", element: <SignUp />},
@@ -34,11 +36,10 @@ const router = createBrowserRouter([
   {
     path: "/Dashboard",
     element: <Dashboard />,
-    errorElement: <ErrorPage />,
     children: [
       { path: "MyGoalsPage", element: <MyGoalsPage /> },
-      { path: "CreateGoalPage", element: <CreateGoalPage /> }
-
+      { path: "CreateGoalPage", element: <CreateGoalPage /> },
+      { path: "AccountManagment", element: <AccountManagement /> }
     ],
   }
 ]);

@@ -13,7 +13,9 @@ const Login = () => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
 
-    const handleLogin = () => {};
+    const handleLogin = () => {
+        // alert(username + " " + password)
+    }
 
     return (
         <>
@@ -50,15 +52,16 @@ const Login = () => {
                         setPassword(e.target.value);
                         }}
                     />
-
-                    <Button
-                        fullWidth
-                        variant="contained"
-                        sx={{ mt: 3, mb: 2 }}
-                        onClick={handleLogin}
-                    >Login
-                    </Button>
-                    <Link to="/signup">Sign Up</Link>
+                    <Link to="Dashboard">
+                        <Button
+                            fullWidth
+                            variant="contained"
+                            sx={{ mt: 3, mb: 2 }}
+                            onClick={handleLogin}
+                        >Login
+                        </Button>
+                    </Link>
+                    <Link to="SignUp">Sign Up</Link>
                 </Box>
             </Container>
         </>

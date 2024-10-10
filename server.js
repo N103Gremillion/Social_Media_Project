@@ -28,20 +28,6 @@ const pool = mysql.createPool({
 	database: 'csc403'
 });
 
-app.post('/uploadProfilePicture', upload.single('image'), (req, res) => {
-	const userId = req.body.userId;
-	const imagePath = req.file.path;
-
-	const uploadImageQuery = "insert into user_images (user_id, image_path) values (?,?)";
-
-	pool.query(uploadImageQuery, [userId, imagePath], (err, result) => {
-		if (err) {
-			return res.status(500).json({ error: error.message });
-		}
-		res.status(201).json({ message: "Profile picture uploaded.", imagePath });
-	});
-});
-
 app.get('/getProfilePicture', (req,res) => {
 	const userId = req.query.userId;
 
@@ -84,6 +70,19 @@ app.post('/addUser', (req,res) => {
 		res.status(201).json({ id: results.insertId });
 	});
 });
+
+app.post('/checkForUser', (req,res) => {
+	const { userName, userPassword } = req.body;
+
+	const checkForUserCommand = 'select id from users where name = ? and password = ?';
+
+	pool.query(checkForUserCommand, [userName, userPassword], (error, results) => {
+		if (error) {
+			return res.status(500).json({ error: error.message });
+		}
+		res.status(201).json({ results });
+	})
+})
 
 app.post('/changeUserName', (req,res) => {
 	const {userId, newName} = req.body;
@@ -202,5 +201,5 @@ function addGoalCheckpointConnection(checkpointId,goalId,query,req,res) {
 
 
 app.listen(port, () => {
-	console.log('server is running on http://localhost:${port}');
+	console.log('server is running');
 });

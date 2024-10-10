@@ -15,14 +15,13 @@ const App = () => {
     <div>
       {/* <MainFeedPage/> */}
       <MainFeedPage/>
-      <Post
+      
+      {/* <Post
         title={examplePost.title}
         content={examplePost.content}
         author={examplePost.author}
         date={examplePost.date}
-      />
-      {/* button to update the post */}
-      {/* <button onClick={updatePost}>Update Post</button> */}
+      /> */}
     </div>
   );
 };

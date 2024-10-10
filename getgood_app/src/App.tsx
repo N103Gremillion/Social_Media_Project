@@ -4,6 +4,7 @@ import Toolbar from "./components/Toolbar";
 import ErrorPage from "./pages/ErrorPage";
 import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
+import CreateGoalPage from "./pages/CreateGoalPage";
 import { createBrowserRouter, RouterProvider, Outlet} from "react-router-dom";
 
 
@@ -36,7 +37,8 @@ const router = createBrowserRouter([
     errorElement: <ErrorPage />,
     children: [
       { path: "MyGoalsPage", element: <MyGoalsPage /> },
-      { path: "SignUp", element: <SignUp /> }
+      { path: "CreateGoalPage", element: <CreateGoalPage /> }
+
     ],
   }
 ]);

@@ -69,8 +69,8 @@ const Toolbar : React.FC = () => {
       </Link>
       <Link
         style={toolbarButtonStyle('Button2')}
-        to="Page2"
-        onMouseEnter={() => handleMouseEnter('Button2')}
+        to="CreateGoalPage"
+        onMouseEnter={() => handleMouseEnter('CreateGoalPage')}
         onMouseLeave={handleMouseLeave}
       >
         Button 2

@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
-import './App.css';
 
 interface Checkpoint {
   checkpointName: string;
   checkpointDate: string;
 }
 
-function App() {
+const CreateGoalPage = () => {
   const port = 3231;
   const [goalName, setGoalName] = useState<string>('');
   const [goalDescription, setGoalDescription] = useState<string>('');
@@ -123,7 +122,16 @@ function App() {
   }
 
   return (
-    <div className="App">
+    <div className="CreateGoal" 
+    style={{
+      display: 'flex',
+      flexDirection: 'column',
+      textAlign: 'center',
+      justifyContent: 'center',
+      alignItems: 'center',
+      height: '100vh',
+      padding: '0 20px', // Add horizontal padding if needed
+    }}>
       <h1>Create A Goal</h1>
         <div className='goal-name'>
           <h3>Name:</h3>
@@ -186,7 +194,7 @@ function App() {
             onChange={(e) => setNewCheckpointDate(e.target.value)}
             placeholder="YYYY MM DD"
           />
-          <button onClick={addCheckpoint}>Add Checkpoint</button>
+          <p><button onClick={addCheckpoint}>Add Checkpoint</button></p>
 
           <p><button onClick={createGoal}>Create Goal</button></p>
         </div>
@@ -196,4 +204,4 @@ function App() {
   );
 }
 
-export default App;
+export default CreateGoalPage;

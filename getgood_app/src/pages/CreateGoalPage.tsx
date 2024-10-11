@@ -121,17 +121,24 @@ const CreateGoalPage = () => {
     return checkpointValues;
   }
 
+  const CreatGoalPageStyle: React.CSSProperties = {
+    backgroundColor: 'lightyellow',
+    width: '95%',
+    height: '100vh',
+    // padding: '20px',
+    textAlign: 'center',
+    // make the items in div vertially align
+    display: 'flex',
+    alignItems:'center',
+    justifyContent: 'space-evenly',
+    flexDirection: 'column',
+    position: 'fixed',
+    marginLeft: '5vw',
+    zIndex: '0',    
+  };
+
   return (
-    <div className="CreateGoal" 
-    style={{
-      display: 'flex',
-      flexDirection: 'column',
-      textAlign: 'center',
-      justifyContent: 'center',
-      alignItems: 'center',
-      height: '100vh',
-      padding: '0 20px', // Add horizontal padding if needed
-    }}>
+    <div className="CreateGoal" style={CreatGoalPageStyle}>
       <h1>Create A Goal</h1>
         <div className='goal-name'>
           <h3>Name:</h3>

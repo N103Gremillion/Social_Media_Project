@@ -6,54 +6,53 @@ import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
 import AccountManagement from "./pages/AccountManagement";
 import CreateGoalPage from "./pages/CreateGoalPage";
+import MainFeedPage from "./pages/MainFeedPage";
 import { createBrowserRouter, RouterProvider, Outlet} from "react-router-dom";
 
 
 const dashboardStyle : React.CSSProperties = {
-  marginLeft: '7%',
-  padding: '20px',
+  marginLeft: '5%',
   height: '100vh',
-  boxSizing: 'border-box',
-  overflow: 'auto',
-};
-
-const pageContentStyle: React.CSSProperties = {
-  width: '93%',
-  padding: '20px',
   boxSizing: 'border-box',
   overflow: 'auto',
 };
 
 const Dashboard  = () => {
   return (
-    <div style={dashboardStyle}>   
+    <div>   
       <Toolbar />
-      <div style={pageContentStyle}>
+      <div style={dashboardStyle}>
         <Outlet />
-      </div> 
+        </div>
     </div>
   );
 };
 
 const router = createBrowserRouter([
-  {path: "/", element: <Login />, errorElement: <ErrorPage />
-  },
-  
-
-  {path: "/SignUp", element: <SignUp />},
-
+  { path: "/", element: <Login />, errorElement: <ErrorPage /> },
+  { path: "signup", element: <SignUp /> },
   {
-    path: "/Dashboard",
+    path: "dashboard",
     element: <Dashboard />,
     children: [
-      { path: "MyGoalsPage", element: <MyGoalsPage /> },
-      { path: "CreateGoalPage", element: <CreateGoalPage /> },
-      { path: "AccountManagment", element: <AccountManagement /> }
+      { path: "my-goals", element: <MyGoalsPage /> },
+      { path: "create-goal", element: <CreateGoalPage /> },
+      { path: "account-management", element: <AccountManagement /> },
+      { path: "main-feed", element: <MainFeedPage /> },
     ],
-  }
+  },
 ]);
 
+
 function App() {
+
+  const examplePost = {
+    title: "Hello World",
+    content: "this is the first of my posts asdlkfjasdklfjasdl;kfjsd;lfsdkfjasdklfjasdfkljasdfkl;asdjfl;kasdf",
+    author: "Nathan Gremillion",
+    date: "October 6th 2024"
+  };
+
   return (
     <div>
       <RouterProvider router={router} />
@@ -62,3 +61,13 @@ function App() {
 }
 
 export default App;
+
+
+
+
+
+
+
+
+
+

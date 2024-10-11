@@ -61,7 +61,7 @@ const Toolbar : React.FC = () => {
     <div style={divStyle}>
       <Link
         style ={toolbarButtonStyle('Button1')}
-        to="MyGoalsPage"
+        to="my-goals"
         onMouseEnter={() => handleMouseEnter('Button1')}
         onMouseLeave={handleMouseLeave}
       >
@@ -69,7 +69,7 @@ const Toolbar : React.FC = () => {
       </Link>
       <Link
         style={toolbarButtonStyle('Button2')}
-        to="CreateGoalPage"
+        to="create-goal"
         onMouseEnter={() => handleMouseEnter('Button2')}
         onMouseLeave={handleMouseLeave}
       >
@@ -77,7 +77,7 @@ const Toolbar : React.FC = () => {
       </Link>
       <Link
         style={toolbarButtonStyle('Button3')} 
-        to="AccountManagment"
+        to="account-management"
         onMouseEnter={() => handleMouseEnter('Button3')}
         onMouseLeave={handleMouseLeave}
       >
@@ -85,7 +85,7 @@ const Toolbar : React.FC = () => {
       </Link>
       <Link
         style={toolbarButtonStyle('Button4')}
-        to="Page4"
+        to="main-feed"
         onMouseEnter={() => handleMouseEnter('Button4')}
         onMouseLeave={handleMouseLeave}
       >

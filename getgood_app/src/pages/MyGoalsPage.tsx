@@ -1,21 +1,26 @@
 import Goal from "../components/Goal";
 
+const pageContentStyle: React.CSSProperties = {
+  backgroundColor: 'lightyellow',
+  width: '95%',
+  height: '100vh',
+  // padding: '20px',
+  textAlign: 'center',
+  // make the items in div vertially align
+  display: 'flex',
+  alignItems:'center',
+  justifyContent: 'space-evenly',
+  flexDirection: 'column',
+  position: 'fixed',
+  marginLeft: '5vw',
+  zIndex: '0',    
+};
 
 
 
 function MyGoalsPage() {
   return (
-    <div
-    style={{ 
-      width: '100vw', 
-      height: '100vh', 
-      backgroundColor: 'lightblue', 
-      display: 'flex', 
-      alignItems: 'center', 
-      marginLeft: '5%',
-      marginRight: '5%',
-      justifyContent: 'space-evenly'
-    }}>
+    <div style={pageContentStyle}>
       <Goal />
       <Goal />
       <Goal />

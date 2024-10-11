@@ -18,25 +18,34 @@ const Login = () => {
     }
 
     return (
-        <>
-            <Container maxWidth="xs">
-                <Box sx={{
-                    mt: 20,
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center"
-                }}
-                >
-                    <Typography variant="h5">Login</Typography>
-                    <TextField
-                        margin="normal"
-                        required
-                        fullWidth
-                        id="username"
-                        label="Username"
-                        name="username"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
+        <div
+        style={{
+            height: "100vh",
+            width: "100vw",  
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: "lightblue",
+            paddingBottom: "10%"
+        }}
+        >
+            <Box sx={{
+                mt: 20,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center"
+            }}
+            >
+                <Typography variant="h5">Login</Typography>
+                <TextField
+                    margin="normal"
+                    required
+                    fullWidth
+                    id="username"
+                    label="Username"
+                    name="username"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
                     />
 
                     <TextField
@@ -63,9 +72,8 @@ const Login = () => {
                     </Link>
                     <Link to="SignUp">Sign Up</Link>
                 </Box>
-            </Container>
-        </>
-    )
-}
-
-export default Login
+            </div>
+        )
+    }
+    
+    export default Login

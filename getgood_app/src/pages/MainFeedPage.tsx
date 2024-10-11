@@ -158,7 +158,8 @@ const MainFeedPage : React.FC = () => {
           display: "flex",
           flexDirection: "row", 
           justifyContent: "space-between",
-          width: "50%"
+          width: "50%",
+          marginTop: "2%"
         }}>
           <button 
             style={submitPostButtonStyle}

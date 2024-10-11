@@ -134,7 +134,8 @@ const CreateGoalPage = () => {
     flexDirection: 'column',
     position: 'fixed',
     marginLeft: '5vw',
-    zIndex: '0',    
+    zIndex: '0', 
+    overflowY: 'auto'   
   };
 
   return (

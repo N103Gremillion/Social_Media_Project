@@ -16,7 +16,7 @@ const Toolbar : React.FC = () => {
 
   const divStyle : React.CSSProperties = {
     backgroundColor: 'skyblue',
-    width: '5%',
+    width: '7%',
     height: '100vh',
     padding: '20px',
     borderRadius: '10px',
@@ -65,7 +65,7 @@ const Toolbar : React.FC = () => {
         onMouseEnter={() => handleMouseEnter('Button1')}
         onMouseLeave={handleMouseLeave}
       >
-        Button 1
+        My Goals
       </Link>
       <Link
         style={toolbarButtonStyle('Button2')}
@@ -73,7 +73,7 @@ const Toolbar : React.FC = () => {
         onMouseEnter={() => handleMouseEnter('Button2')}
         onMouseLeave={handleMouseLeave}
       >
-        Button 2
+        Create Goal
       </Link>
       <Link
         style={toolbarButtonStyle('Button3')} 
@@ -81,7 +81,7 @@ const Toolbar : React.FC = () => {
         onMouseEnter={() => handleMouseEnter('Button3')}
         onMouseLeave={handleMouseLeave}
       >
-        Button 3
+        Account Manager
       </Link>
       <Link
         style={toolbarButtonStyle('Button4')}
@@ -89,7 +89,7 @@ const Toolbar : React.FC = () => {
         onMouseEnter={() => handleMouseEnter('Button4')}
         onMouseLeave={handleMouseLeave}
       >
-        Button 4
+        Main Feed
       </Link>
       <Link
         style={toolbarButtonStyle('Button5')} 

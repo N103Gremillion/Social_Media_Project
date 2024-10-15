@@ -76,7 +76,6 @@ const MainFeedPage : React.FC = () => {
     backgroundColor: 'lightyellow',
     width: '100%',
     height: '100vh',
-    padding: '20px',
     textAlign: 'center',
     // make the items in div vertially align
     display: 'flex',
@@ -84,8 +83,8 @@ const MainFeedPage : React.FC = () => {
     justifyContent: 'space-evenly',
     flexDirection: 'column',
     position: 'fixed',
-    marginLeft: '5%',
-    zIndex: '-1'
+    marginLeft: '5vw',
+    zIndex: '0'
   };
 
   const addPostButtonStyle : React.CSSProperties = {
@@ -105,6 +104,7 @@ const MainFeedPage : React.FC = () => {
     flexDirection: 'column',
     justifyContent: 'space',
     height: '100vh',
+    width: '98vw',
     margin: '3%',
     padding: '3%',
     border: '2px solid blue' 
@@ -129,7 +129,7 @@ const MainFeedPage : React.FC = () => {
 
   const submitPostButtonStyle : React.CSSProperties ={
     width: '20vw'
-  }
+  }// Aligns elements vertically
 
   const closePostButtonStyle : React.CSSProperties = {
     width: '20vw'
@@ -183,7 +183,13 @@ const MainFeedPage : React.FC = () => {
           onChange={handlePostMainTextChange}
         />
 
-        <div className="postPromptButtonContainer">
+        <div className="postPromptButtonContainer" style={{
+          display: "flex",
+          flexDirection: "row", 
+          justifyContent: "space-between",
+          width: "50%",
+          marginTop: "2%"
+        }}>
           <button 
             style={submitPostButtonStyle}
             onClick={submitPost} 

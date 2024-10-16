@@ -1,7 +1,6 @@
 import {
     Box,
     Button,
-    Container,
     TextField,
     Typography,
 } from "@mui/material";
@@ -25,7 +24,6 @@ const SignUp = () => {
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            backgroundColor: "lightblue", 
             paddingBottom: "10%"
         }}
         >

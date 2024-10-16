@@ -1,5 +1,4 @@
 import {
-    Container,
     Box,
     Typography,
     TextField,
@@ -10,11 +9,11 @@ import {Link} from "react-router-dom"
 
 
 const Login = () => {
-    const [username, setUsername] = useState("");
+    const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
     const handleLogin = () => {
-        // alert(username + " " + password)
+        // alert(email + " " + password)
     }
 
     return (
@@ -25,7 +24,6 @@ const Login = () => {
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            backgroundColor: "lightblue",
             paddingBottom: "10%"
         }}
         >
@@ -41,11 +39,11 @@ const Login = () => {
                     margin="normal"
                     required
                     fullWidth
-                    id="username"
-                    label="Username"
-                    name="username"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
+                    id="email"
+                    label="Email"
+                    name="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     />
 
                     <TextField

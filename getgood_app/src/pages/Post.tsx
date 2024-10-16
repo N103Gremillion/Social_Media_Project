@@ -12,7 +12,6 @@ const Post : React.FC<{title : string; content : string; author : string, date :
     backgroundColor: 'white',
     boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
     maxWidth: '800px',
-    paddingRight: '10%'
   }
 
   const titleStyle = {
@@ -25,9 +24,10 @@ const Post : React.FC<{title : string; content : string; author : string, date :
   const contentStyle = {
     fontSize: '1rem',
     margin: '8px',
-    textOverflow: 'ellipsis',
     overflow: 'hidden',
-    lineHeight: '1.6'
+    whiteSpace: 'normal',
+    lineHeight: '1.6',
+    wordWrap: "break-word"
   };
 
   const footerStyle = {

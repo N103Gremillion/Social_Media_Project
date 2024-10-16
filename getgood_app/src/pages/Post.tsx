@@ -1,30 +1,33 @@
+import { fontWeight, lineHeight } from "@mui/system";
 import React from "react";
 
-const Post : React.FC<{title : string; content : string; author : string, date : string}>  = ({title, content, author, date}) => {
+const Post : React.FC<{title : string; content : string; author : string, date : string, imagePath: string}>  = ({title, content, author, date, imagePath}) => {
   
   const postStyle = {
     border: '1px solid black',
-    borderRadius: '5px',
-    padding: '16px',
-    marginTop: '16px',
-    marginBottom: '16px',
-    marginLeft: '5%',
-    // this create a shadw effect around the element
-    boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
+    borderRadius: '10px',
+    padding: '20px',
+    margin: '20px auto',
+    width: '80%',
+    backgroundColor: 'white',
+    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+    maxWidth: '800px',
+    paddingRight: '10%'
   }
 
   const titleStyle = {
-    fontSize: '1.5rem',
-    margin: '8px',
-    textOverflow: 'ellipsis',
-    overflow: 'hidden'
+    fontSize: '2rem',
+    fontWeight: 'bold',
+    marginBottom: '10px',
+    color: '#333'
   };
 
   const contentStyle = {
     fontSize: '1rem',
     margin: '8px',
     textOverflow: 'ellipsis',
-    overflow: 'hidden'
+    overflow: 'hidden',
+    lineHeight: '1.6'
   };
 
   const footerStyle = {
@@ -36,12 +39,37 @@ const Post : React.FC<{title : string; content : string; author : string, date :
     overflow: 'hidden'
   };
 
+  const postImageStyle = {
+    maxWidth: '70%',
+    height: 'auto',
+    borderRadius: '8px',
+    marginBottom: '20px',
+  };
+
+  const buttonStyle = {
+    padding: '8px 16px',
+    backgroundColor: '#007BFF',
+    color: 'white',
+    border: 'none',
+    borderRadius: '5px',
+    cursor: 'pointer',
+    fontSize: '0.9rem',
+    transition: 'background-color 0.2s',
+  };
+
   return (
     <div style={postStyle}>
       <h2 style={titleStyle}>{title}</h2>
+      <div/>
       <div 
+      style={contentStyle}
       // replace all \n with appropriate <br /> (new line)
       dangerouslySetInnerHTML={{ __html: content.replace(/\n/g, '<br />') }} 
+      />
+      <img
+        style={postImageStyle}
+        src={imagePath}
+        alt="post image"
       />
       <div style={footerStyle}>
         <span>By: {author}</span>
@@ -49,7 +77,11 @@ const Post : React.FC<{title : string; content : string; author : string, date :
       </div>
       <div>
         {/* like and comment buttons */}
-        <button onClick={() => console.log('Liked!')}>Like</button>
+        <button 
+          style={buttonStyle}
+          onClick={() => console.log('Liked!')}>
+          Like
+        </button>
       </div>
     </div>
   );

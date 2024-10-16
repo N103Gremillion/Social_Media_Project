@@ -8,7 +8,8 @@ const MainFeedPage : React.FC = () => {
     title: string;
     content: string;
     author: string;
-    date: string
+    date: string;
+    imagePath: string
   }
 
   const [isPostPromptOpen, setIsPostPromptOpen] = useState(false);
@@ -16,6 +17,7 @@ const MainFeedPage : React.FC = () => {
   const [date, setDate] = useState<string>('');
   const [title, setTitle] = useState<string>('');
   const [content, setContent] = useState<string>('');
+  const [imagePath, setImagePath] = useState<string>('');
   // list of current posts
   const [posts, setPosts] = useState<PostType[]>([]);
 
@@ -29,6 +31,7 @@ const MainFeedPage : React.FC = () => {
     setDate('');
     setTitle('');
     setContent('');
+    setImagePath('');
     setIsPostPromptOpen(false);
     
   };
@@ -58,6 +61,14 @@ const MainFeedPage : React.FC = () => {
     }
   }
 
+  const handleImageChange = (event : ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const imageUrl = URL.createObjectURL(file); 
+      setImagePath(imageUrl); 
+    }
+  }
+
   const submitPost = () => {
     if (title === '' || author === '' || date === '' || content === '') {
       return;
@@ -67,7 +78,7 @@ const MainFeedPage : React.FC = () => {
     // Reformat the date to "day-month-year"
     const formattedDate = `${day}-${month}-${year}`;
 
-    const newPost: PostType = {title, content, author, date: formattedDate};
+    const newPost: PostType = {title, content, author, date: formattedDate, imagePath};
     setPosts([...posts, newPost]);
     closePromptForPost();
   }
@@ -183,6 +194,13 @@ const MainFeedPage : React.FC = () => {
           onChange={handlePostMainTextChange}
         />
 
+        <input
+          type="file"
+          placeholder="image-File"
+          accept="image/png, image/jpeg"
+          onChange={handleImageChange}
+        />
+
         <div className="postPromptButtonContainer" style={{
           display: "flex",
           flexDirection: "row", 
@@ -226,6 +244,7 @@ const MainFeedPage : React.FC = () => {
             content={post.content}
             author={post.author}
             date={post.date}
+            imagePath={post.imagePath}
           />
         ))}
       </div>

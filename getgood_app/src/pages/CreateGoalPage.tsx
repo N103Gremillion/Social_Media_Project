@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import ReactFlow, { addEdge } from 'reactflow';
+import 'reactflow/dist/style.css';
 
 interface Checkpoint {
   checkpointName: string;
@@ -28,6 +30,15 @@ const CreateGoalPage = () => {
     setNewCheckpointName('');
     setNewCheckpointDate('');
   };
+
+  const [checkpointNodes, setCheckpointNodes] = useState([
+    { id: '1', position: { x: 50, y: 20 }, data: { label: 'Start' }, sourcePosition: 'right' },
+    { id: '2', position: { x: 250, y: 20 }, data: { label: 'End' }, sourcePosition: 'right', targetPosition: 'left' }
+  ]);
+
+  const [edges, setEdges] = useState([
+    { id: '1-2', source: '1', target: '2', type: 'straight' }
+  ]);
 
   const addCheckpoint = () => {
     if (newCheckpointName && newCheckpointDate) {
@@ -179,6 +190,9 @@ const CreateGoalPage = () => {
             onChange={(e) => setGoalEndDate(e.target.value)}
             placeholder="YYYY-MM-DD"
           />
+          <div style={{ width: '700px', height: '8vh', overflowX: 'scroll' }}>
+            <ReactFlow nodes={checkpointNodes} edges={edges} panOnDrag={false}/>
+          </div>
         </div>
 
         <div className="checkpoint-display">
@@ -186,6 +200,9 @@ const CreateGoalPage = () => {
           <p>
             Start {combineCheckpoints()} - End
           </p>
+          <div>
+            
+          </div>
         </div>
 
         <div className="checkpoint-form">

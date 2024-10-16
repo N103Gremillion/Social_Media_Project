@@ -3,6 +3,7 @@ import DeleteConfirmationModal from "./DeleteConfirmationModal";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 export interface GoalProps {
+  id: number; 
   name: string; 
   description: string;
   startDate: string;
@@ -10,10 +11,11 @@ export interface GoalProps {
 }
 const Goal: React.FC<GoalProps> = (props) => {
   const {
-    name="Cool Goal", 
-    description="This goal is radical B)", 
-    startDate="04/20/1969",
-    endDate="04/20/2020", 
+    id, 
+    name, 
+    description, 
+    startDate,
+    endDate, 
   } = props; 
 
   const [showModal, setShowModal] = useState(false);

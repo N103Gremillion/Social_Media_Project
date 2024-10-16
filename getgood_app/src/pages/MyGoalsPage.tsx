@@ -24,11 +24,13 @@ const MyGoalsPage: React.FC = () => {
       <h2>My Goals</h2>
       {goals.length > 0 ? (
         goals.map(goal => (
-          <Goal key={goal.id} 
-          name={goal.name} 
-          description={goal.description} 
-          startDate={goal.startDate} 
-          endDate={goal.endDate} />
+          <Goal 
+          key={goal.id}
+          id={goal.id}
+          name={goal.name}
+          description={goal.description}
+          startDate={goal.startDate}
+          endDate={goal.endDate}  />
         ))
       ) : (
         <p>No Goals belonging to USER</p>

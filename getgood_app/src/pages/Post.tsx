@@ -1,8 +1,24 @@
 import { fontWeight, lineHeight } from "@mui/system";
-import React from "react";
+import React, { useState } from "react";
+import likeImage from "../sprites/like.png";
 
 const Post : React.FC<{title : string; content : string; author : string, date : string, imagePath: string}>  = ({title, content, author, date, imagePath}) => {
   
+  const [hoveringLike, setHoveringLike] = useState<boolean>(false);
+  const [likeCounter, setLikeCounter] = useState(0);
+
+  const handleMouseEnterLike = () => {
+    setHoveringLike(true);
+  }
+
+  const handleMouseLeaveLike = () => {
+    setHoveringLike(false);
+  }
+
+  const handleLikeButtonClick = () => {
+    setLikeCounter(likeCounter + 1);
+  }
+
   const postStyle = {
     border: '1px solid black',
     borderRadius: '10px',
@@ -47,14 +63,23 @@ const Post : React.FC<{title : string; content : string; author : string, date :
   };
 
   const buttonStyle = {
-    padding: '8px 16px',
-    backgroundColor: '#007BFF',
-    color: 'white',
-    border: 'none',
-    borderRadius: '5px',
+    padding: '1% 2%',
+    backgroundColor: hoveringLike === true ? '#007BFF' : 'darkBlue',
+    color: hoveringLike === true ? 'black' : 'white',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    border: '1px solid #ccc',
     cursor: 'pointer',
-    fontSize: '0.9rem',
-    transition: 'background-color 0.2s',
+    width: '10%', 
+    borderRadius: '12px',
+    margin: '0 auto', 
+  };
+  
+  const likeImageStyle = {
+    width: '100%', 
+    height: 'auto', 
+    marginRight: '5%', 
   };
 
   return (
@@ -79,9 +104,15 @@ const Post : React.FC<{title : string; content : string; author : string, date :
         {/* like and comment buttons */}
         <button 
           style={buttonStyle}
-          onClick={() => console.log('Liked!')}>
-          Like
+          onMouseEnter={() => handleMouseEnterLike()}
+          onMouseLeave={() => handleMouseLeaveLike()}
+          onClick={() => handleLikeButtonClick()}
+          >
+          <img src={likeImage} alt="LikeButton" 
+            style={likeImageStyle}
+          />
         </button>
+        {likeCounter}
       </div>
     </div>
   );

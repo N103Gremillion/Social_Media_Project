@@ -75,8 +75,8 @@ const MainFeedPage : React.FC = () => {
     }
     
     const [year, month, day] = date.split('-');
-    // Reformat the date to "day-month-year"
-    const formattedDate = `${day}-${month}-${year}`;
+    // Reformat the date to "month-day-year"
+    const formattedDate = `${month}-${day}-${year}`;
 
     const newPost: PostType = {title, content, author, date: formattedDate, imagePath};
     setPosts([...posts, newPost]);

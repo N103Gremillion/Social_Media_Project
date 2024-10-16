@@ -1,31 +1,39 @@
-import Goal from "../components/Goal";
+import React, { useState, useEffect } from 'react'; 
+import Goal, { GoalProps } from "../components/Goal"
 
-const pageContentStyle: React.CSSProperties = {
-  backgroundColor: 'lightyellow',
-  width: '95%',
-  height: '100vh',
-  // padding: '20px',
-  textAlign: 'center',
-  // make the items in div vertially align
-  display: 'flex',
-  alignItems:'center',
-  justifyContent: 'space-evenly',
-  flexDirection: 'column',
-  position: 'fixed',
-  marginLeft: '5vw',
-  zIndex: '0',    
-};
+const MyGoalsPage: React.FC = () => {
+  const [goals, setGoals] = useState<GoalProps[]>([]); 
 
+  const fetchGoals = async () => {
+    const response = await fetch('');   //replace with endpoint
+    const data = await response.json(); 
+    return data.goals; 
+  }
 
+  useEffect(() => {
+    const loadGoals = async() => {
+      const fetchedGoals = await fetchGoals(); 
+      setGoals(fetchedGoals); 
+    }; 
 
-function MyGoalsPage() {
+    loadGoals(); 
+  }, []); 
+
   return (
-    <div style={pageContentStyle}>
-      <Goal />
-      <Goal />
-      <Goal />
+    <div className="my-goals-pg">
+      <h2>My Goals</h2>
+      {goals.length > 0 ? (
+        goals.map(goal => (
+          <Goal key={goal.id} 
+          name={goal.name} 
+          description={goal.description} 
+          startDate={goal.startDate} 
+          endDate={goal.endDate} />
+        ))
+      ) : (
+        <p>No Goals belonging to USER</p>
+      )}
     </div>
-  );
-}
-
-export default MyGoalsPage;
+    );
+  };
+  export default MyGoalsPage;

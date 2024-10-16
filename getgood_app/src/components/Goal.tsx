@@ -2,7 +2,20 @@ import React, { useState } from "react";
 import DeleteConfirmationModal from "./DeleteConfirmationModal";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-function Goal() {
+export interface GoalProps {
+  name: string; 
+  description: string;
+  startDate: string;
+  endDate: string; 
+}
+const Goal: React.FC<GoalProps> = (props) => {
+  const {
+    name="Cool Goal", 
+    description="This goal is radical B)", 
+    startDate="04/20/1969",
+    endDate="04/20/2020", 
+  } = props; 
+
   const [showModal, setShowModal] = useState(false);
 
   // Show modal
@@ -23,10 +36,14 @@ function Goal() {
   return (
     <>
       <div className="card">
-        <div className="card-header">Goal</div>
+        <div className="card-header">{name}</div>
         <div className="card-body">
-          <h5 className="card-title">Some descriptor of the goal.</h5>
-          <p className="card-text">Even more descriptions of goal.</p>
+          <h5 className="card-title">{description}</h5>
+          <p className="card-text">{startDate}</p>
+          <p className="card-text">{endDate}</p>
+          <a href="#" className="btn btn-primary">
+            Manage
+          </a>
           <a href="#" className="btn btn-primary">
             Edit
           </a>

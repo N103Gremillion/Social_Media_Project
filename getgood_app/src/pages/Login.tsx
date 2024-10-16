@@ -25,7 +25,6 @@ const Login = () => {
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            backgroundColor: "lightblue",
             paddingBottom: "10%"
         }}
         >

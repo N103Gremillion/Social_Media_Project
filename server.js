@@ -3,11 +3,24 @@ const mysql = require('mysql2');
 const multer = require('multer');
 const path = require('path');
 const cors = require('cors');
+const bodyParser = require('body-parser');
+const router = require('./routes/router');
+
 const app = express();
 
-app.use(cors());
-app.use(express.json());
-const port = 3231;
+app.use(bodyParser.json)
+app.use(bodyParser.urlencoded({extended:false}))
+
+const corsOptions = {
+	origin: '*',
+	credentials: true,
+	optionSuccessStatus: 200
+}
+
+app.use(cors(corsOptions));
+app.use('/', router);
+
+const port = 4000;
 
 
 const storage = multer.diskStorage({
@@ -28,21 +41,21 @@ const pool = mysql.createPool({
 	database: 'csc403'
 });
 
-app.get('/getProfilePicture', (req,res) => {
-	const userId = req.query.userId;
+// app.get('/getProfilePicture', (req,res) => {
+// 	const userId = req.query.userId;
 
-	const getImagePathQuery = 'select image_path from user_images where user_id = ?';
+// 	const getImagePathQuery = 'select image_path from user_images where user_id = ?';
 
-	pool.query(getImagePathQuery, [userId], (err, results) => {
-		if (err) {
-			return res.status(500).json({ error: err.message });
-		}
-	const imagePath = results[0].image_path;
+// 	pool.query(getImagePathQuery, [userId], (err, results) => {
+// 		if (err) {
+// 			return res.status(500).json({ error: err.message });
+// 		}
+// 	const imagePath = results[0].image_path;
 
-	// send file located at image path
-	res.sendFile(path.resolve(__dirname, imagePath));
-	});
-});
+// 	// send file located at image path
+// 	res.sendFile(path.resolve(__dirname, imagePath));
+// 	});
+// });
 
 app.get('/getUserGoals', (req,res) => {
 	const  userId  = req.query.userId;
@@ -201,5 +214,5 @@ function addGoalCheckpointConnection(checkpointId,goalId,query,req,res) {
 
 
 app.listen(port, () => {
-	console.log('server is running');
+	console.log('server is running on port ${port}');
 });

@@ -7,7 +7,7 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
-const port = 3231;
+const port = 3306;			// 3231, etc. 
 
 
 const storage = multer.diskStorage({

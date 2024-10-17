@@ -5,7 +5,7 @@ const MyGoalsPage: React.FC = () => {
   const [goals, setGoals] = useState<GoalProps[]>([]); 
 
   const fetchGoals = async () => {
-    const response = await fetch('');   //replace with endpoint
+    const response = await fetch('/getUserGoals');   //replace with endpoint
     const data = await response.json(); 
     return data.goals; 
   }

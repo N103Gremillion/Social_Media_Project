@@ -59,6 +59,10 @@ router.get('/getUserGoals', (req,res) => {
 router.post('/addUser', (req,res) => {
 	const { name, email, password } = req.body;
 
+	console.log('Username: ', name);
+	console.log('Email: ', email);
+	console.log('Password: ', password);
+
 	const addUserCommand = 'insert into users (name,email,password) values (?,?,?)';
 
 	pool.query(addUserCommand, [name, email, password], (error,results) => {

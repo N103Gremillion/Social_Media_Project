@@ -4,23 +4,13 @@ import {
     TextField,
     Typography,
 } from "@mui/material";
-import {useState, useEffect} from "react";
+import {useState} from "react";
 import {Link} from "react-router-dom"
 
 const SignUp = () => {
-    const [username, setUsername] = useState("");
+    const [name, setUsername] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-
-    // useEffect(() => {
-    //     fetch("/addUser", {
-    //         method: "POST",
-    //         headers: {
-    //             'Content-type': "application/json"
-    //         },
-    //         body: JSON.stringify({username, email, password})
-    //         })
-    //     })
 
     const handleSignUp = () => {
         fetch("/addUser", {
@@ -28,7 +18,7 @@ const SignUp = () => {
             headers: {
                 'Content-type': "application/json"
             },
-            body: JSON.stringify({username, email, password})
+            body: JSON.stringify({name, email, password})
             })
     }
 
@@ -59,7 +49,7 @@ const SignUp = () => {
                     id="username"
                     name="username"
                     label="Username"
-                    value={username}
+                    value={name}
                     onChange={(e) => setUsername(e.target.value)}
                 />
 
@@ -71,7 +61,7 @@ const SignUp = () => {
                     name="email"
                     label="Email Address"
                     value={email}
-                    onChange={(e) => setEmail(e. target.value)}
+                    onChange={(e) => setEmail(e.target.value)}
                 />
 
                 <TextField

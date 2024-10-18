@@ -4,7 +4,7 @@ import {
     TextField,
     Typography,
 } from "@mui/material";
-import {useState} from "react";
+import {useState, useEffect} from "react";
 import {Link} from "react-router-dom"
 
 const SignUp = () => {
@@ -12,8 +12,24 @@ const SignUp = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
+    // useEffect(() => {
+    //     fetch("/addUser", {
+    //         method: "POST",
+    //         headers: {
+    //             'Content-type': "application/json"
+    //         },
+    //         body: JSON.stringify({username, email, password})
+    //         })
+    //     })
+
     const handleSignUp = () => {
-        alert(username + " " + email + " " + password)
+        fetch("/addUser", {
+            method: "POST",
+            headers: {
+                'Content-type': "application/json"
+            },
+            body: JSON.stringify({username, email, password})
+            })
     }
 
     return (

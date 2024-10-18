@@ -46,4 +46,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+<<<<<<< HEAD
 >>>>>>> myGoals
+=======
+>>>>>>> backend

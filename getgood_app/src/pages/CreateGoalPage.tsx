@@ -1,10 +1,30 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import ReactFlow, { addEdge } from 'reactflow';
 import 'reactflow/dist/style.css';
 
-interface Checkpoint {
-  checkpointName: string;
-  checkpointDate: string;
+interface Position {
+  x: number;
+  y: number;
+}
+
+interface NodeData {
+  label: string;
+}
+
+interface Node {
+  id: string;
+  position: Position;
+  data: NodeData;
+  sourcePosition: string;
+  targetPosition: string;
+  date: string;
+}
+
+interface Edge {
+  id: string;
+  source: string;
+  target: string;
+  type: string;
 }
 
 const CreateGoalPage = () => {
@@ -13,7 +33,7 @@ const CreateGoalPage = () => {
   const [goalDescription, setGoalDescription] = useState<string>('');
   const [goalStartDate, setGoalStartDate] = useState<string>('');
   const [goalEndDate, setGoalEndDate] = useState<string>('');
-  const [checkpoints, setCheckpoints] = useState<Checkpoint[]>([]);
+  const [checkpoints, setCheckpoints] = useState<any>([]);
   const [newCheckpointName, setNewCheckpointName] = useState<string>('');
   const [newCheckpointDate, setNewCheckpointDate] = useState<string>('');
 
@@ -31,38 +51,102 @@ const CreateGoalPage = () => {
     setNewCheckpointDate('');
   };
 
-  const [checkpointNodes, setCheckpointNodes] = useState([
-    { id: '1', position: { x: 50, y: 20 }, data: { label: 'Start' }, sourcePosition: 'right' },
-    { id: '2', position: { x: 250, y: 20 }, data: { label: 'End' }, sourcePosition: 'right', targetPosition: 'left' }
+  let [nodes, setNodes] = useState<any>([
+    { id: '1', position: { x: 50, y: 20 }, data: { label: 'Start' }, sourcePosition: 'right', targetPosition: 'left', date: "01-01-1500" },
+    { id: '2', position: { x: 250, y: 20 }, data: { label: 'End' }, sourcePosition: 'right', targetPosition: 'left', date: '01-01-9999' }
   ]);
 
-  const [edges, setEdges] = useState([
+  const [edges, setEdges] = useState<Edge[]>([
     { id: '1-2', source: '1', target: '2', type: 'straight' }
   ]);
 
-  const addCheckpoint = () => {
-    if (newCheckpointName && newCheckpointDate) {
-  
-      const newCheckpoint: Checkpoint = {
-        checkpointName: newCheckpointName,
-        checkpointDate: newCheckpointDate
-      }
-
-      // sort new checkpoint based on date
-      const updatedCheckpoints = [...checkpoints, newCheckpoint].sort((a,b) => {
-        const date1 = new Date(a.checkpointDate).getTime();
-        const date2 = new Date(b.checkpointDate).getTime();
-
-        if (date1<date2) {
-          return -1;
-        }
-        return 1;
-      });
-
-      setCheckpoints(updatedCheckpoints);
-      clearCheckpointFields();
+  const updateCheckpointIDs = (oldCheckpoints: Node[]) => {
+    const newCheckpoints: Node[] = Array.from(oldCheckpoints);
+    for (let i=0; i<oldCheckpoints.length; i++) {
+      newCheckpoints[i].id = `${i+1}`;
     }
+    return newCheckpoints;
   };
+
+  const updateCheckpointPositions = (nodes: any[]) => {
+    const newNodes: any[] = Array.from(nodes);
+    for (let i=0; i<newNodes.length; i++) {
+      newNodes[i].position.x = 50 + 200*i;
+    }
+    return newNodes;
+  }
+
+  const updateEdges = (checkpoints: Node[]) => {
+    const newEdges: Edge[] = [];
+
+    for (let i=0; i<checkpoints.length-1;i++) {
+
+      let start: Node = checkpoints[i];
+      let end: Node = checkpoints[i+1];
+
+      const newEdge = {
+        id: `${start.id}-${end.id}`,
+        source: `${start.id}`,
+        target: `${end.id}`,
+        type: 'straight'
+      }
+      newEdges.push(newEdge);
+    }
+    return newEdges;
+  }
+
+  const printEdges =  (edges: Edge[]) => {
+    console.log("printing edges");
+    for (let i=0;i<edges.length;i++) {
+      console.log(`id: ${edges[i].id} source: ${edges[i].source} target: ${edges[i].target}`);
+    }
+    console.log();
+  };
+
+  const addCheckpointNode = () => {
+    if (!newCheckpointDate || !newCheckpointName) {
+      return;
+    }
+
+    let length = nodes.length;
+    let lastNode = nodes[length - 1]; // Get the last node
+
+    // Create a new checkpoint node
+    const newNode = {
+      id: (length + 1).toString(), // Generate a new unique id
+      position: { x: lastNode.position.x + 200, y: lastNode.position.y }, // Position it based on the last node
+      data: { label: newCheckpointName },
+      sourcePosition: 'right',
+      targetPosition: 'left',
+      date: newCheckpointDate
+    };
+
+    // Append the new node to the existing array
+    setNodes((nodes: any) => [...nodes, newNode]);
+    sortnodes();
+    setNodes((nodes: any) => updateCheckpointIDs(nodes));
+    setNodes((nodes: any) => updateCheckpointPositions(nodes));
+    
+    clearCheckpointFields();
+    
+    
+  };
+
+  useEffect(() => {
+    setEdges(updateEdges(nodes));
+  }, [nodes]);
+
+  const printNodes = () => {
+    console.log("printing nodes")
+    for (let i=0; i<nodes.length;i++) {
+      console.log(`id: ${nodes[i].id}  name: ${nodes[i].data.label}`);
+    }
+    console.log('\n');
+  }
+
+  const sortnodes = () => {
+    setNodes((nodes: any) => [...nodes].sort((a,b) => new Date(a.date).getTime() - new Date(b.date).getTime()));
+  }
 
   const createGoal = async () => {
     const goalInfo = {
@@ -149,6 +233,7 @@ const CreateGoalPage = () => {
     overflowY: 'auto'   
   };
 
+
   return (
     <div className="CreateGoal" style={CreatGoalPageStyle}>
       <h1>Create A Goal</h1>
@@ -178,20 +263,20 @@ const CreateGoalPage = () => {
           <h3>Length:</h3> 
           <p>From</p>
           <input
-            type="text"
+            type="date"
             value={goalStartDate}
             onChange={(e) => setGoalStartDate(e.target.value)}
             placeholder="YYYY-MM-DD"
           />
           <p>to</p>
           <input
-            type="text"
+            type="date"
             value={goalEndDate}
             onChange={(e) => setGoalEndDate(e.target.value)}
             placeholder="YYYY-MM-DD"
           />
-          <div style={{ width: '700px', height: '8vh', overflowX: 'scroll' }}>
-            <ReactFlow nodes={checkpointNodes} edges={edges} panOnDrag={false}/>
+          <div style={{ width: '1000px', height: '12vh', overflowX: 'scroll' }}>
+            <ReactFlow nodes={nodes} edges={edges} panOnDrag={false}/>
           </div>
         </div>
 
@@ -214,12 +299,12 @@ const CreateGoalPage = () => {
             placeholder="Checkpoint Name"
           />
           <input
-            type="text"
+            type="date"
             value={newCheckpointDate}
             onChange={(e) => setNewCheckpointDate(e.target.value)}
             placeholder="YYYY MM DD"
           />
-          <p><button onClick={addCheckpoint}>Add Checkpoint</button></p>
+          <p><button onClick={addCheckpointNode}>Add Checkpoint</button></p>
 
           <p><button onClick={createGoal}>Create Goal</button></p>
         </div>

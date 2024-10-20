@@ -1,3 +1,4 @@
+import React from "react";
 import {
     Box,
     Button,
@@ -11,8 +12,16 @@ const SignUp = () => {
     const [name, setUsername] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    
+    const [nameError, setNameError] = useState(" ")
+    const [emailError, setEmailError] = useState(" ")
+    const [passwordError, setPasswordError] = useState(" ")
 
     const handleSignUp = async () => {
+        setNameError(name)
+        setEmailError(email)
+        setPasswordError(password)
+
         try {
             const signupInfo = await fetch("/addUser", {
                 method: "POST",
@@ -25,6 +34,7 @@ const SignUp = () => {
             console.log('Response from server:', result)
         } catch (error) {
             console.error('Error: ', error)
+
         }
     }
 
@@ -55,6 +65,7 @@ const SignUp = () => {
                     id="username"
                     name="username"
                     label="Username"
+                    error = {React.useMemo(() => nameError === "", [nameError])}
                     value={name}
                     onChange={(e) => setUsername(e.target.value)}
                 />
@@ -66,6 +77,7 @@ const SignUp = () => {
                     id="email"
                     name="email"
                     label="Email Address"
+                    error = {React.useMemo(() => emailError === "", [emailError])}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                 />
@@ -78,6 +90,7 @@ const SignUp = () => {
                     name="password"
                     label="Password"
                     type="password"
+                    error = {React.useMemo(() => passwordError === "", [passwordError])}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                 />

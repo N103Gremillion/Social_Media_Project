@@ -3,9 +3,11 @@ import { Link } from 'react-router-dom';
 import Goal, { GoalProps } from "../components/Goal"   
 
 const MyGoalsPage: React.FC = () => {
+    const [userId] = useState<number>(0);   // hardcoded userId for testing
     const [goals, setGoals] = useState<GoalProps[]>([]);    
+
     useEffect(() => {
-      fetch('http://localhost:3231/api/getUserGoals?userId=1', {
+      fetch(`http://localhost:3231/getUserGoals?userId=${userId}`, {
         headers: {
           'Accept' : 'application/json',
         },
@@ -18,7 +20,7 @@ const MyGoalsPage: React.FC = () => {
         .catch((error) => {
           console.error('Fetch error:', error)
         });
-    }, []);
+    }, [userId]);
 
   return (
     <div className="my-goals-pg">
@@ -31,7 +33,8 @@ const MyGoalsPage: React.FC = () => {
           name={goal.name}
           description={goal.description}
           startDate={goal.startDate}
-          endDate={goal.endDate}  />
+          endDate={goal.endDate} 
+          userId = {userId} />
         ))
       ) : (
         <div>

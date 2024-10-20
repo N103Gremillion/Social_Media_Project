@@ -12,14 +12,20 @@ const SignUp = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
-    const handleSignUp = () => {
-        fetch("/addUser", {
-            method: "POST",
-            headers: {
-                'Content-type': "application/json"
-            },
-            body: JSON.stringify({name, email, password})
+    const handleSignUp = async () => {
+        try {
+            const signupInfo = await fetch("/addUser", {
+                method: "POST",
+                headers: {
+                    'Content-type': "application/json"
+                },
+                body: JSON.stringify({name, email, password})
             })
+            const result = await signupInfo.json()
+            console.log('Response from server:', result)
+        } catch (error) {
+            console.error('Error: ', error)
+        }
     }
 
     return (

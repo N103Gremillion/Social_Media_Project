@@ -1,3 +1,4 @@
+import React from "react";
 import {
     Box,
     Typography,
@@ -12,8 +13,12 @@ const Login = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
+    const [emailError, setEmailError] = useState(" ")
+    const [passwordError, setPasswordError] = useState(" ")
+
     const handleLogin = () => {
-        // alert(email + " " + password)
+        setEmailError(email)
+        setPasswordError(password)
     }
 
     return (
@@ -42,6 +47,7 @@ const Login = () => {
                     id="email"
                     label="Email"
                     name="email"
+                    error = {React.useMemo(() => emailError === "", [emailError])}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     />
@@ -54,6 +60,7 @@ const Login = () => {
                         name="password"
                         label="Password"
                         type="password"
+                        error = {React.useMemo(() => passwordError === "", [passwordError])}
                         value={password}
                         onChange={(e) => {
                         setPassword(e.target.value);

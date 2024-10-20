@@ -1,9 +1,10 @@
 import React, { useState } from "react";
+import { useNavigate } from 'react-router-dom'; 
 import DeleteConfirmationModal from "./DeleteConfirmationModal";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 export interface GoalProps {
-  id: number; 
+  id : number
   name: string; 
   description: string;
   startDate: string;
@@ -11,7 +12,6 @@ export interface GoalProps {
 }
 const Goal: React.FC<GoalProps> = (props) => {
   const {
-    id, 
     name, 
     description, 
     startDate,
@@ -19,6 +19,7 @@ const Goal: React.FC<GoalProps> = (props) => {
   } = props; 
 
   const [showModal, setShowModal] = useState(false);
+  const navigate = useNavigate()
 
   // Show modal
   const handleShowModal = () => {
@@ -35,6 +36,13 @@ const Goal: React.FC<GoalProps> = (props) => {
     console.log("Goal deleted");
     setShowModal(false);
   };
+
+  const handleEdit = () => {
+    navigate('/Dashboard/create-goal', {
+      state: { name, description, startDate, endDate }
+    });
+  };
+
   return (
     <>
       <div className="card">
@@ -46,7 +54,7 @@ const Goal: React.FC<GoalProps> = (props) => {
           <a href="#" className="btn btn-primary">
             Manage
           </a>
-          <a href="#" className="btn btn-primary">
+          <a href="#" className="btn btn-primary" onClick={handleEdit}>
             Edit
           </a>
           <a href="#" className="btn btn-primary" onClick={handleShowModal}>

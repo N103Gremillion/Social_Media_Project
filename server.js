@@ -7,7 +7,7 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
-const port = 3306;			// 3231, etc. 
+const port = 3231;			
 
 
 const storage = multer.diskStorage({
@@ -24,8 +24,16 @@ const upload = multer({ storage: storage });
 const pool = mysql.createPool({
 	host: 'localhost',
 	user: 'root',
-	password: 'BarOfChocolateEarPhones',
+	password: 'root',		// BarOfChocolateEarPhones
 	database: 'csc403'
+});
+
+// cors configuration to not block vite dev server
+app.use((req, res, next) => {
+	res.setHeader('Access-Control-Allow-Origin', '*');  // Or restrict to your frontend domain
+	res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+	res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+	next();
 });
 
 app.get('/getProfilePicture', (req,res) => {
@@ -44,7 +52,7 @@ app.get('/getProfilePicture', (req,res) => {
 	});
 });
 
-app.get('/getUserGoals', (req,res) => {
+app.get('/api/getUserGoals', (req,res) => {
 	const  userId  = req.query.userId;
 
 	const getUserGoalsQuery = 'select goals.name, goals.description, goals.start_date, goals.end_date, goals.current_progress from goals join user_goals on goals.id = user_goals.goal_id where user_goals.user_id = ?';
@@ -53,6 +61,7 @@ app.get('/getUserGoals', (req,res) => {
 		if (error) {
 			return res.status(500).json({ error: error.message});
 		}
+		res.setHeader('Content-Type', 'application/json')
 		res.json(results);
 	});
 });

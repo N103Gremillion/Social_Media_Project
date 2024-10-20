@@ -1,23 +1,24 @@
 import React, { useState, useEffect } from 'react'; 
-import Goal, { GoalProps } from "../components/Goal"
+import { Link } from 'react-router-dom'; 
+import Goal, { GoalProps } from "../components/Goal"   
 
 const MyGoalsPage: React.FC = () => {
-  const [goals, setGoals] = useState<GoalProps[]>([]); 
-
-  const fetchGoals = async () => {
-    const response = await fetch('/getUserGoals');   //replace with endpoint
-    const data = await response.json(); 
-    return data.goals; 
-  }
-
-  useEffect(() => {
-    const loadGoals = async() => {
-      const fetchedGoals = await fetchGoals(); 
-      setGoals(fetchedGoals); 
-    }; 
-
-    loadGoals(); 
-  }, []); 
+    const [goals, setGoals] = useState<GoalProps[]>([]);    
+    useEffect(() => {
+      fetch('http://localhost:3231/api/getUserGoals?userId=1', {
+        headers: {
+          'Accept' : 'application/json',
+        },
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          console.log('Parsed data:', data);
+          setGoals(data);
+        })
+        .catch((error) => {
+          console.error('Fetch error:', error)
+        });
+    }, []);
 
   return (
     <div className="my-goals-pg">
@@ -33,9 +34,13 @@ const MyGoalsPage: React.FC = () => {
           endDate={goal.endDate}  />
         ))
       ) : (
-        <p>No Goals belonging to USER</p>
+        <div>
+          <p>Oops! It seems you dont have any goals created yet. Visit the Create Goal page to get started!</p>
+          <Link to="/Dashboard/create-goal">Create a Goal</Link>
+        </div>
       )}
     </div>
     );
   };
+  
   export default MyGoalsPage;

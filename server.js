@@ -20,7 +20,7 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use('/', router);
 
-const port = 3000;
+const port = 3231;
 
 
 // app.get('/getProfilePicture', (req,res) => {

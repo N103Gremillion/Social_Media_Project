@@ -18,16 +18,9 @@ const upload = multer({ storage: storage });
 const pool = mysql.createPool({
 	host: 'localhost',
 	user: 'root',
-	password: 'BarOfChocolateEarPhones',
+	password: 'root',
 	database: 'csc403'
 });
-
-// pool.query('SELECT * FROM users', (err, result, fields) => {
-// 	// if(err) {
-// 	// 	return console.log(err);
-// 	// }
-// 	return console.log(result);
-// })
 
 router.get('/getProfilePicture', (req, res) => {
   const userId = req.query.userId;
@@ -66,39 +59,14 @@ router.get('/getUserGoals', (req,res) => {
 router.post('/addUser', (req,res) => {
 	const { name, email, password } = req.body;
 
-	console.log('Username: ', name);
-	console.log('Email: ', email);
-	console.log('Password: ', password);
+	const addUserCommand = 'insert into users (name,email,password) values (?,?,?)';
 
-	// try {
-	// 	const [result] = pool.query(
-	// 		'INSERT INTO users (name, email, password) VALUES (?, ?, ?)',
-	// 		[name, email, password]
-	// 	);
-	// 	console.log("Command ran");
-
-	// 	res.status(201).json({message: 'User created successfully!',
-	// 		id: result.insertId
-	// 	});
-
-	// } catch (error) {
-	// 	console.error('Error creating user:', error);
-	// 	res.status(500).json({message: 'Error creating user'});
-	// }
-
-	const addUserCommand = {
-		text: 'INSERT INTO users (name,email,password) VALUES (?,?,?)',
-		values: [name, email, password]
-	}
-
-	pool.query(addUserCommand, (error,results) => {
+	pool.query(addUserCommand, [name, email, password], (error,results) => {
 		if (error) {
-			console.log("Error", error);
-			res.status(500).json({message: 'Error creating user'});
+			return res.status(500).json({ error: error.message });
 		}
-		console.log("Works");
 		res.status(201).json({ id: results.insertId });
-	});
+	});	
 });
 
 router.post('/checkForUser', (req,res) => {

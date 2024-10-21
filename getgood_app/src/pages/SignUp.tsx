@@ -12,7 +12,7 @@ const SignUp = () => {
     const [name, setUsername] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    
+
     const [nameError, setNameError] = useState(" ")
     const [emailError, setEmailError] = useState(" ")
     const [passwordError, setPasswordError] = useState(" ")
@@ -23,7 +23,7 @@ const SignUp = () => {
         setPasswordError(password)
 
         try {
-            const signupInfo = await fetch("/addUser", {
+            const signupInfo = await fetch('http://localhost:3231/addUser', {
                 method: "POST",
                 headers: {
                     'Content-type': "application/json"
@@ -34,7 +34,6 @@ const SignUp = () => {
             console.log('Response from server:', result)
         } catch (error) {
             console.error('Error: ', error)
-
         }
     }
 

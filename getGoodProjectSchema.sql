@@ -47,4 +47,3 @@ CREATE TABLE user_images (
     image_path VARCHAR(500),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
-

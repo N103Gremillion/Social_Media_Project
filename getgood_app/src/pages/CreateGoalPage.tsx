@@ -207,15 +207,6 @@ const CreateGoalPage = () => {
     }
   }
 
-  const combineCheckpoints = () => {
-    const checkpointValues = []
-
-    for (let i=0; i<checkpoints.length; i++) {
-      checkpointValues.push( <span key={i}> - {checkpoints[i].checkpointName} </span> );
-    }
-    return checkpointValues;
-  }
-
   const CreatGoalPageStyle: React.CSSProperties = {
     backgroundColor: 'lightyellow',
     width: '95%',
@@ -275,18 +266,11 @@ const CreateGoalPage = () => {
             onChange={(e) => setGoalEndDate(e.target.value)}
             placeholder="YYYY-MM-DD"
           />
-          <div style={{ width: '1000px', height: '12vh', overflowX: 'scroll' }}>
-            <ReactFlow nodes={nodes} edges={edges} panOnDrag={false}/>
-          </div>
-        </div>
-
-        <div className="checkpoint-display">
-          <h2>Checkpoints:</h2>
-          <p>
-            Start {combineCheckpoints()} - End
-          </p>
-          <div>
-            
+          <div className="checkpoint-display" style={{display: 'flex', width: '1000px', justifyContent: 'center', overflowX: 'auto', whiteSpace: 'nowrap'}}>
+            <h2>Checkpoints:</h2>
+            <div style={{height: '12vh' }}>
+              <ReactFlow nodes={nodes} edges={edges} nodesDraggable={false} fitView={true}/>
+            </div>
           </div>
         </div>
 

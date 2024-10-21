@@ -1,7 +1,6 @@
 import React, { useState,useEffect } from 'react';
-import ReactFlow, { addEdge } from 'reactflow';
+import ReactFlow from 'reactflow';
 import AddCheckpointModal from '../components/AddCheckpointModal';
-import { Button } from 'react-bootstrap';
 import 'reactflow/dist/style.css';
 
 interface Position {
@@ -30,7 +29,6 @@ interface Edge {
 }
 
 const CreateGoalPage = () => {
-  const port = 3231;
   const [goalName, setGoalName] = useState<string>('');
   const [goalDescription, setGoalDescription] = useState<string>('');
   const [goalStartDate, setGoalStartDate] = useState<string>('');
@@ -98,14 +96,6 @@ const CreateGoalPage = () => {
     return newEdges;
   }
 
-  const printEdges =  (edges: Edge[]) => {
-    console.log("printing edges");
-    for (let i=0;i<edges.length;i++) {
-      console.log(`id: ${edges[i].id} source: ${edges[i].source} target: ${edges[i].target}`);
-    }
-    console.log();
-  };
-
   const addCheckpointNode = () => {
     if (!newCheckpointDate || !newCheckpointName) {
       return;
@@ -138,14 +128,6 @@ const CreateGoalPage = () => {
   useEffect(() => {
     setEdges(updateEdges(nodes));
   }, [nodes]);
-
-  const printNodes = () => {
-    console.log("printing nodes")
-    for (let i=0; i<nodes.length;i++) {
-      console.log(`id: ${nodes[i].id}  name: ${nodes[i].data.label}`);
-    }
-    console.log('\n');
-  }
 
   const sortnodes = () => {
     setNodes((nodes: any) => [...nodes].sort((a,b) => new Date(a.date).getTime() - new Date(b.date).getTime()));
@@ -182,15 +164,15 @@ const CreateGoalPage = () => {
     setCheckpoints([]);
   }
 
-  const addCheckpointsToDataBase = async (goalId: any) => {
+  const addCheckpointsToDataBase = async (goalId: string) => {
     for (const checkpoint of checkpoints) {
       addCheckpointToDataBase(checkpoint, goalId);
     }
   };
 
-  const addCheckpointToDataBase = async (checkpoint: Checkpoint, goalId: any) => {
-    const name = checkpoint.checkpointName;
-    const date = checkpoint.checkpointDate;
+  const addCheckpointToDataBase = async (checkpoint: any, goalId: string) => {
+    const name = checkpoint.data.label;
+    const date = checkpoint.date;
 
     try {
       const response = await fetch('http://localhost:3231/addCheckpoint', {
@@ -214,9 +196,7 @@ const CreateGoalPage = () => {
     backgroundColor: 'lightyellow',
     width: '95%',
     height: '100vh',
-    // padding: '20px',
     textAlign: 'center',
-    // make the items in div vertially align
     display: 'flex',
     alignItems:'center',
     justifyContent: 'space-evenly',
@@ -226,7 +206,6 @@ const CreateGoalPage = () => {
     zIndex: '0', 
     overflowY: 'auto'   
   };
-
 
   return (
     <div className="CreateGoal" style={CreatGoalPageStyle}>
@@ -289,6 +268,7 @@ const CreateGoalPage = () => {
                   zoomOnDoubleClick={false}
                   zoomOnScroll={false}
                   zoomOnPinch={false}
+                  connectOnClick={false}
                   />
               </div>
             </div>

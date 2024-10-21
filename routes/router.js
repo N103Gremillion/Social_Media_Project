@@ -22,6 +22,13 @@ const pool = mysql.createPool({
 	database: 'csc403'
 });
 
+pool.query('select * from users', (error,results) => {
+	if(error) {
+		return res.status(500).json({ error: error.message });
+	}
+	console.log(results);
+})
+
 router.get('/getProfilePicture', (req, res) => {
   const userId = req.query.userId;
 
@@ -57,6 +64,8 @@ router.get('/getUserGoals', (req,res) => {
 });
 
 router.post('/addUser', (req,res) => {
+	console.log("Adding new user");
+
 	const { name, email, password } = req.body;
 
 	const addUserCommand = 'insert into users (name,email,password) values (?,?,?)';
@@ -67,7 +76,29 @@ router.post('/addUser', (req,res) => {
 		}
 		res.status(201).json({ id: results.insertId });
 	});	
+
+	console.log("New user added");
 });
+
+router.post('/existingUsers', (req, res) => {
+	console.log("Checking for existing user with same email")
+	const {email} = req.body;
+	console.log(email);
+
+	const checkUsers = 'select * from users where email = ?';
+
+	pool.query(checkUsers, [email], (error, results) => {
+		if (error) {
+			return res.status(500).json({ error: error.message });
+		}
+		else if(results.length > 0){
+			return res.status(500).json({error: "User already exists"});
+		}
+		else {
+			return res.status(201).json({ results });
+		}
+	})
+})
 
 router.post('/checkForUser', (req,res) => {
 	const { userName, userPassword } = req.body;

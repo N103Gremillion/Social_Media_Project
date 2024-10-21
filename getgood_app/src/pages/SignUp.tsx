@@ -22,7 +22,28 @@ const SignUp = () => {
         setEmailError(email)
         setPasswordError(password)
 
+        console.log(nameError)
+        console.log(emailError)
+        console.log(passwordError)
+
         try {
+            console.log("Run existing user")
+            const existingUsers = await fetch ('http://localhost:3231/existingUsers', {
+                method: 'POST',
+                headers: {
+                    'Content-type': "application/json"
+                },
+                body: JSON.stringify({email})
+            })
+
+            const existingResult = await existingUsers.json()
+            console.log('Response from server:', existingResult)
+            console.log(existingUsers.status)
+            if(existingUsers.status > 499) {
+                throw new Error("User already exists")
+            }
+
+            console.log("Creating user")
             const signupInfo = await fetch('http://localhost:3231/addUser', {
                 method: "POST",
                 headers: {
@@ -30,8 +51,9 @@ const SignUp = () => {
                 },
                 body: JSON.stringify({name, email, password})
             })
-            const result = await signupInfo.json()
-            console.log('Response from server:', result)
+
+            const signupResult = await signupInfo.json()
+            console.log('Response from server:', signupResult)
         } catch (error) {
             console.error('Error: ', error)
         }

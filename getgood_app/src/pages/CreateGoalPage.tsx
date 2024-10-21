@@ -1,5 +1,7 @@
 import React, { useState,useEffect } from 'react';
 import ReactFlow, { addEdge } from 'reactflow';
+import AddCheckpointModal from '../components/AddCheckpointModal';
+import { Button } from 'react-bootstrap';
 import 'reactflow/dist/style.css';
 
 interface Position {
@@ -36,6 +38,7 @@ const CreateGoalPage = () => {
   const [checkpoints, setCheckpoints] = useState<any>([]);
   const [newCheckpointName, setNewCheckpointName] = useState<string>('');
   const [newCheckpointDate, setNewCheckpointDate] = useState<string>('');
+  const [isCheckpointModalOpen, setIsCheckpointModalOpen] = useState(false);
 
   const userId = 1;
 
@@ -266,30 +269,46 @@ const CreateGoalPage = () => {
             onChange={(e) => setGoalEndDate(e.target.value)}
             placeholder="YYYY-MM-DD"
           />
-          <div className="checkpoint-display" style={{display: 'flex', width: '1000px', justifyContent: 'center', overflowX: 'auto', whiteSpace: 'nowrap'}}>
+          <div className="checkpoint-display" >
             <h2>Checkpoints:</h2>
-            <div style={{height: '12vh' }}>
-              <ReactFlow nodes={nodes} edges={edges} nodesDraggable={false} fitView={true}/>
+            <div style={{ width: '1000px', overflowX: 'auto'}}>
+              <div 
+                style={{display: 'flex', height: '10vh', 
+                width: `${Math.max(nodes.length * 500, 1000)}px`, 
+                justifyContent: 'center', 
+                whiteSpace: 'nowrap'}}>
+                <ReactFlow 
+                  nodes={nodes} 
+                  edges={edges} 
+                  nodesDraggable={false} 
+                  panOnDrag = {false} 
+                  fitView={true}
+                  elevateNodesOnSelect={false}
+                  elevateEdgesOnSelect={false}
+                  edgesFocusable={false}
+                  zoomOnDoubleClick={false}
+                  zoomOnScroll={false}
+                  zoomOnPinch={false}
+                  />
+              </div>
             </div>
           </div>
         </div>
 
         <div className="checkpoint-form">
-          <h3>Add Checkpoint</h3>
-          <input
-            type="text"
-            value={newCheckpointName}
-            onChange={(e) => setNewCheckpointName(e.target.value)}
-            placeholder="Checkpoint Name"
+          <button onClick={() => setIsCheckpointModalOpen(true)}>Add Checkpoint</button>
+          <AddCheckpointModal
+            isOpen={isCheckpointModalOpen}
+            close={() => {setIsCheckpointModalOpen(false)}}
+            checkpointName={newCheckpointName}
+            setCheckpointName={setNewCheckpointName}
+            checkpointDate={newCheckpointDate}
+            setCheckpointDate={setNewCheckpointDate}
+            addCheckpoint={addCheckpointNode}
           />
-          <input
-            type="date"
-            value={newCheckpointDate}
-            onChange={(e) => setNewCheckpointDate(e.target.value)}
-            placeholder="YYYY MM DD"
-          />
-          <p><button onClick={addCheckpointNode}>Add Checkpoint</button></p>
+        </div>
 
+        <div className='create-goal'>
           <p><button onClick={createGoal}>Create Goal</button></p>
         </div>
 

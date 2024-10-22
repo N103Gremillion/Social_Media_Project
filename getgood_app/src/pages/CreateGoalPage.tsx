@@ -39,6 +39,7 @@ const CreateGoalPage = () => {
   const [isCheckpointModalOpen, setIsCheckpointModalOpen] = useState(false);
 
   const userId = 1;
+  const PORT = 4000;
 
   const clearGoalFields = () => {
     setGoalName('');
@@ -52,10 +53,12 @@ const CreateGoalPage = () => {
     setNewCheckpointDate('');
   };
 
-  let [nodes, setNodes] = useState<any>([
-    { id: '1', position: { x: 50, y: 20 }, data: { label: 'Start' }, sourcePosition: 'right', targetPosition: 'left', date: "01-01-1500" },
-    { id: '2', position: { x: 250, y: 20 }, data: { label: 'End' }, sourcePosition: 'right', targetPosition: 'left', date: '01-01-9999' }
-  ]);
+  let beginningNodes = [
+    { id: '1', position: { x: 50, y: 20 }, data: { label: 'Start' }, sourcePosition: 'right', targetPosition: 'left', date: "01-01-01" },
+    { id: '2', position: { x: 250, y: 20 }, data: { label: 'End' }, sourcePosition: 'right', targetPosition: 'left', date: '01-01-99999' }
+  ];
+
+  let [nodes, setNodes] = useState<any>(beginningNodes);
 
   const [edges, setEdges] = useState<Edge[]>([
     { id: '1-2', source: '1', target: '2', type: 'straight' }
@@ -143,7 +146,7 @@ const CreateGoalPage = () => {
     };
 
     try {
-      const response = await fetch('http://localhost:3231/addGoal', {
+      const response = await fetch(`http://localhost:${PORT}/addGoal`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(goalInfo),
@@ -161,12 +164,12 @@ const CreateGoalPage = () => {
     }
 
     clearGoalFields();
-    setCheckpoints([]);
+    setNodes(beginningNodes);
   }
 
   const addCheckpointsToDataBase = async (goalId: string) => {
-    for (const checkpoint of checkpoints) {
-      addCheckpointToDataBase(checkpoint, goalId);
+    for (let i=1; i<nodes.length-1; i++) {
+      addCheckpointToDataBase(nodes[i], goalId);
     }
   };
 
@@ -175,14 +178,15 @@ const CreateGoalPage = () => {
     const date = checkpoint.date;
 
     try {
-      const response = await fetch('http://localhost:3231/addCheckpoint', {
+      const response = await fetch(`http://localhost:${PORT}/addCheckpoint`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({name, date, goalId}),
       });
 
       if (response.ok) {
-        console.log("success");
+        const result = await response.json();
+        console.log(result);
       }else {
         console.error(response.statusText);
       }

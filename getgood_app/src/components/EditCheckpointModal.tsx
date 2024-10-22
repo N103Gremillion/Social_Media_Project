@@ -4,7 +4,8 @@ import { Modal, Button, Form } from 'react-bootstrap';
 interface AddCheckpointModalProps {
     isOpen: boolean;
     close: () => void;
-    addCheckpoint: () => void;
+    saveChanges: () => void;
+    deleteCheckpoint: () => void;
     checkpointName: string;
     setCheckpointName: (name: string) => void;
     checkpointDate: string;
@@ -15,17 +16,25 @@ interface AddCheckpointModalProps {
 const AddCheckpointModal: React.FC<AddCheckpointModalProps> = ({
     isOpen,
     close,
-    addCheckpoint,
+    saveChanges,
+    deleteCheckpoint,
     checkpointName,
     setCheckpointName,
     checkpointDate,
     setCheckpointDate,
     clearCheckpointFields
   }) => {
-    const handleAddCheckpoint = (e: React.FormEvent) => {
+    const handleSaveChanges = (e: React.FormEvent) => {
         e.preventDefault();
-        addCheckpoint();
+        saveChanges();
         close();
+        
+    };
+    const handeDeleteCheckpoint = (e: React.FormEvent) => {
+        e.preventDefault();
+        deleteCheckpoint();
+        close();
+        
     };
     const handleClose = () => {
         clearCheckpointFields();
@@ -34,7 +43,7 @@ const AddCheckpointModal: React.FC<AddCheckpointModalProps> = ({
     return (
         <Modal show={isOpen} onHide={handleClose}>
             <Modal.Header closeButton>
-                <Modal.Title>Add Checkpoint</Modal.Title>
+                <Modal.Title>Edit Checkpoint</Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <Form>
@@ -59,7 +68,8 @@ const AddCheckpointModal: React.FC<AddCheckpointModalProps> = ({
                 </Form>
             </Modal.Body>
             <Modal.Footer>
-                <Button variant="primary" onClick={handleAddCheckpoint}>Add Checkpoint</Button>
+                <Button variant="primary" onClick={handleSaveChanges}>Save Changes</Button>
+                <Button variant="danger" onClick={handeDeleteCheckpoint}>Delete</Button>
             </Modal.Footer>
         </Modal>
     )

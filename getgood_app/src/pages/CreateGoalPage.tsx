@@ -1,32 +1,15 @@
 import React, { useState,useEffect } from 'react';
-import ReactFlow from 'reactflow';
+import ReactFlow, { Edge, Node, Position } from 'reactflow';
 import AddCheckpointModal from '../components/AddCheckpointModal';
+import EditCheckpointModal from '../components/EditCheckpointModal';
 import 'reactflow/dist/style.css';
-
-interface Position {
-  x: number;
-  y: number;
-}
 
 interface NodeData {
   label: string;
+  date: string
 }
 
-interface Node {
-  id: string;
-  position: Position;
-  data: NodeData;
-  sourcePosition: string;
-  targetPosition: string;
-  date: string;
-}
-
-interface Edge {
-  id: string;
-  source: string;
-  target: string;
-  type: string;
-}
+interface Checkpoint extends Node<NodeData> {}
 
 const CreateGoalPage = () => {
   const [goalName, setGoalName] = useState<string>('');
@@ -37,6 +20,8 @@ const CreateGoalPage = () => {
   const [newCheckpointName, setNewCheckpointName] = useState<string>('');
   const [newCheckpointDate, setNewCheckpointDate] = useState<string>('');
   const [isCheckpointModalOpen, setIsCheckpointModalOpen] = useState(false);
+  const [isEditCheckpointModalOpen, setIsEditCheckpointModalOpen] = useState(false);
+  let [currentCheckpoint, setcurrentCheckpoint] = useState<Node>();
 
   const userId = 1;
   const PORT = 4000;
@@ -53,12 +38,12 @@ const CreateGoalPage = () => {
     setNewCheckpointDate('');
   };
 
-  let beginningNodes = [
-    { id: '1', position: { x: 50, y: 20 }, data: { label: 'Start' }, sourcePosition: 'right', targetPosition: 'left', date: "01-01-01" },
-    { id: '2', position: { x: 250, y: 20 }, data: { label: 'End' }, sourcePosition: 'right', targetPosition: 'left', date: '01-01-99999' }
+  let beginningNodes: Checkpoint[] = [
+    { id: '1', position: { x: 50, y: 20 }, data: { label: 'Start', date: "01-01-01" }, sourcePosition: Position.Right, targetPosition: Position.Left },
+    { id: '2', position: { x: 250, y: 20 }, data: { label: 'End', date: '01-01-99999' }, sourcePosition: Position.Right, targetPosition: Position.Left }
   ];
 
-  let [nodes, setNodes] = useState<any>(beginningNodes);
+  let [nodes, setNodes] = useState<Checkpoint[]>(beginningNodes);
 
   const [edges, setEdges] = useState<Edge[]>([
     { id: '1-2', source: '1', target: '2', type: 'straight' }
@@ -72,8 +57,8 @@ const CreateGoalPage = () => {
     return newCheckpoints;
   };
 
-  const updateCheckpointPositions = (nodes: any[]) => {
-    const newNodes: any[] = Array.from(nodes);
+  const updateCheckpointPositions = (nodes: Node[]) => {
+    const newNodes: Node[] = Array.from(nodes);
     for (let i=0; i<newNodes.length; i++) {
       newNodes[i].position.x = 50 + 200*i;
     }
@@ -111,17 +96,17 @@ const CreateGoalPage = () => {
     const newNode = {
       id: (length + 1).toString(), // Generate a new unique id
       position: { x: lastNode.position.x + 200, y: lastNode.position.y }, // Position it based on the last node
-      data: { label: newCheckpointName },
-      sourcePosition: 'right',
-      targetPosition: 'left',
-      date: newCheckpointDate
+      data: { label: newCheckpointName, date: newCheckpointDate },
+      sourcePosition: Position.Right,
+      targetPosition: Position.Left,
+      
     };
 
     // Append the new node to the existing array
-    setNodes((nodes: any) => [...nodes, newNode]);
+    setNodes((nodes: Node[]) => [...nodes, newNode]);
     sortnodes();
-    setNodes((nodes: any) => updateCheckpointIDs(nodes));
-    setNodes((nodes: any) => updateCheckpointPositions(nodes));
+    setNodes((nodes: Node[]) => updateCheckpointIDs(nodes));
+    setNodes((nodes: Node[]) => updateCheckpointPositions(nodes));
     
     clearCheckpointFields();
     
@@ -133,7 +118,47 @@ const CreateGoalPage = () => {
   }, [nodes]);
 
   const sortnodes = () => {
-    setNodes((nodes: any) => [...nodes].sort((a,b) => new Date(a.date).getTime() - new Date(b.date).getTime()));
+    setNodes((nodes: Node[]) => [...nodes].sort((a,b) => new Date(a.data.date).getTime() - new Date(b.data.date).getTime()));
+  }
+
+  const handeCheckpointClick = (event: React.MouseEvent, node: Node) => {
+    setcurrentCheckpoint(node);
+    setNewCheckpointName(node.data.label);
+    setNewCheckpointDate(node.data.date);
+    setIsEditCheckpointModalOpen(true);
+  }
+
+  const saveCheckpoint = () => {
+    if (currentCheckpoint == null) {
+      console.log("it is null");
+      return;
+    }
+    let replaceIndex = currentCheckpoint.id;
+    let newNode: Node = {...currentCheckpoint};
+    newNode.data.label = newCheckpointName;
+    newNode.data.date = newCheckpointDate;
+
+    const newNodes = nodes.filter(node => node.id == replaceIndex ? newNode : node);
+    setNodes(newNodes);
+    sortnodes();
+    setNodes((nodes: Node[]) => updateCheckpointIDs(nodes));
+    setNodes((nodes: Node[]) => updateCheckpointPositions(nodes));
+  }
+
+  const deleteCheckpoint = () => {
+    if (currentCheckpoint == null) {
+      return;
+    }
+
+    let deleteId = currentCheckpoint.id;
+    const newNodes: Node[] = nodes.filter(node => node.id != deleteId);
+
+    setNodes(newNodes);
+    sortnodes();
+    setNodes((nodes: Node[]) => updateCheckpointIDs(nodes));
+    setNodes((nodes: Node[]) => updateCheckpointPositions(nodes));
+    
+    clearCheckpointFields();
   }
 
   const createGoal = async () => {
@@ -173,9 +198,9 @@ const CreateGoalPage = () => {
     }
   };
 
-  const addCheckpointToDataBase = async (checkpoint: any, goalId: string) => {
+  const addCheckpointToDataBase = async (checkpoint: Node, goalId: string) => {
     const name = checkpoint.data.label;
-    const date = checkpoint.date;
+    const date = checkpoint.data.date;
 
     try {
       const response = await fetch(`http://localhost:${PORT}/addCheckpoint`, {
@@ -273,6 +298,7 @@ const CreateGoalPage = () => {
                   zoomOnScroll={false}
                   zoomOnPinch={false}
                   connectOnClick={false}
+                  onNodeClick={handeCheckpointClick}
                   />
               </div>
             </div>
@@ -289,6 +315,18 @@ const CreateGoalPage = () => {
             checkpointDate={newCheckpointDate}
             setCheckpointDate={setNewCheckpointDate}
             addCheckpoint={addCheckpointNode}
+            clearCheckpointFields={clearCheckpointFields}
+          />
+          <EditCheckpointModal
+            isOpen={isEditCheckpointModalOpen}
+            close={() => {setIsEditCheckpointModalOpen(false)}}
+            checkpointName={newCheckpointName}
+            setCheckpointName={setNewCheckpointName}
+            checkpointDate={newCheckpointDate}
+            setCheckpointDate={setNewCheckpointDate}
+            saveChanges={saveCheckpoint}
+            deleteCheckpoint={deleteCheckpoint}
+            clearCheckpointFields={clearCheckpointFields}
           />
         </div>
 

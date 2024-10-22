@@ -178,4 +178,22 @@ router.post('/decrementLikes', (req,res) => {
 	});
 });
 
+function addGoalUserConnection(userId,goalId,query,req,res) {
+	pool.query(query, [userId, goalId], (error, results) => {
+                if (error) {
+                        return res.status(500).json({error: error.message});
+                }
+                res.status(201).json({ id: goalId});
+        });
+}
+
+function addGoalCheckpointConnection(checkpointId,goalId,query,req,res) {
+        pool.query(query, [goalId, checkpointId], (error, results) => {
+                if (error) {
+                        return res.status(500).json({error: error.message});
+                }
+                res.status(201).json({ id: results.insertId});
+        });
+}
+
 module.exports = router

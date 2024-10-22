@@ -55,7 +55,10 @@ const SignUp = () => {
             const signupResult = await signupInfo.json()
             console.log('Response from server:', signupResult)
         } catch (error) {
-            console.error('Error: ', error)
+            console.error(error)
+            setNameError("")
+            setEmailError("")
+            setPasswordError("")
         }
     }
 

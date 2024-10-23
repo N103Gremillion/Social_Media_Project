@@ -1,5 +1,6 @@
 import React, { ChangeEvent, KeyboardEvent, useState } from "react";
 import Post from "./Post";
+import axios from "axios";
 
 const MainFeedPage : React.FC = () => {
 
@@ -20,6 +21,7 @@ const MainFeedPage : React.FC = () => {
   const [imagePath, setImagePath] = useState<string>('');
   // list of current posts
   const [posts, setPosts] = useState<PostType[]>([]);
+  const BASE_URL : string = 'http://localhost:4000/';
 
   const openPromptForPost = () => {
     setIsPostPromptOpen(true);
@@ -69,7 +71,7 @@ const MainFeedPage : React.FC = () => {
     }
   }
 
-  const submitPost = () => {
+  const submitPost = async () => {
     if (title === '' || author === '' || date === '' || content === '') {
       return;
     }
@@ -79,8 +81,20 @@ const MainFeedPage : React.FC = () => {
     const formattedDate = `${month}-${day}-${year}`;
 
     const newPost: PostType = {title, content, author, date: formattedDate, imagePath};
-    setPosts([...posts, newPost]);
-    closePromptForPost();
+
+    try {
+      const response = axios.post(`${BASE_URL}api/posts`, newPost,{
+      headers: {
+        'Content-Type': 'application/json',
+      }});
+
+      console.log(response);
+      setPosts([...posts, newPost]);
+      closePromptForPost();
+    }
+    catch (err){
+      console.log('Error submitting the post:', err);
+    }
   }
 
   const mainDivStyle : React.CSSProperties = {
@@ -228,15 +242,18 @@ const MainFeedPage : React.FC = () => {
 
   return (
     <div style={mainDivStyle}>
-      <div className="postContainer" id="diplayContainer"
-      style={{
-        width: '80%',
-        marginRight: '20%',
-        overflowY: 'auto',
-        paddingRight: '3%',
-        boxSizing: 'border-box'
-      }}>
-        {/* display all post in the post array */}
+      <div 
+        className="postContainer" 
+        id="displayContainer"
+        style={{
+          width: '80%',
+          marginRight: '20%',
+          overflowY: 'auto',
+          paddingRight: '3%',
+          boxSizing: 'border-box'
+        }}
+      >
+        {/* display all posts in the post array */}
         {posts.map((post, index) => (
           <Post
             key={index}
@@ -249,14 +266,14 @@ const MainFeedPage : React.FC = () => {
         ))}
       </div>
       <button 
-      style={addPostButtonStyle} 
-      className="addPostButton"
-      onClick={openPromptForPost}>
+        style={addPostButtonStyle} 
+        className="addPostButton"
+        onClick={openPromptForPost}
+      >
         + Post
       </button>
-
     </div>
-  );
+  );  
 }
 
 export default MainFeedPage;

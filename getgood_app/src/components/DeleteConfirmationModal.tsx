@@ -1,5 +1,6 @@
 import React from "react";
 import { Button, Modal } from "react-bootstrap";
+import './styles/deleteConfirmationModal.css'
 
 interface DeleteConfirmationModalProps {
   show: boolean;

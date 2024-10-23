@@ -10,6 +10,7 @@ export interface GoalProps {
   startDate: string;
   endDate: string; 
   userId: number; 
+  onRemoveGoal: (goalId: number) => void; 
 }
 const Goal: React.FC<GoalProps> = (props) => {
   const {

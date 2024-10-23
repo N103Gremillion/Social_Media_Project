@@ -1,4 +1,4 @@
-import React, { ChangeEvent, KeyboardEvent, useState } from "react";
+import React, { ChangeEvent, KeyboardEvent, useState, useEffect } from "react";
 import Post from "./Post";
 import axios from "axios";
 
@@ -22,6 +22,19 @@ const MainFeedPage : React.FC = () => {
   // list of current posts
   const [posts, setPosts] = useState<PostType[]>([]);
   const BASE_URL : string = 'http://localhost:4000/';
+
+  // use effect runs on every render (fetch post from backend)
+  useEffect( () => {
+    const fetchPosts = async () => {
+      try {
+        const response = await axios.get(`${BASE_URL}api/posts`);
+        setPosts(response.data);
+      }
+      catch (error) {
+        console.error('Error occured when fetching posts:', error);
+      }
+    }
+  });
 
   const openPromptForPost = () => {
     setIsPostPromptOpen(true);

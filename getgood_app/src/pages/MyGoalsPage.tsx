@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import Goal, { GoalProps } from "../components/Goal"   
 
 const MyGoalsPage: React.FC = () => {
-    const [userId] = useState<number>(0);   // hardcoded userId for testing
+    const [userId] = useState<number>(2);   // hardcoded userId for testing
     const [goals, setGoals] = useState<GoalProps[]>([]);    
 
     useEffect(() => {
@@ -22,6 +22,10 @@ const MyGoalsPage: React.FC = () => {
         });
     }, [userId]);
 
+    const handleRemoveGoal = (goalId: number) => {
+      setGoals(goals.filter((goal) => goal.id !== goalId)); 
+    }
+
   return (
     <div className="my-goals-pg">
       <h2>My Goals</h2>
@@ -34,7 +38,9 @@ const MyGoalsPage: React.FC = () => {
           description={goal.description}
           startDate={goal.startDate}
           endDate={goal.endDate} 
-          userId = {userId} />
+          userId = {userId} 
+          onRemoveGoal={handleRemoveGoal}
+          />
         ))
       ) : (
         <div>

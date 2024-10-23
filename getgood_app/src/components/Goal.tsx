@@ -33,12 +33,15 @@ const Goal: React.FC<GoalProps> = (props) => {
   };
 
   const handleConfirmDelete = () => {
+    console.log("Deleting goalId:", goalId); 
+    console.log("For userId:", userId); 
+    
     fetch("http://localhost:3231/deleteGoal", {
       method: 'POST',
       headers: { 'Content-Type' : 'application/json'},
       body:  JSON.stringify({
-        userId: props.userId,
-        goalId: props.id,
+        userId: userId,
+        goalId: goalId,
       }),
     })
     .then(response => {

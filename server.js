@@ -55,7 +55,7 @@ app.get('/getProfilePicture', (req,res) => {
 app.get('/getUserGoals', (req,res) => {
 	const  userId  = req.query.userId;
 
-	const getUserGoalsQuery = 'select goals.name, goals.description, goals.start_date, goals.end_date, goals.current_progress from goals join user_goals on goals.id = user_goals.goal_id where user_goals.user_id = ?';
+	const getUserGoalsQuery = 'select goals.name, goals.description, goals.start_date, goals.end_date, goals.current_progress, goals.id from goals join user_goals on goals.id = user_goals.goal_id where user_goals.user_id = ?';
 
 	pool.query(getUserGoalsQuery, [userId], (error,results) => {
 		if (error) {
@@ -136,7 +136,6 @@ app.post('/addGoal', (req,res) => {
 app.post('/deleteGoal', (req,res) => {
 	const { userId, goalId } = req.body;
 
-	console.log('Received delete request for userId:', userId, 'and goalId:', goalId);
 
 	const deleteQuery = "delete from goals where id=?";
 	const deleteConnectionQuery = "delete from user_goals where user_id=? and goal_id=?";
@@ -144,14 +143,12 @@ app.post('/deleteGoal', (req,res) => {
 		if (error) {
 			return res.status(500).json({error: error.message});
 		}
-		console.log('Deleted goal with id:', goalId, 'from goals table.');
 	});
 
 	pool.query(deleteConnectionQuery, [userId, goalId], (error, results) => {
 		if (error) {
 			return res.status(500).json({ error: error.message });
 		}
-		console.log('Deleted user-goal connection for userId:', userId, 'and goalId:', goalId);
 		res.status(201).json({ deleted: true });
 	});
 });

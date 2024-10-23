@@ -178,6 +178,31 @@ router.post('/decrementLikes', (req,res) => {
 	});
 });
 
+// for the posts on the mainFeed
+let posts = [];
+
+router.post('/api/posts', (req, res) => {
+  const { title, content, author, date, imagePath } = req.body;
+  const newPost = { title, content, author, date, imagePath, likes: 0 };
+
+	// add post to the sql database
+  const query = 'INSERT INTO mainFeedPosts (title, content, author, date, imagePath, likes) VALUES (?, ?, ?, ?, ?, ?)';
+	
+	pool.query(query, [newPost.title, newPost.content, newPost.author, newPost.date, newPost.imagePath, newPost.likes]) , (error, results) => {
+		
+		if (error){
+			console.error("error when trying to send the post to database:", error);
+			return res.status(500).json({ message: 'Error saving post to database' });
+		}
+
+		newPost.id = results.insertId;
+		posts.push(newPost);
+		res.status(201).json(newPost);
+		console.log(posts);
+
+	}
+});
+
 function addGoalUserConnection(userId,goalId,query,req,res) {
 	pool.query(query, [userId, goalId], (error, results) => {
                 if (error) {

@@ -69,6 +69,24 @@ router.post('/addUser', (req,res) => {
 	});
 });
 
+router.post('/existingUsers', (req, res) => {
+	const {email} = req.body;
+
+	const checkUsers = 'select * from users where email = ?';
+
+	pool.query(checkUsers, [email], (error, results) => {
+		if (error) {
+			return res.status(500).json({ error: error.message });
+		}
+		else if(results.length > 0){
+			return res.status(500).json({error: "User already exists"});
+		}
+		else {
+			return res.status(201).json({ results });
+		}
+	})
+})
+
 router.post('/checkForUser', (req,res) => {
 	const { userName, userPassword } = req.body;
 

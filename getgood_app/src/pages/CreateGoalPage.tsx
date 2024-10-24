@@ -2,6 +2,7 @@ import React, { useState,useEffect } from 'react';
 import ReactFlow, { Edge, Node, Position } from 'reactflow';
 import AddCheckpointModal from '../components/AddCheckpointModal';
 import EditCheckpointModal from '../components/EditCheckpointModal';
+import ErrorModal from '../components/ErrorModal';
 import 'reactflow/dist/style.css';
 
 interface NodeData {
@@ -16,11 +17,12 @@ const CreateGoalPage = () => {
   const [goalDescription, setGoalDescription] = useState<string>('');
   const [goalStartDate, setGoalStartDate] = useState<string>('');
   const [goalEndDate, setGoalEndDate] = useState<string>('');
-  const [checkpoints, setCheckpoints] = useState<any>([]);
   const [newCheckpointName, setNewCheckpointName] = useState<string>('');
   const [newCheckpointDate, setNewCheckpointDate] = useState<string>('');
   const [isCheckpointModalOpen, setIsCheckpointModalOpen] = useState(false);
   const [isEditCheckpointModalOpen, setIsEditCheckpointModalOpen] = useState(false);
+  const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   let [currentCheckpoint, setcurrentCheckpoint] = useState<Node>();
 
   const userId = 1;
@@ -161,7 +163,30 @@ const CreateGoalPage = () => {
     clearCheckpointFields();
   }
 
+  const checkDates = () => {
+    const startDate = new Date(goalStartDate).getTime();
+    const endDate = new Date(goalEndDate).getTime();
+    const firstCheckpointDate = new Date(nodes[1].data.date).getTime();
+    const lastCheckpointDate = new Date(nodes[nodes.length-2].data.date).getTime();
+    let finalState = true;
+
+    if (startDate > endDate) {
+      setErrorMessage("Start date is after final date. Please fix before Submitting.");
+      setIsErrorModalOpen(true);
+      finalState = false;
+    } else if ((firstCheckpointDate > startDate || lastCheckpointDate < endDate) && nodes.length>2) {
+      setErrorMessage("Checkpoint Dates are not within goal time span. Please fix before Submitting.");
+      setIsErrorModalOpen(true);
+      finalState = false;
+    }
+
+    return finalState;
+  }
+
   const createGoal = async () => {
+    if (!checkDates()) {
+      return;
+    }
     const goalInfo = {
       userId,
       goalName,
@@ -327,6 +352,11 @@ const CreateGoalPage = () => {
             saveChanges={saveCheckpoint}
             deleteCheckpoint={deleteCheckpoint}
             clearCheckpointFields={clearCheckpointFields}
+          />
+          <ErrorModal
+            isOpen={isErrorModalOpen}
+            close={() => {setIsErrorModalOpen(false)}}
+            errorMessage={errorMessage}
           />
         </div>
 

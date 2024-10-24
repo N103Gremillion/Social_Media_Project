@@ -247,7 +247,7 @@ const CreateGoalPage = () => {
   }
 
   const CreatGoalPageStyle: React.CSSProperties = {
-    backgroundColor: 'lightyellow',
+    backgroundColor: 'white',
     width: '95%',
     height: '100vh',
     textAlign: 'center',

@@ -24,11 +24,14 @@ const AddCheckpointModal: React.FC<AddCheckpointModalProps> = ({
     setCheckpointDate,
     clearCheckpointFields
   }) => {
+    const style = {
+        backgroundColor: 'black',
+        color: 'white'
+    }
     const handleSaveChanges = (e: React.FormEvent) => {
         e.preventDefault();
         saveChanges();
         close();
-        
     };
     const handeDeleteCheckpoint = (e: React.FormEvent) => {
         e.preventDefault();
@@ -52,6 +55,7 @@ const AddCheckpointModal: React.FC<AddCheckpointModalProps> = ({
                         <Form.Control
                             type="text"
                             value={checkpointName}
+                            style={style}
                             onChange={(e: any) => setCheckpointName(e.target.value)}
                             placeholder="Enter checkpoint name"
                             autoComplete='off'
@@ -61,6 +65,7 @@ const AddCheckpointModal: React.FC<AddCheckpointModalProps> = ({
                         <Form.Label>Checkpoint Date</Form.Label>
                         <Form.Control
                             type="date"
+                            style={style}
                             value={checkpointDate}
                             onChange={(e: any) => setCheckpointDate(e.target.value)}
                         />

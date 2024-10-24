@@ -18,16 +18,9 @@ const upload = multer({ storage: storage });
 const pool = mysql.createPool({
 	host: 'localhost',
 	user: 'root',
-	password: 'root',
+	password: 'BarOfChocolateEarPhones',
 	database: 'csc403'
 });
-
-pool.query('select * from users', (error,results) => {
-	if(error) {
-		return res.status(500).json({ error: error.message });
-	}
-	console.log(results);
-})
 
 router.get('/getProfilePicture', (req, res) => {
   const userId = req.query.userId;
@@ -64,8 +57,6 @@ router.get('/getUserGoals', (req,res) => {
 });
 
 router.post('/addUser', (req,res) => {
-	console.log("Adding new user");
-
 	const { name, email, password } = req.body;
 
 	const addUserCommand = 'insert into users (name,email,password) values (?,?,?)';
@@ -75,15 +66,11 @@ router.post('/addUser', (req,res) => {
 			return res.status(500).json({ error: error.message });
 		}
 		res.status(201).json({ id: results.insertId });
-	});	
-
-	console.log("New user added");
+	});
 });
 
 router.post('/existingUsers', (req, res) => {
-	console.log("Checking for existing user with same email")
 	const {email} = req.body;
-	console.log(email);
 
 	const checkUsers = 'select * from users where email = ?';
 
@@ -208,5 +195,48 @@ router.post('/decrementLikes', (req,res) => {
 	res.status(201).json({ message: "Likes decremented" });
 	});
 });
+
+// for the posts on the mainFeed
+let posts = [];
+
+router.post('/api/posts', (req, res) => {
+  const { title, content, author, date, imagePath } = req.body;
+  const newPost = { title, content, author, date, imagePath, likes: 0 };
+
+	// add post to the sql database
+  const query = 'INSERT INTO mainFeedPosts (title, content, author, date, imagePath, likes) VALUES (?, ?, ?, ?, ?, ?)';
+	
+	pool.query(query, [newPost.title, newPost.content, newPost.author, newPost.date, newPost.imagePath, newPost.likes]) , (error, results) => {
+		
+		if (error){
+			console.error("error when trying to send the post to database:", error);
+			return res.status(500).json({ message: 'Error saving post to database' });
+		}
+
+		newPost.id = results.insertId;
+		posts.push(newPost);
+		res.status(201).json(newPost);
+		console.log(posts);
+
+	}
+});
+
+function addGoalUserConnection(userId,goalId,query,req,res) {
+	pool.query(query, [userId, goalId], (error, results) => {
+                if (error) {
+                        return res.status(500).json({error: error.message});
+                }
+                res.status(201).json({ id: goalId});
+        });
+}
+
+function addGoalCheckpointConnection(checkpointId,goalId,query,req,res) {
+        pool.query(query, [goalId, checkpointId], (error, results) => {
+                if (error) {
+                        return res.status(500).json({error: error.message});
+                }
+                res.status(201).json({ id: results.insertId});
+        });
+}
 
 module.exports = router

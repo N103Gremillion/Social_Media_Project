@@ -47,3 +47,13 @@ CREATE TABLE user_images (
     image_path VARCHAR(500),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
+
+CREATE TABLE mainFeedPosts (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    content TEXT NOT NULL,
+    author VARCHAR(100) NOT NULL,
+    date DATE NOT NULL,
+    imagePath VARCHAR(255),
+    likes INT DEFAULT 0 
+)

@@ -199,14 +199,49 @@ router.post('/decrementLikes', (req,res) => {
 // for the posts on the mainFeed
 let posts = [];
 
+router.get('/api/posts', (req, res) => {
+
+	const query = `
+	SELECT 
+		title,
+		content,
+		author,
+		DATE_FORMAT(date, '%d-%m-%Y') AS formatted_date,
+		imagePath,
+		likes
+	FROM
+		mainFeedPosts;
+	`;
+
+	pool.query(query, (error, results) => {
+		if (error){
+			console.error("error fetching the posts form database", error);
+			return res.status(500).json();
+		}
+		
+		// add all elements in the table to the posts[]
+		const formattedPosts = results.map(post => ({
+			id: post.id,
+			title: post.title,
+			content: post.content,
+			author: post.author,
+			date: post.formatted_date,
+			imagePath: post.imagePath,
+			likes: post.likes,
+		}));
+
+		res.status(200).json(formattedPosts);
+	});
+});
+
 router.post('/api/posts', (req, res) => {
   const { title, content, author, date, imagePath } = req.body;
   const newPost = { title, content, author, date, imagePath, likes: 0 };
-
+	
 	// add post to the sql database
   const query = 'INSERT INTO mainFeedPosts (title, content, author, date, imagePath, likes) VALUES (?, ?, ?, ?, ?, ?)';
 	
-	pool.query(query, [newPost.title, newPost.content, newPost.author, newPost.date, newPost.imagePath, newPost.likes]) , (error, results) => {
+	pool.query(query, [newPost.title, newPost.content, newPost.author, newPost.date, newPost.imagePath, newPost.likes], (error, results) => {
 		
 		if (error){
 			console.error("error when trying to send the post to database:", error);
@@ -216,9 +251,8 @@ router.post('/api/posts', (req, res) => {
 		newPost.id = results.insertId;
 		posts.push(newPost);
 		res.status(201).json(newPost);
-		console.log(posts);
 
-	}
+	});
 });
 
 function addGoalUserConnection(userId,goalId,query,req,res) {

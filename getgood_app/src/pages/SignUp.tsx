@@ -1,4 +1,3 @@
-import React from "react";
 import {
     Box,
     Button,
@@ -9,26 +8,47 @@ import {useState} from "react";
 import {Link} from "react-router-dom"
 
 const SignUp = () => {
+    //Variables to keep track of information from the user
     const [name, setUsername] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
-    const [nameError, setNameError] = useState(" ")
-    const [emailError, setEmailError] = useState(" ")
-    const [passwordError, setPasswordError] = useState(" ")
+    //
+    const [nameError, setNameError] = useState(false)
+    const [emailError, setEmailError] = useState(false)
+    const [passwordError, setPasswordError] = useState(false)
+
+    const [emailErrorType, setErrorType] = useState("")
 
     const handleSignUp = async () => {
-        setNameError(name)
-        setEmailError(email)
-        setPasswordError(password)
 
-        console.log(nameError)
-        console.log(emailError)
-        console.log(passwordError)
+        if(name === ""){
+            setNameError(true)
+        }
+        else {
+            setNameError(false)
+        }
+        if(email === ""){
+            setEmailError(true)
+            setErrorType("Please enter an Email")
+        }
+        else {
+            setEmailError(false)
+        }
+        if(password === ""){
+            setPasswordError(true)
+        }
+        else {
+            setPasswordError(false)
+        }
+
+        if(nameError || emailError || passwordError) {
+            return
+        }
 
         try {
             console.log("Run existing user")
-            const existingUsers = await fetch ('http://localhost:3231/existingUsers', {
+            const existingUsers = await fetch ('http://localhost:4000/existingUsers', {
                 method: 'POST',
                 headers: {
                     'Content-type': "application/json"
@@ -44,7 +64,7 @@ const SignUp = () => {
             }
 
             console.log("Creating user")
-            const signupInfo = await fetch('http://localhost:3231/addUser', {
+            const signupInfo = await fetch('http://localhost:4000/addUser', {
                 method: "POST",
                 headers: {
                     'Content-type': "application/json"
@@ -56,9 +76,8 @@ const SignUp = () => {
             console.log('Response from server:', signupResult)
         } catch (error) {
             console.error(error)
-            setNameError("")
-            setEmailError("")
-            setPasswordError("")
+            setEmailError(true)
+            setErrorType("Email is already being used by an existing account")
         }
     }
 
@@ -89,7 +108,8 @@ const SignUp = () => {
                     id="username"
                     name="username"
                     label="Username"
-                    error = {React.useMemo(() => nameError === "", [nameError])}
+                    error = {nameError}
+                    helperText = {!nameError ? '' : 'Please enter a Username'}
                     value={name}
                     onChange={(e) => setUsername(e.target.value)}
                 />
@@ -101,7 +121,8 @@ const SignUp = () => {
                     id="email"
                     name="email"
                     label="Email Address"
-                    error = {React.useMemo(() => emailError === "", [emailError])}
+                    error = {emailError}
+                    helperText = {!emailError ? '' : emailErrorType}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                 />
@@ -114,7 +135,8 @@ const SignUp = () => {
                     name="password"
                     label="Password"
                     type="password"
-                    error = {React.useMemo(() => passwordError === "", [passwordError])}
+                    error = {passwordError}
+                    helperText = {!passwordError ? '' : 'Please enter a Password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                 />

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'; 
 import { Link } from 'react-router-dom'; 
 import Goal, { GoalProps } from "../components/Goal"   
+import './styles/myGoalsPage.css';
 
 const MyGoalsPage: React.FC = () => {
     const [userId] = useState<number>(2);   // hardcoded userId for testing
@@ -43,7 +44,7 @@ const MyGoalsPage: React.FC = () => {
           />
         ))
       ) : (
-        <div>
+        <div className="no-goals-message">
           <p>Oops! It seems you dont have any goals created yet. Visit the Create Goal page to get started!</p>
           <Link to="/Dashboard/create-goal">Create a Goal</Link>
         </div>

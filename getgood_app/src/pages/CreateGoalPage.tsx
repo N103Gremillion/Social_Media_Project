@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import ReactFlow, { Edge, Node, Position } from 'reactflow';
-import { Checkpoint, updateCheckpointIDs, updateCheckpointPositions, updateEdges, addCheckpointNode } from '../components/goalFunctions';
+import { Checkpoint, updateCheckpointIDs, updateCheckpointPositions, updateEdges, addCheckpointNode, beginningNodes, beginningEdges } from '../components/goalFunctions';
 import AddCheckpointModal from '../components/AddCheckpointModal';
 import EditCheckpointModal from '../components/EditCheckpointModal';
 import ErrorModal from '../components/ErrorModal';
@@ -34,16 +34,9 @@ const CreateGoalPage = () => {
     setNewCheckpointDate('');
   };
 
-  let beginningNodes: Checkpoint[] = [
-    { id: '1', position: { x: 50, y: 20 }, data: { label: 'Start', date: "01-01-01" }, sourcePosition: Position.Right, targetPosition: Position.Left },
-    { id: '2', position: { x: 250, y: 20 }, data: { label: 'End', date: '01-01-99999' }, sourcePosition: Position.Right, targetPosition: Position.Left }
-  ];
-
   let [nodes, setNodes] = useState<Checkpoint[]>(beginningNodes);
 
-  const [edges, setEdges] = useState<Edge[]>([
-    { id: '1-2', source: '1', target: '2', type: 'straight' }
-  ]);
+  const [edges, setEdges] = useState<Edge[]>(beginningEdges);
 
   const sortnodes = (nodes: Node[]) => {
     return ([...nodes].sort((a,b) => new Date(a.data.date).getTime() - new Date(b.data.date).getTime()));

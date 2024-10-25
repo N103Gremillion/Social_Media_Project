@@ -1,4 +1,5 @@
 import { Edge, Node, Position } from 'reactflow';
+import React, { useState } from 'react';
 
 interface NodeData {
     label: string;
@@ -7,6 +8,12 @@ interface NodeData {
   
 export interface Checkpoint extends Node<NodeData> {}
 
+export const beginningNodes: Checkpoint[] = [
+  { id: '1', position: { x: 50, y: 20 }, data: { label: 'Start', date: "01-01-01" }, sourcePosition: Position.Right, targetPosition: Position.Left },
+  { id: '2', position: { x: 250, y: 20 }, data: { label: 'End', date: '01-01-99999' }, sourcePosition: Position.Right, targetPosition: Position.Left }
+];
+
+export const beginningEdges: Edge[] = [{ id: '1-2', source: '1', target: '2', type: 'straight' }];
 
 export const updateCheckpointIDs = (oldCheckpoints: Node[]) => {
     const newCheckpoints: Node[] = Array.from(oldCheckpoints);

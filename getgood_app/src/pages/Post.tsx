@@ -1,11 +1,18 @@
-import { fontWeight, lineHeight } from "@mui/system";
 import React, { useState } from "react";
 import likeImage from "../sprites/like.png";
+import { border } from "@mui/system";
 
-const Post : React.FC<{title : string; content : string; author : string, date : string, imagePath: string}>  = ({title, content, author, date, imagePath}) => {
+const Post : React.FC<{
+  title : string; 
+  content : string; 
+  author : string, 
+  date : string, 
+  imagePath: string, 
+  likes: number
+}>  = ({title, content, author, date, imagePath, likes}) => {
   
   const [hoveringLike, setHoveringLike] = useState<boolean>(false);
-  const [likeCounter, setLikeCounter] = useState(0);
+  const [likeCounter, setLikeCounter] = useState(likes);
 
   const handleMouseEnterLike = () => {
     setHoveringLike(true);
@@ -17,6 +24,8 @@ const Post : React.FC<{title : string; content : string; author : string, date :
 
   const handleLikeButtonClick = () => {
     setLikeCounter(likeCounter + 1);
+
+    // change on backend
   }
 
   const postStyle = {
@@ -62,7 +71,7 @@ const Post : React.FC<{title : string; content : string; author : string, date :
     marginBottom: '20px',
   };
 
-  const buttonStyle = {
+  const likeButtonStyle = {
     padding: '1% 2%',
     backgroundColor: hoveringLike === true ? '#007BFF' : 'darkBlue',
     color: hoveringLike === true ? 'black' : 'white',
@@ -75,12 +84,24 @@ const Post : React.FC<{title : string; content : string; author : string, date :
     borderRadius: '12px',
     margin: '0 auto', 
   };
-  
+
   const likeImageStyle = {
     width: '100%', 
     height: 'auto', 
     marginRight: '5%', 
   };
+
+  const deleteButtonStyle = {
+    padding: '1% 2%',
+    backgroundColor: 'red',
+    color: hoveringLike === true ? 'black' : 'white',
+    alignItems: 'right',
+    border: '1px solid #ccc',
+    cursor: 'pointer',
+    width: '10%', 
+    borderRadius: '12px',
+    margin: '0 auto',
+  }
 
   return (
     <div style={postStyle}>
@@ -103,7 +124,7 @@ const Post : React.FC<{title : string; content : string; author : string, date :
       <div>
         {/* like and comment buttons */}
         <button 
-          style={buttonStyle}
+          style={likeButtonStyle}
           onMouseEnter={() => handleMouseEnterLike()}
           onMouseLeave={() => handleMouseLeaveLike()}
           onClick={() => handleLikeButtonClick()}

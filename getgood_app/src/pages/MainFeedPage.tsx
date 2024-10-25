@@ -4,13 +4,13 @@ import axios from "axios";
 
 const MainFeedPage : React.FC = () => {
 
-
   type PostType = {
     title: string;
     content: string;
     author: string;
     date: string;
-    imagePath: string
+    imagePath: string;
+    likes: number
   }
 
   const [isPostPromptOpen, setIsPostPromptOpen] = useState(false);
@@ -19,22 +19,30 @@ const MainFeedPage : React.FC = () => {
   const [title, setTitle] = useState<string>('');
   const [content, setContent] = useState<string>('');
   const [imagePath, setImagePath] = useState<string>('');
+  const [likes] = useState<number>(0);
+
   // list of current posts
   const [posts, setPosts] = useState<PostType[]>([]);
   const BASE_URL : string = 'http://localhost:4000/';
 
-  // use effect runs on every render (fetch post from backend)
-  useEffect( () => {
-    const fetchPosts = async () => {
-      try {
-        const response = await axios.get(`${BASE_URL}api/posts`);
-        setPosts(response.data);
-      }
-      catch (error) {
-        console.error('Error occured when fetching posts:', error);
-      }
+  const fetchPosts = async () => {
+    try {
+      const response = await axios.get(`${BASE_URL}api/posts`);
+      console.log(response.data);
+      setPosts(response.data);
     }
-  });
+    catch (error) {
+      console.error('Error occured when fetching posts:', error);
+    }
+  }
+
+  useEffect( () => {
+    fetchPosts();
+  }, []);
+
+  useEffect(() => {
+    console.log('Updated posts:', posts); 
+  }, [posts]);
 
   const openPromptForPost = () => {
     setIsPostPromptOpen(true);
@@ -93,15 +101,15 @@ const MainFeedPage : React.FC = () => {
     // Reformat the date to "month-day-year"
     const formattedDate = `${month}-${day}-${year}`;
 
-    const newPost: PostType = {title, content, author, date: formattedDate, imagePath};
+    const newPost: PostType = {title, content, author, date: formattedDate, imagePath, likes};
+    const dataBasePost: PostType = {title, content, author, date, imagePath, likes};
 
     try {
-      const response = axios.post(`${BASE_URL}api/posts`, newPost,{
+      const response = axios.post(`${BASE_URL}api/posts`, dataBasePost,{
       headers: {
         'Content-Type': 'application/json',
       }});
 
-      console.log(response);
       setPosts([...posts, newPost]);
       closePromptForPost();
     }
@@ -214,7 +222,7 @@ const MainFeedPage : React.FC = () => {
           style={{
             width: '80vw',
             height: '40%',
-            resize: 'none' // Optional: Prevent resizing if you want a fixed size
+            resize: 'none' 
           }}
           placeholder="Enter your content here."
           value={content}
@@ -275,6 +283,7 @@ const MainFeedPage : React.FC = () => {
             author={post.author}
             date={post.date}
             imagePath={post.imagePath}
+            likes={post.likes}
           />
         ))}
       </div>

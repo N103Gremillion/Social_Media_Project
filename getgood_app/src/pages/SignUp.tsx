@@ -5,9 +5,12 @@ import {
     Typography,
 } from "@mui/material";
 import {useState} from "react";
-import {Link} from "react-router-dom"
+import {Link, useNavigate} from "react-router-dom"
 
 const SignUp = () => {
+    
+    const navigate = useNavigate()
+
     //Variables to keep track of information from the user
     const [name, setUsername] = useState("");
     const [email, setEmail] = useState("");
@@ -22,32 +25,35 @@ const SignUp = () => {
 
     const handleSignUp = async () => {
 
+        const emailFormat = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i
+
+        var err = false
+
         if(name === ""){
             setNameError(true)
-        }
-        else {
+            err = true
+        } else {
             setNameError(false)
         }
-        if(email === ""){
+        if(email === "" || emailFormat.test(email) === false){
             setEmailError(true)
-            setErrorType("Please enter an Email")
-        }
-        else {
+            setErrorType("Please enter a valid Email")
+            err = true
+        } else {
             setEmailError(false)
         }
         if(password === ""){
             setPasswordError(true)
-        }
-        else {
+            err = true
+        } else {
             setPasswordError(false)
         }
 
-        if(nameError || emailError || passwordError) {
+        if(err) {
             return
         }
 
         try {
-            console.log("Run existing user")
             const existingUsers = await fetch ('http://localhost:4000/existingUsers', {
                 method: 'POST',
                 headers: {
@@ -63,7 +69,6 @@ const SignUp = () => {
                 throw new Error("User already exists")
             }
 
-            console.log("Creating user")
             const signupInfo = await fetch('http://localhost:4000/addUser', {
                 method: "POST",
                 headers: {
@@ -72,8 +77,13 @@ const SignUp = () => {
                 body: JSON.stringify({name, email, password})
             })
 
-            const signupResult = await signupInfo.json()
-            console.log('Response from server:', signupResult)
+            const userResults = await signupInfo.json()
+            if(userResults.status > 499) {
+                throw new Error("Create user error")
+            }
+
+            navigate("/Dashboard")
+
         } catch (error) {
             console.error(error)
             setEmailError(true)

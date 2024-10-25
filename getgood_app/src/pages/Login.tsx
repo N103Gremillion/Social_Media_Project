@@ -1,24 +1,73 @@
-import React from "react";
 import {
     Box,
     Typography,
     TextField,
     Button,
-  } from "@mui/material";
+} from "@mui/material";
 import {useState} from "react";
-import {Link} from "react-router-dom"
+import {Link, useNavigate} from "react-router-dom"
 
 
 const Login = () => {
+
+    const navigate = useNavigate()
+
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
-    const [emailError, setEmailError] = useState(" ")
-    const [passwordError, setPasswordError] = useState(" ")
+    const [emailError, setEmailError] = useState(false)
+    const [passwordError, setPasswordError] = useState(false)
 
-    const handleLogin = () => {
-        setEmailError(email)
-        setPasswordError(password)
+    const [emailErrorType, setEmailErrorType] = useState("")
+    const [passwordErrorType, setPasswordErrorType] = useState("")
+
+    const handleLogin = async () => {
+
+        const emailFormat = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i
+
+        var err = false
+
+        if(email === "" || emailFormat.test(email) === false){
+            setEmailError(true)
+            setEmailErrorType("Please enter a valid Email")
+            err = true
+        } else {
+            setEmailError(false)
+        }
+        if(password === ""){
+            setPasswordError(true)
+            setPasswordErrorType("Please enter a Password")
+            err = true
+        } else {
+            setPasswordError(false)
+        }
+
+        if(err) {
+            return
+        }
+
+        console.log("Run function")
+        const checkForUser = await fetch('http://localhost:4000/checkForUser', {
+            method: 'POST',
+            headers: {
+                'Content-type': "application/json"
+            },
+            body: JSON.stringify({email, password})
+        })
+        console.log("After function")
+
+        if(checkForUser.status > 499) {
+            setEmail("")
+            setEmailError(true)
+            setEmailErrorType("Account not found")
+
+            setPassword("")
+            setPasswordError(true)
+            setPasswordErrorType("Account not found")
+        } else {
+            navigate("/Dashboard")
+        }
+
     }
 
     return (
@@ -47,7 +96,8 @@ const Login = () => {
                     id="email"
                     label="Email"
                     name="email"
-                    error = {React.useMemo(() => emailError === "", [emailError])}
+                    error = {emailError}
+                    helperText = {!emailError ? '' : emailErrorType}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     />
@@ -60,21 +110,22 @@ const Login = () => {
                         name="password"
                         label="Password"
                         type="password"
-                        error = {React.useMemo(() => passwordError === "", [passwordError])}
+                        error = {passwordError}
+                        helperText = {!passwordError ? '' : passwordErrorType}
                         value={password}
                         onChange={(e) => {
                         setPassword(e.target.value);
                         }}
                     />
-                    <Link to="Dashboard">
-                        <Button
-                            fullWidth
-                            variant="contained"
-                            sx={{ mt: 3, mb: 2 }}
-                            onClick={handleLogin}
-                        >Login
-                        </Button>
-                    </Link>
+
+                    <Button
+                        fullWidth
+                        variant="contained"
+                        sx={{ mt: 3, mb: 2 }}
+                        onClick={handleLogin}
+                    >Login
+                    </Button>
+
                     <Link to="SignUp">Sign Up</Link>
                 </Box>
             </div>

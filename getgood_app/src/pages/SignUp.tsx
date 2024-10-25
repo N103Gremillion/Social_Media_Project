@@ -62,9 +62,6 @@ const SignUp = () => {
                 body: JSON.stringify({email})
             })
 
-            const existingResult = await existingUsers.json()
-            console.log('Response from server:', existingResult)
-            console.log(existingUsers.status)
             if(existingUsers.status > 499) {
                 throw new Error("User already exists")
             }
@@ -77,8 +74,7 @@ const SignUp = () => {
                 body: JSON.stringify({name, email, password})
             })
 
-            const userResults = await signupInfo.json()
-            if(userResults.status > 499) {
+            if(signupInfo.status > 499) {
                 throw new Error("Create user error")
             }
 

@@ -1,17 +1,24 @@
 import React, { useState,useEffect } from 'react';
 import ReactFlow, { Edge, Node, Position } from 'reactflow';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Checkpoint, updateCheckpointIDs, updateCheckpointPositions, updateEdges, addCheckpointNode } from '../components/goalFunctions';
 import AddCheckpointModal from '../components/AddCheckpointModal';
 import EditCheckpointModal from '../components/EditCheckpointModal';
 import ErrorModal from '../components/ErrorModal';
+import { GoalProps } from '../components/Goal'
 import 'reactflow/dist/style.css';
 
 const CreateGoalPage = () => {
-  const [goalName, setGoalName] = useState<string>('');
-  const [goalDescription, setGoalDescription] = useState<string>('');
-  const [goalStartDate, setGoalStartDate] = useState<string>('');
-  const [goalEndDate, setGoalEndDate] = useState<string>('');
+  const location = useLocation(); 
+
+  const [goal, setGoal] = useState({
+    id: null, 
+    goalName: '',
+    goalDescription: '', 
+    goalStartDate: '',
+    goalEndDate: '', 
+  });
+  const [checkpoints, setCheckpoints] = useState<Checkpoint[]>([]);
   const [newCheckpointName, setNewCheckpointName] = useState<string>('');
   const [newCheckpointDate, setNewCheckpointDate] = useState<string>('');
   const [isCheckpointModalOpen, setIsCheckpointModalOpen] = useState(false);
@@ -20,15 +27,38 @@ const CreateGoalPage = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
   let [currentCheckpoint, setcurrentCheckpoint] = useState<Node>();
-
   const userId = 1;
   const PORT = 4000;
 
+  useEffect (() => {
+    if (location.state) {
+      const { name, description, startDate, endDate } = location.state as GoalProps; 
+      setGoal((prevGoal) => ({
+        ...prevGoal,
+        goalName: name, 
+        goalDescription: description,
+        goalStartDate: startDate, 
+        goalEndDate: endDate,
+      }));
+    }
+  }, [location.state]); 
+
   const clearGoalFields = () => {
-    setGoalName('');
-    setGoalDescription('');
-    setGoalStartDate('');
-    setGoalEndDate('');
+    setGoal({
+      id: null,
+      goalName: '',
+      goalDescription: '', 
+      goalStartDate: '',
+      goalEndDate: '',
+    })
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {    // handle input types for bot input and text area html events
+    const { name, value } = e.target; 
+    setGoal((prevGoal) => ({
+      ...prevGoal,
+      [name]: value,
+    }));
   };
 
   const clearCheckpointFields = () => {
@@ -97,8 +127,8 @@ const CreateGoalPage = () => {
   }
 
   const checkDates = () => {
-    const startDate = new Date(goalStartDate).getTime();
-    const endDate = new Date(goalEndDate).getTime();
+    const startDate = new Date(goal.goalStartDate).getTime();
+    const endDate = new Date(goal.goalEndDate).getTime();
     const firstCheckpointDate = new Date(nodes[1].data.date).getTime();
     const lastCheckpointDate = new Date(nodes[nodes.length-2].data.date).getTime();
     let finalState = true;
@@ -123,10 +153,10 @@ const CreateGoalPage = () => {
     }
     const goalInfo = {
       userId,
-      goalName,
-      goalDescription,
-      goalStartDate,
-      goalEndDate
+      goalName: goal.goalName,
+      goalDescription: goal.goalDescription,
+      goalStartDate: goal.goalStartDate,
+      goalEndDate: goal.goalEndDate,
     };
 
     try {
@@ -182,7 +212,14 @@ const CreateGoalPage = () => {
     } catch (error) {
       console.error(error);
     }
-  }
+    setGoal({
+      id: null,
+      goalName: '',
+      goalDescription: '',
+      goalStartDate: '',
+      goalEndDate: ''
+    }); 
+  }; 
 
   const CreatGoalPageStyle: React.CSSProperties = {
     backgroundColor: 'white',
@@ -207,8 +244,9 @@ const CreateGoalPage = () => {
           <input
               type="text"
               id="goal-name"
-              value={goalName}
-              onChange={(e) => setGoalName(e.target.value)}
+              name="goalName"
+              value={goal.goalName}
+              onChange={handleChange}
               placeholder="Enter your goal name"
             />
         </div>
@@ -217,8 +255,9 @@ const CreateGoalPage = () => {
           <h3>Description:</h3>
           <textarea
             id="goal-description"
-            value={goalDescription}
-            onChange={(e) => setGoalDescription(e.target.value)}
+            name="goalDescription"
+            value={goal.goalDescription}
+            onChange={handleChange}
             placeholder="Enter a description of your goal"
           />
         </div>
@@ -228,16 +267,18 @@ const CreateGoalPage = () => {
           <h3>Length:</h3> 
           <p>From</p>
           <input
-            type="date"
-            value={goalStartDate}
-            onChange={(e) => setGoalStartDate(e.target.value)}
+            type="text"
+            name="goalStartDate"
+            value={goal.goalStartDate}
+            onChange={handleChange}
             placeholder="YYYY-MM-DD"
           />
           <p>to</p>
           <input
-            type="date"
-            value={goalEndDate}
-            onChange={(e) => setGoalEndDate(e.target.value)}
+            type="text"
+            name="goalEndDate"
+            value={goal.goalEndDate}
+            onChange={handleChange}
             placeholder="YYYY-MM-DD"
           />
           <div className="checkpoint-display" >

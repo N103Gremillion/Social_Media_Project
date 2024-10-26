@@ -42,7 +42,7 @@ const port = 4000;
 // app.get('/getUserGoals', (req,res) => {
 // 	const  userId  = req.query.userId;
 
-// 	const getUserGoalsQuery = 'select goals.name, goals.description, goals.start_date, goals.end_date, goals.current_progress from goals join user_goals on goals.id = user_goals.goal_id where user_goals.user_id = ?';
+// 	const getUserGoalsQuery = 'select goals.name, goals.description, goals.start_date, goals.end_date, goals.current_progress, goals.id from goals join user_goals on goals.id = user_goals.goal_id where user_goals.user_id = ?';
 
 // 	pool.query(getUserGoalsQuery, [userId], (error,results) => {
 // 		if (error) {

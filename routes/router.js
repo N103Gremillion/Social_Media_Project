@@ -255,6 +255,21 @@ router.post('/api/posts', (req, res) => {
 	});
 });
 
+router.post('/getCheckpoints', (req,res) => {
+	const { userId, goalId } = req.body;
+
+	const query = "select * from checkpoints where (id in (select checkpoint_id from goal_checkpoints where goal_id = ?) and ? in (select goal_id from user_goals where user_id = ?))";
+
+	pool.query(query, [goalId,goalId,userId], (error, results) => {
+		if (error){
+			return res.status(500).json({ error });
+		}
+		res.status(201).json(results);
+	});
+	
+
+})
+
 function addGoalUserConnection(userId,goalId,query,req,res) {
 	pool.query(query, [userId, goalId], (error, results) => {
                 if (error) {

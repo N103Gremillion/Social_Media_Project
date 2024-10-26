@@ -1,19 +1,54 @@
 const express = require('express');
 const path = require('path');
+const fs = require('fs');
 const router = express.Router();
 const mysql = require('mysql2');
 const multer = require('multer');
+const baseUrl = 'http://localhost:4000';
 
 const storage = multer.diskStorage({
+
 	destination: (req, file, cb) => {
-		cb(null, 'profilePictures/');
+	
+		const publicDirectory = path.join(__dirname, '../public');
+
+		if (req.body.type === 'mainFeedPost') {
+			directory = path.join(publicDirectory, '/mainFeedImages');
+		} else if (req.body.type === 'profile') {
+			directory = path.join(publicDirectory, '/profilePictures');
+		} else {
+			return cb(new Error('Invalid type specified'), null);
+		}
+
+		// Create directory if it doesn't exist
+		fs.mkdir(directory, { recursive: true }, (err) => {
+			if (err) return cb(err);
+			cb(null, directory);
+		});
 	},
+
 	filename: (req, file, cb) => {
-		cb(null, Date.now() + path.extname(file.originalname));
+		const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+		cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
 	}
 });
 
-const upload = multer({ storage: storage });
+// upload images to backend
+const upload = multer({ 
+	storage: storage,
+	limits: { fileSize: 5 * 1024 * 1024 },
+	fileFilter: function (req, file, cb) {
+		const filetypes = /jpeg|jpg|png|gif/;
+		const mimetype = filetypes.test(file.mimetype);
+		const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+
+		// if it is the correct extension and 
+		if (mimetype && extname) {
+			return cb(null, true);
+		}
+		cb(new Error('you can only upload images'));
+	}
+ });
 
 const pool = mysql.createPool({
 	host: 'localhost',
@@ -196,6 +231,21 @@ router.post('/decrementLikes', (req,res) => {
 	});
 });
 
+router.post('/getCheckpoints', (req,res) => {
+	const { userId, goalId } = req.body;
+
+	const query = "select * from checkpoints where (id in (select checkpoint_id from goal_checkpoints where goal_id = ?) and ? in (select goal_id from user_goals where user_id = ?))";
+
+	pool.query(query, [goalId,goalId,userId], (error, results) => {
+		if (error){
+			return res.status(500).json({ error });
+		}
+		res.status(201).json(results);
+	});
+	
+
+});
+
 // for the posts on the mainFeed
 let posts = [];
 
@@ -234,14 +284,16 @@ router.get('/api/posts', (req, res) => {
 	});
 });
 
-router.post('/api/posts', (req, res) => {
-  const { title, content, author, date, imagePath } = req.body;
-  const newPost = { title, content, author, date, imagePath, likes: 0 };
-	
+router.post('/api/posts', upload.single('image'), (req, res) => {
+
+	const { title, content, author, date } = req.body;
+	const imagePath = req.file ? `${baseUrl}/mainFeedImages/${req.file.filename}` : null;
+	const newPost = { title, content, author, date, imagePath, likes: 0 };
+  
 	// add post to the sql database
-  const query = 'INSERT INTO mainFeedPosts (title, content, author, date, imagePath, likes) VALUES (?, ?, ?, ?, ?, ?)';
-	
-	pool.query(query, [newPost.title, newPost.content, newPost.author, newPost.date, newPost.imagePath, newPost.likes], (error, results) => {
+	const query = 'INSERT INTO mainFeedPosts (title, content, author, date, imagePath, likes) VALUES (?, ?, ?, ?, ?, ?)';
+	  
+	  pool.query(query, [newPost.title, newPost.content, newPost.author, newPost.date, newPost.imagePath, newPost.likes], (error, results) => {
 		
 		if (error){
 			console.error("error when trying to send the post to database:", error);
@@ -251,24 +303,10 @@ router.post('/api/posts', (req, res) => {
 		newPost.id = results.insertId;
 		posts.push(newPost);
 		res.status(201).json(newPost);
-
-	});
+  
+	  });
+  
 });
-
-router.post('/getCheckpoints', (req,res) => {
-	const { userId, goalId } = req.body;
-
-	const query = "select * from checkpoints where (id in (select checkpoint_id from goal_checkpoints where goal_id = ?) and ? in (select goal_id from user_goals where user_id = ?))";
-
-	pool.query(query, [goalId,goalId,userId], (error, results) => {
-		if (error){
-			return res.status(500).json({ error });
-		}
-		res.status(201).json(results);
-	});
-	
-
-})
 
 function addGoalUserConnection(userId,goalId,query,req,res) {
 	pool.query(query, [userId, goalId], (error, results) => {

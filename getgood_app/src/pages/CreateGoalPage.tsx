@@ -1,69 +1,166 @@
-import React, { useState } from 'react';
-
-interface Checkpoint {
-  checkpointName: string;
-  checkpointDate: string;
-}
+import React, { useState,useEffect } from 'react';
+import ReactFlow, { Edge, Node, Position } from 'reactflow';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { Checkpoint, updateCheckpointIDs, updateCheckpointPositions, updateEdges, addCheckpointNode } from '../components/goalFunctions';
+import AddCheckpointModal from '../components/AddCheckpointModal';
+import EditCheckpointModal from '../components/EditCheckpointModal';
+import ErrorModal from '../components/ErrorModal';
+import { GoalProps } from '../components/Goal'
+import 'reactflow/dist/style.css';
 
 const CreateGoalPage = () => {
-  const port = 3231;
-  const [goalName, setGoalName] = useState<string>('');
-  const [goalDescription, setGoalDescription] = useState<string>('');
-  const [goalStartDate, setGoalStartDate] = useState<string>('');
-  const [goalEndDate, setGoalEndDate] = useState<string>('');
+  const location = useLocation(); 
+
+  const [goal, setGoal] = useState({
+    id: null, 
+    goalName: '',
+    goalDescription: '', 
+    goalStartDate: '',
+    goalEndDate: '', 
+  });
   const [checkpoints, setCheckpoints] = useState<Checkpoint[]>([]);
   const [newCheckpointName, setNewCheckpointName] = useState<string>('');
   const [newCheckpointDate, setNewCheckpointDate] = useState<string>('');
-
+  const [isCheckpointModalOpen, setIsCheckpointModalOpen] = useState(false);
+  const [isEditCheckpointModalOpen, setIsEditCheckpointModalOpen] = useState(false);
+  const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const navigate = useNavigate();
+  let [currentCheckpoint, setcurrentCheckpoint] = useState<Node>();
   const userId = 1;
+  const PORT = 4000;
+
+  useEffect (() => {
+    if (location.state) {
+      const { name, description, startDate, endDate } = location.state as GoalProps; 
+      setGoal((prevGoal) => ({
+        ...prevGoal,
+        goalName: name, 
+        goalDescription: description,
+        goalStartDate: startDate, 
+        goalEndDate: endDate,
+      }));
+    }
+  }, [location.state]); 
 
   const clearGoalFields = () => {
-    setGoalName('');
-    setGoalDescription('');
-    setGoalStartDate('');
-    setGoalEndDate('');
+    setGoal({
+      id: null,
+      goalName: '',
+      goalDescription: '', 
+      goalStartDate: '',
+      goalEndDate: '',
+    })
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {    // handle input types for bot input and text area html events
+    const { name, value } = e.target; 
+    setGoal((prevGoal) => ({
+      ...prevGoal,
+      [name]: value,
+    }));
   };
 
   const clearCheckpointFields = () => {
     setNewCheckpointName('');
     setNewCheckpointDate('');
   };
+  const beginningNodes: Checkpoint[] = [
+    { id: '1', position: { x: 50, y: 20 }, data: { label: 'Start', date: "01-01-01" }, sourcePosition: Position.Right, targetPosition: Position.Left },
+    { id: '2', position: { x: 250, y: 20 }, data: { label: 'End', date: '01-01-99999' }, sourcePosition: Position.Right, targetPosition: Position.Left }
+  ];
+  const beginningEdges: Edge[] = [{ id: '1-2', source: '1', target: '2', type: 'straight' }];
+  let [nodes, setNodes] = useState<Checkpoint[]>(beginningNodes);
 
-  const addCheckpoint = () => {
-    if (newCheckpointName && newCheckpointDate) {
-  
-      const newCheckpoint: Checkpoint = {
-        checkpointName: newCheckpointName,
-        checkpointDate: newCheckpointDate
-      }
+  const [edges, setEdges] = useState<Edge[]>(beginningEdges);
 
-      // sort new checkpoint based on date
-      const updatedCheckpoints = [...checkpoints, newCheckpoint].sort((a,b) => {
-        const date1 = new Date(a.checkpointDate).getTime();
-        const date2 = new Date(b.checkpointDate).getTime();
+  const sortnodes = (nodes: Node[]) => {
+    return ([...nodes].sort((a,b) => new Date(a.data.date).getTime() - new Date(b.data.date).getTime()));
+  }
 
-        if (date1<date2) {
-          return -1;
-        }
-        return 1;
-      });
+  const handeCheckpointClick = (event: React.MouseEvent, node: Node) => {
+    setcurrentCheckpoint(node);
+    setNewCheckpointName(node.data.label);
+    setNewCheckpointDate(node.data.date);
+    setIsEditCheckpointModalOpen(true);
+  }
 
-      setCheckpoints(updatedCheckpoints);
-      clearCheckpointFields();
+  const saveCheckpoint = () => {
+    if (currentCheckpoint == null) {
+      console.log("it is null");
+      return;
     }
-  };
+    let replaceIndex = currentCheckpoint.id;
+    let newNode: Node = {...currentCheckpoint};
+    newNode.data.label = newCheckpointName;
+    newNode.data.date = newCheckpointDate;
+
+    const newNodes = nodes.filter(node => node.id == replaceIndex ? newNode : node);
+
+    setNodes(() => {
+      const sortedNodes = sortnodes(newNodes);
+      const idUpdatedNodes = updateCheckpointIDs(sortedNodes);
+      const positionUpdatedNodes = updateCheckpointPositions(idUpdatedNodes);
+      setEdges(updateEdges(positionUpdatedNodes));
+      return positionUpdatedNodes;
+    });
+    clearCheckpointFields();
+  }
+
+  const deleteCheckpoint = () => {
+    if (currentCheckpoint == null) {
+      return;
+    }
+
+    let deleteId = currentCheckpoint.id;
+    const newNodes: Node[] = nodes.filter(node => node.id != deleteId);
+
+    setNodes(() => {
+      const sortedNodes = sortnodes(newNodes);
+      const idUpdatedNodes = updateCheckpointIDs(sortedNodes);
+      const positionUpdatedNodes = updateCheckpointPositions(idUpdatedNodes);
+      setEdges(updateEdges(positionUpdatedNodes));
+      return positionUpdatedNodes;
+    })
+    
+    clearCheckpointFields();
+  }
+
+  const checkDates = () => {
+    const startDate = new Date(goal.goalStartDate).getTime();
+    const endDate = new Date(goal.goalEndDate).getTime();
+    const firstCheckpointDate = new Date(nodes[1].data.date).getTime();
+    const lastCheckpointDate = new Date(nodes[nodes.length-2].data.date).getTime();
+    let finalState = true;
+
+    if (startDate > endDate) {
+      setErrorMessage("Start date is after final date. Please fix before Submitting.");
+      
+      setIsErrorModalOpen(true);
+      finalState = false;
+    } else if ((firstCheckpointDate < startDate || lastCheckpointDate > endDate) && nodes.length>2) {
+      setErrorMessage("Checkpoint Dates are not within goal time span. Please fix before Submitting.");
+      setIsErrorModalOpen(true);
+      finalState = false;
+    }
+
+    return finalState;
+  }
 
   const createGoal = async () => {
+    if (!checkDates()) {
+      return;
+    }
     const goalInfo = {
       userId,
-      goalName,
-      goalDescription,
-      goalStartDate,
-      goalEndDate
+      goalName: goal.goalName,
+      goalDescription: goal.goalDescription,
+      goalStartDate: goal.goalStartDate,
+      goalEndDate: goal.goalEndDate,
     };
 
     try {
-      const response = await fetch('http://localhost:3231/addGoal', {
+      const response = await fetch(`http://localhost:${PORT}/addGoal`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(goalInfo),
@@ -72,37 +169,42 @@ const CreateGoalPage = () => {
       if (response.ok) {
         const result = await response.json();
         console.log(result);
+        sessionStorage.setItem('goalId', result.id);
+        console.log(sessionStorage.getItem('goalId'));
         addCheckpointsToDataBase(result.id);
       }else {
-        console.error(response.statusText);
+        const result = await response.json();
+        console.error(result);
       }
     } catch (error) {
       console.error(error);
     }
 
     clearGoalFields();
-    setCheckpoints([]);
+    setNodes(beginningNodes);
+    navigate('/dashboard/edit-goal-progress');
   }
 
-  const addCheckpointsToDataBase = async (goalId: any) => {
-    for (const checkpoint of checkpoints) {
-      addCheckpointToDataBase(checkpoint, goalId);
+  const addCheckpointsToDataBase = async (goalId: string) => {
+    for (let i=1; i<nodes.length-1; i++) {
+      addCheckpointToDataBase(nodes[i], goalId);
     }
   };
 
-  const addCheckpointToDataBase = async (checkpoint: Checkpoint, goalId: any) => {
-    const name = checkpoint.checkpointName;
-    const date = checkpoint.checkpointDate;
+  const addCheckpointToDataBase = async (checkpoint: Node, goalId: string) => {
+    const name = checkpoint.data.label;
+    const date = checkpoint.data.date;
 
     try {
-      const response = await fetch('http://localhost:3231/addCheckpoint', {
+      const response = await fetch(`http://localhost:${PORT}/addCheckpoint`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({name, date, goalId}),
       });
 
       if (response.ok) {
-        console.log("success");
+        const result = await response.json();
+        console.log(result);
       }else {
         console.error(response.statusText);
       }
@@ -110,24 +212,20 @@ const CreateGoalPage = () => {
     } catch (error) {
       console.error(error);
     }
-  }
-
-  const combineCheckpoints = () => {
-    const checkpointValues = []
-
-    for (let i=0; i<checkpoints.length; i++) {
-      checkpointValues.push( <span key={i}> - {checkpoints[i].checkpointName} </span> );
-    }
-    return checkpointValues;
-  }
+    setGoal({
+      id: null,
+      goalName: '',
+      goalDescription: '',
+      goalStartDate: '',
+      goalEndDate: ''
+    }); 
+  }; 
 
   const CreatGoalPageStyle: React.CSSProperties = {
-    backgroundColor: 'lightyellow',
+    backgroundColor: 'white',
     width: '95%',
     height: '100vh',
-    // padding: '20px',
     textAlign: 'center',
-    // make the items in div vertially align
     display: 'flex',
     alignItems:'center',
     justifyContent: 'space-evenly',
@@ -146,8 +244,9 @@ const CreateGoalPage = () => {
           <input
               type="text"
               id="goal-name"
-              value={goalName}
-              onChange={(e) => setGoalName(e.target.value)}
+              name="goalName"
+              value={goal.goalName}
+              onChange={handleChange}
               placeholder="Enter your goal name"
             />
         </div>
@@ -156,8 +255,9 @@ const CreateGoalPage = () => {
           <h3>Description:</h3>
           <textarea
             id="goal-description"
-            value={goalDescription}
-            onChange={(e) => setGoalDescription(e.target.value)}
+            name="goalDescription"
+            value={goal.goalDescription}
+            onChange={handleChange}
             placeholder="Enter a description of your goal"
           />
         </div>
@@ -168,42 +268,78 @@ const CreateGoalPage = () => {
           <p>From</p>
           <input
             type="text"
-            value={goalStartDate}
-            onChange={(e) => setGoalStartDate(e.target.value)}
+            name="goalStartDate"
+            value={goal.goalStartDate}
+            onChange={handleChange}
             placeholder="YYYY-MM-DD"
           />
           <p>to</p>
           <input
             type="text"
-            value={goalEndDate}
-            onChange={(e) => setGoalEndDate(e.target.value)}
+            name="goalEndDate"
+            value={goal.goalEndDate}
+            onChange={handleChange}
             placeholder="YYYY-MM-DD"
           />
-        </div>
-
-        <div className="checkpoint-display">
-          <h2>Checkpoints:</h2>
-          <p>
-            Start {combineCheckpoints()} - End
-          </p>
+          <div className="checkpoint-display" >
+            <h2>Checkpoints:</h2>
+            <div style={{ width: '1000px', overflowX: 'auto'}}>
+              <div 
+                style={{display: 'flex', height: '10vh', 
+                width: `${Math.max(nodes.length * 500, 1000)}px`, 
+                justifyContent: 'center', 
+                whiteSpace: 'nowrap'}}>
+                <ReactFlow 
+                  nodes={nodes} 
+                  edges={edges} 
+                  nodesDraggable={false} 
+                  panOnDrag = {false} 
+                  fitView={true}
+                  elevateNodesOnSelect={false}
+                  elevateEdgesOnSelect={false}
+                  edgesFocusable={false}
+                  zoomOnDoubleClick={false}
+                  zoomOnScroll={false}
+                  zoomOnPinch={false}
+                  connectOnClick={false}
+                  onNodeClick={handeCheckpointClick}
+                  />
+              </div>
+            </div>
+          </div>
         </div>
 
         <div className="checkpoint-form">
-          <h3>Add Checkpoint</h3>
-          <input
-            type="text"
-            value={newCheckpointName}
-            onChange={(e) => setNewCheckpointName(e.target.value)}
-            placeholder="Checkpoint Name"
+          <button onClick={() => setIsCheckpointModalOpen(true)}>Add Checkpoint</button>
+          <AddCheckpointModal
+            isOpen={isCheckpointModalOpen}
+            close={() => {setIsCheckpointModalOpen(false)}}
+            checkpointName={newCheckpointName}
+            setCheckpointName={setNewCheckpointName}
+            checkpointDate={newCheckpointDate}
+            setCheckpointDate={setNewCheckpointDate}
+            addCheckpoint={() => addCheckpointNode(nodes, newCheckpointDate, newCheckpointName, setNodes, setEdges)}
+            clearCheckpointFields={clearCheckpointFields}
           />
-          <input
-            type="text"
-            value={newCheckpointDate}
-            onChange={(e) => setNewCheckpointDate(e.target.value)}
-            placeholder="YYYY MM DD"
+          <EditCheckpointModal
+            isOpen={isEditCheckpointModalOpen}
+            close={() => {setIsEditCheckpointModalOpen(false)}}
+            checkpointName={newCheckpointName}
+            setCheckpointName={setNewCheckpointName}
+            checkpointDate={newCheckpointDate}
+            setCheckpointDate={setNewCheckpointDate}
+            saveChanges={saveCheckpoint}
+            deleteCheckpoint={deleteCheckpoint}
+            clearCheckpointFields={clearCheckpointFields}
           />
-          <p><button onClick={addCheckpoint}>Add Checkpoint</button></p>
+          <ErrorModal
+            isOpen={isErrorModalOpen}
+            close={() => {setIsErrorModalOpen(false)}}
+            errorMessage={errorMessage}
+          />
+        </div>
 
+        <div className='create-goal'>
           <p><button onClick={createGoal}>Create Goal</button></p>
         </div>
 

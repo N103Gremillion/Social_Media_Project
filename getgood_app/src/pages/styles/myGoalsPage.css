@@ -1,0 +1,34 @@
+.page-header {
+    text-align: center; 
+    margin-top: 20px;
+    font-size: 2em; 
+    font-weight: bold; 
+    color: #333; 
+}
+
+.my-goals-page {
+    padding-left: 8%; 
+    margin-top: 20px; 
+}
+
+.no-goals-message {
+    font-size: 1.2em;
+    color: #6c757d; 
+    background-color: #f9f9f9;
+    padding: 20px;
+    border: 1px solid #dee2e6; 
+    border-radius: 8px; 
+    max-width: 600px;
+    margin: 20px 0; 
+    text-align: center; 
+}
+
+.no-goals-message a{
+    color: #007bff;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.no-goals-message a:hover {
+    text-decoration: underline;
+}

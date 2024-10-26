@@ -30,7 +30,6 @@ const MainFeedPage : React.FC = () => {
   const fetchPosts = async () => {
     await axios.get(`${BASE_URL}api/posts`)
     .then( response => {
-      console.log(response.data);
       setPosts(response.data);
     })
     .catch(error => console.error('error fetching posts: ', error))

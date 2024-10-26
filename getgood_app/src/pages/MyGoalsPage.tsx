@@ -29,7 +29,7 @@ const MyGoalsPage: React.FC = () => {
 
   return (
     <div className="my-goals-pg">
-      <h2>My Goals</h2>
+      <h2 className="page-header">My Goals</h2>
       {goals.length > 0 ? (
         goals.map(goal => (
           <Goal 

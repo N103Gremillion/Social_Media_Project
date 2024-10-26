@@ -1,6 +1,14 @@
+.page-header {
+    text-align: center; 
+    margin-top: 20px;
+    font-size: 2em; 
+    font-weight: bold; 
+    color: #333; 
+}
+
 .my-goals-page {
-    margin-left: 400px; 
-    padding: 20px;
+    padding-left: 8%; 
+    margin-top: 20px; 
 }
 
 .no-goals-message {
@@ -11,7 +19,7 @@
     border: 1px solid #dee2e6; 
     border-radius: 8px; 
     max-width: 600px;
-    margin: 0 auto; 
+    margin: 20px 0; 
     text-align: center; 
 }
 

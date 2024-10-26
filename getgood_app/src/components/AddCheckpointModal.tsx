@@ -29,6 +29,7 @@ const AddCheckpointModal: React.FC<AddCheckpointModalProps> = ({
     const handleAddCheckpoint = (e: React.FormEvent) => {
         e.preventDefault();
         addCheckpoint();
+        clearCheckpointFields();
         close();
     };
     const handleClose = () => {

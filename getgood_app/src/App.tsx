@@ -40,9 +40,10 @@ const router = createBrowserRouter([
       { path: "create-goal", element: <CreateGoalPage /> },
       { path: "account-management", element: <AccountManagement /> },
       { path: "main-feed", element: <MainFeedPage /> },
+      { path: "edit-goal-progress", element: <EditGoalProgress />}
     ],
   },
-  { path: "edit-goal-progress", element: <EditGoalProgress />}
+  
 ]);
 
 

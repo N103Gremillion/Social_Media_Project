@@ -1,6 +1,7 @@
 import React, { useState,useEffect } from 'react';
 import ReactFlow, { Edge, Node, Position } from 'reactflow';
-import { Checkpoint, updateCheckpointIDs, updateCheckpointPositions, updateEdges, addCheckpointNode, beginningNodes, beginningEdges } from '../components/goalFunctions';
+import { useNavigate } from 'react-router-dom';
+import { Checkpoint, updateCheckpointIDs, updateCheckpointPositions, updateEdges, addCheckpointNode } from '../components/goalFunctions';
 import AddCheckpointModal from '../components/AddCheckpointModal';
 import EditCheckpointModal from '../components/EditCheckpointModal';
 import ErrorModal from '../components/ErrorModal';
@@ -17,9 +18,10 @@ const CreateGoalPage = () => {
   const [isEditCheckpointModalOpen, setIsEditCheckpointModalOpen] = useState(false);
   const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const navigate = useNavigate();
   let [currentCheckpoint, setcurrentCheckpoint] = useState<Node>();
 
-  const userId = sessionStorage.getItem('userId');
+  const userId = 1;
   const PORT = 4000;
 
   const clearGoalFields = () => {
@@ -33,7 +35,11 @@ const CreateGoalPage = () => {
     setNewCheckpointName('');
     setNewCheckpointDate('');
   };
-
+  const beginningNodes: Checkpoint[] = [
+    { id: '1', position: { x: 50, y: 20 }, data: { label: 'Start', date: "01-01-01" }, sourcePosition: Position.Right, targetPosition: Position.Left },
+    { id: '2', position: { x: 250, y: 20 }, data: { label: 'End', date: '01-01-99999' }, sourcePosition: Position.Right, targetPosition: Position.Left }
+  ];
+  const beginningEdges: Edge[] = [{ id: '1-2', source: '1', target: '2', type: 'straight' }];
   let [nodes, setNodes] = useState<Checkpoint[]>(beginningNodes);
 
   const [edges, setEdges] = useState<Edge[]>(beginningEdges);
@@ -67,7 +73,8 @@ const CreateGoalPage = () => {
       const positionUpdatedNodes = updateCheckpointPositions(idUpdatedNodes);
       setEdges(updateEdges(positionUpdatedNodes));
       return positionUpdatedNodes;
-    })
+    });
+    clearCheckpointFields();
   }
 
   const deleteCheckpoint = () => {
@@ -98,9 +105,10 @@ const CreateGoalPage = () => {
 
     if (startDate > endDate) {
       setErrorMessage("Start date is after final date. Please fix before Submitting.");
+      
       setIsErrorModalOpen(true);
       finalState = false;
-    } else if ((firstCheckpointDate > startDate || lastCheckpointDate < endDate) && nodes.length>2) {
+    } else if ((firstCheckpointDate < startDate || lastCheckpointDate > endDate) && nodes.length>2) {
       setErrorMessage("Checkpoint Dates are not within goal time span. Please fix before Submitting.");
       setIsErrorModalOpen(true);
       finalState = false;
@@ -131,9 +139,12 @@ const CreateGoalPage = () => {
       if (response.ok) {
         const result = await response.json();
         console.log(result);
+        sessionStorage.setItem('goalId', result.id);
+        console.log(sessionStorage.getItem('goalId'));
         addCheckpointsToDataBase(result.id);
       }else {
-        console.error(response.statusText);
+        const result = await response.json();
+        console.error(result);
       }
     } catch (error) {
       console.error(error);
@@ -141,6 +152,7 @@ const CreateGoalPage = () => {
 
     clearGoalFields();
     setNodes(beginningNodes);
+    navigate('/dashboard/edit-goal-progress');
   }
 
   const addCheckpointsToDataBase = async (goalId: string) => {
@@ -265,7 +277,7 @@ const CreateGoalPage = () => {
             setCheckpointName={setNewCheckpointName}
             checkpointDate={newCheckpointDate}
             setCheckpointDate={setNewCheckpointDate}
-            addCheckpoint={() => addCheckpointNode(nodes, newCheckpointDate, newCheckpointName, clearCheckpointFields, setNodes, setEdges)}
+            addCheckpoint={() => addCheckpointNode(nodes, newCheckpointDate, newCheckpointName, setNodes, setEdges)}
             clearCheckpointFields={clearCheckpointFields}
           />
           <EditCheckpointModal

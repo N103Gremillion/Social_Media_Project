@@ -54,7 +54,7 @@ export const sortnodes = (nodes: Node[]) => {
     return ([...nodes].sort((a,b) => new Date(a.data.date).getTime() - new Date(b.data.date).getTime()));
 }
 
-export const addCheckpointNode = (nodes: Node[], newCheckpointDate: string, newCheckpointName: string, clearCheckpointFields: () => void, setNodes: React.Dispatch<React.SetStateAction<Checkpoint[]>>, setEdges: React.Dispatch<React.SetStateAction<Edge[]>>) => {
+export const addCheckpointNode = (nodes: Node[], newCheckpointDate: string, newCheckpointName: string, setNodes: React.Dispatch<React.SetStateAction<Checkpoint[]>>, setEdges: React.Dispatch<React.SetStateAction<Edge[]>>) => {
     if (!newCheckpointDate || !newCheckpointName) {
       return;
     }
@@ -81,7 +81,6 @@ export const addCheckpointNode = (nodes: Node[], newCheckpointDate: string, newC
       return positionUpdatedNodes;
     })
     
-    clearCheckpointFields();
     
   };
 

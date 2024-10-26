@@ -53,7 +53,7 @@ const upload = multer({
 const pool = mysql.createPool({
 	host: 'localhost',
 	user: 'root',
-	password: 'BarOfChocolateEarPhones',
+	password: 'Chi538Burger',
 	database: 'csc403'
 });
 

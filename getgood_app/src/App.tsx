@@ -7,6 +7,7 @@ import SignUp from "./pages/SignUp";
 import AccountManagement from "./pages/AccountManagement";
 import CreateGoalPage from "./pages/CreateGoalPage";
 import MainFeedPage from "./pages/MainFeedPage";
+import EditGoalProgress from "./pages/EditGoalProgress";
 import { createBrowserRouter, RouterProvider, Outlet} from "react-router-dom";
 
 
@@ -41,6 +42,7 @@ const router = createBrowserRouter([
       { path: "main-feed", element: <MainFeedPage /> },
     ],
   },
+  { path: "edit-goal-progress", element: <EditGoalProgress />}
 ]);
 
 

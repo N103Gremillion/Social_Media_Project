@@ -1,6 +1,7 @@
 import React, { ChangeEvent, KeyboardEvent, useState, useEffect } from "react";
 import Post from "./Post";
 import axios from "axios";
+import FormData from 'form-data';
 
 const MainFeedPage : React.FC = () => {
 
@@ -14,35 +15,30 @@ const MainFeedPage : React.FC = () => {
   }
 
   const [isPostPromptOpen, setIsPostPromptOpen] = useState(false);
+  const [isReqestInProgress, setIsReqestInProgress] = useState(false);
   const [author, setAuthor] = useState<string>('');
   const [date, setDate] = useState<string>('');
   const [title, setTitle] = useState<string>('');
   const [content, setContent] = useState<string>('');
   const [imagePath, setImagePath] = useState<string>('');
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [likes] = useState<number>(0);
-
   // list of current posts
   const [posts, setPosts] = useState<PostType[]>([]);
   const BASE_URL : string = 'http://localhost:4000/';
 
   const fetchPosts = async () => {
-    try {
-      const response = await axios.get(`${BASE_URL}api/posts`);
+    await axios.get(`${BASE_URL}api/posts`)
+    .then( response => {
       console.log(response.data);
       setPosts(response.data);
-    }
-    catch (error) {
-      console.error('Error occured when fetching posts:', error);
-    }
+    })
+    .catch(error => console.error('error fetching posts: ', error))
   }
 
   useEffect( () => {
     fetchPosts();
   }, []);
-
-  useEffect(() => {
-    console.log('Updated posts:', posts); 
-  }, [posts]);
 
   const openPromptForPost = () => {
     setIsPostPromptOpen(true);
@@ -89,11 +85,13 @@ const MainFeedPage : React.FC = () => {
     if (file) {
       const imageUrl = URL.createObjectURL(file); 
       setImagePath(imageUrl); 
+      setImageFile(file);
     }
   }
 
   const submitPost = async () => {
-    if (title === '' || author === '' || date === '' || content === '') {
+
+    if (title === '' || author === '' || date === '' || content === '' || isReqestInProgress === true) {
       return;
     }
     
@@ -102,20 +100,36 @@ const MainFeedPage : React.FC = () => {
     const formattedDate = `${month}-${day}-${year}`;
 
     const newPost: PostType = {title, content, author, date: formattedDate, imagePath, likes};
-    const dataBasePost: PostType = {title, content, author, date, imagePath, likes};
+    
+    const formData = new FormData();
 
-    try {
-      const response = axios.post(`${BASE_URL}api/posts`, dataBasePost,{
-      headers: {
-        'Content-Type': 'application/json',
-      }});
+    formData.append('title', title);
+    formData.append('content', content);
+    formData.append('author', author);
+    formData.append('date', date); 
+    formData.append('type', 'mainFeedPost');
 
+    if (imageFile) {
+      formData.append('image', imageFile);
+      formData.append('imageName', imageFile.name) 
+    }
+
+    else {
+      console.log("No image file");
+    }
+
+    console.log("about to post");
+
+    setIsReqestInProgress(true);
+    await axios.post(`${BASE_URL}api/posts`, formData)
+    .then(res => console.log(res))
+    .catch(err => console.log('Error submitting the post:', err))
+    .finally(() => {
       setPosts([...posts, newPost]);
+      setIsReqestInProgress(false);
       closePromptForPost();
-    }
-    catch (err){
-      console.log('Error submitting the post:', err);
-    }
+    })
+    
   }
 
   const mainDivStyle : React.CSSProperties = {
@@ -232,7 +246,7 @@ const MainFeedPage : React.FC = () => {
         <input
           type="file"
           placeholder="image-File"
-          accept="image/png, image/jpeg"
+          accept="image/*"
           onChange={handleImageChange}
         />
 

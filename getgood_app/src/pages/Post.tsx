@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import likeImage from "../sprites/like.png";
-import { border } from "@mui/system";
 
 const Post : React.FC<{
   title : string; 
@@ -115,7 +114,6 @@ const Post : React.FC<{
       <img
         style={postImageStyle}
         src={imagePath}
-        alt="post image"
       />
       <div style={footerStyle}>
         <span>By: {author}</span>

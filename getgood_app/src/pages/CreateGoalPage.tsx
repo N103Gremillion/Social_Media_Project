@@ -182,7 +182,7 @@ const CreateGoalPage = () => {
 
     clearGoalFields();
     setNodes(beginningNodes);
-    navigate('/dashboard/edit-goal-progress');
+    navigate('/dashboard/my-goals');
   }
 
   const addCheckpointsToDataBase = async (goalId: string) => {

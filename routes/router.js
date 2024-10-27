@@ -18,7 +18,7 @@ const upload = multer({ storage: storage });
 const pool = mysql.createPool({
 	host: 'localhost',
 	user: 'root',
-	password: 'password',
+	password: 'BottledchairsarealsoMice',
 	database: 'csc403'
 });
 
@@ -46,7 +46,7 @@ router.get('/getProfilePicture', (req, res) => {
 router.get('/getUserGoals', (req,res) => {
 	const  userId  = req.query.userId;
 
-	const getUserGoalsQuery = 'select goals.name, goals.description, goals.start_date, goals.end_date, goals.current_progress from goals join user_goals on goals.id = user_goals.goal_id where user_goals.user_id = ?';
+	const getUserGoalsQuery = 'select id, goals.name, goals.description, goals.start_date, goals.end_date, goals.current_progress from goals join user_goals on goals.id = user_goals.goal_id where user_goals.user_id = ?';
 
 	pool.query(getUserGoalsQuery, [userId], (error,results) => {
 		if (error) {
@@ -264,6 +264,7 @@ router.post('/getCheckpoints', (req,res) => {
 		if (error){
 			return res.status(500).json({ error });
 		}
+		console.log(`${query}\n${results}\nuser: ${userId}, goal: ${goalId}`);
 		res.status(201).json({checkpoints: results});
 	});
 	

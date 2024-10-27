@@ -75,7 +75,8 @@ const Goal: React.FC<GoalProps> = (props) => {
   };
 
   const handleManage = () => {
-    navigate('/Dashboard/manage-goal', {
+    sessionStorage.setItem('goalId', `${props.id}`);
+    navigate('/Dashboard/edit-goal-progress', {
       state: { name, description, startDate, endDate }
     });
   }

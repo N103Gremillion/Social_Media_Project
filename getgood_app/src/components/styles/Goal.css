@@ -1,0 +1,11 @@
+
+.goal-button {
+    margin-right: 20px;       
+    transition: background-color 0.3s, color 0.3s, transform 0.2s;    
+}
+
+.goal-button:hover {
+    background-color: #0056b3; 
+    color: white;
+    transform: scale(1.05);    
+}

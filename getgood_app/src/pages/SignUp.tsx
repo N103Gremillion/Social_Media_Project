@@ -78,6 +78,10 @@ const SignUp = () => {
                 throw new Error("Create user error")
             }
 
+            const signUpResults = await signupInfo.json()
+
+            //userID is the key
+            sessionStorage.setItem('userID', signUpResults.id)
             navigate("/Dashboard")
 
         } catch (error) {

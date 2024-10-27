@@ -46,7 +46,6 @@ const Login = () => {
             return
         }
 
-        console.log("Run function")
         const checkForUser = await fetch('http://localhost:4000/checkForUser', {
             method: 'POST',
             headers: {
@@ -54,7 +53,6 @@ const Login = () => {
             },
             body: JSON.stringify({email, password})
         })
-        console.log("After function")
 
         if(checkForUser.status > 499) {
             setEmail("")
@@ -65,6 +63,10 @@ const Login = () => {
             setPasswordError(true)
             setPasswordErrorType("Account not found")
         } else {
+            const checkResults = await checkForUser.json()
+
+            //userID is the key
+            sessionStorage.setItem('userID', checkResults[0].id)
             navigate("/Dashboard")
         }
 

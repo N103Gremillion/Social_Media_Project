@@ -8,15 +8,23 @@ import {
     DialogTitle,
     DialogActions,
     DialogContent,
-    TextField
+    TextField,
+    List,
+    ListItem,
+    ListItemAvatar,
+    ListItemButton
 } from "@mui/material";
 import PersonIcon from "@mui/icons-material/Person"
+import Person2Icon from "@mui/icons-material/Person2"
+import Person3Icon from "@mui/icons-material/Person3"
+import Person4Icon from "@mui/icons-material/Person4"
 import { blue } from "@mui/material/colors"
 import React, { useState, useEffect } from "react";
 
 const AccountManagement = () => {
     const [username, setUsername] = useState("")
     const [password, setPassword] = useState("")
+    const [avatar, setAvatar] = useState("Person2Icon")
     const id = sessionStorage.getItem('userID')
 
     useEffect(() => {
@@ -67,6 +75,7 @@ const AccountManagement = () => {
 
     var userValue = username
     var passwordValue = password
+    var avatarValue = avatar
 
     const handleClickUser = () => {
         setOpenUser(true)
@@ -109,6 +118,7 @@ const AccountManagement = () => {
         setOpenAvatar(false)
     }
 
+    console.log(avatar)
     return (
         <div
             style={{
@@ -135,9 +145,11 @@ const AccountManagement = () => {
                 alignItems: "center"
             }}
             >
-                <Avatar sx={{ bgcolor: blue[100], color: blue[600], width: 100, height: 100}}>
-                    <PersonIcon sx={{width: 50, height: 50}}/>
-                </Avatar>
+                <Avatar 
+                src={avatar}
+                sx={{ bgcolor: blue[100], color: blue[600], width: 100, height: 100}}
+                />
+
                 <Box sx={{
                     mt: 10,
                     display: "flex",
@@ -203,7 +215,7 @@ const AccountManagement = () => {
                         }}
             
                     >
-                        <DialogTitle>Change User</DialogTitle>
+                        <DialogTitle>Change Password</DialogTitle>
                         <DialogContent>
                             <TextField
                                 id="password"
@@ -219,9 +231,45 @@ const AccountManagement = () => {
                     </Dialog>
                     
                     <Button
-                        variant="contained"
+                        variant="contained" onClick={handleClickAvatar}
                         sx={{ mt: 2}}
                     >Change Avatar</Button>
+                    
+                    <Dialog 
+                        open={openAvatar}
+                        onClose={handleCloseAvatar}
+                    >
+                        <DialogTitle>Change Avatar</DialogTitle>
+                            <List sx={{pt:0, 
+                            mt: 1,
+                            display: "flex",
+                            flexDirection: "row",
+                            alignItems: "center"}}>
+                                <ListItemButton onClick={() => {setAvatar("PersonIcon"); handleCloseAvatar()}}>
+                                    <Avatar sx={{bgcolor: blue[100], color: blue[600]}}>
+                                        <PersonIcon />
+                                    </Avatar>
+                                </ListItemButton>
+                                <ListItemButton onClick={() => {setAvatar("Person2Icon"); handleCloseAvatar()}}>
+                                    <Avatar sx={{bgcolor: blue[100], color: blue[600]}}>
+                                        <Person2Icon />
+                                    </Avatar>
+                                </ListItemButton>
+                                <ListItemButton onClick={() => {setAvatar("Person3Icon"); handleCloseAvatar()}}>
+                                    <Avatar sx={{bgcolor: blue[100], color: blue[600]}}>
+                                        <Person3Icon />
+                                    </Avatar>
+                                </ListItemButton>
+                                <ListItemButton onClick={() => {setAvatar("Person4Icon"); handleCloseAvatar()}}>
+                                    <Avatar sx={{bgcolor: blue[100], color: blue[600]}}>
+                                        <Person4Icon />
+                                    </Avatar>
+                                </ListItemButton>
+                            </List>
+                        <DialogActions>
+                            <Button onClick={handleCloseAvatar}>Cancel</Button>
+                        </DialogActions>
+                    </Dialog>
                 </Box>
             </Box>
         </div>

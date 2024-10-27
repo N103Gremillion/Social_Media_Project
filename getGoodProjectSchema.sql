@@ -30,7 +30,8 @@ CREATE TABLE checkpoints (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     description TEXT,
-    date DATE
+    date DATE,
+    completed INT DEFAULT 0
 );
 
 CREATE TABLE goal_checkpoints (
@@ -48,3 +49,4 @@ CREATE TABLE user_images (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
+INSERT INTO users (name, email, password) VALUES ('testuser', 'testuser@something.com', 'password');

@@ -3,14 +3,15 @@ import React, { useState } from 'react';
 
 interface NodeData {
     label: string;
-    date: string
+    date: string;
+    completed: boolean;
   }
   
 export interface Checkpoint extends Node<NodeData> {}
 
 export const beginningNodes: Checkpoint[] = [
-  { id: '1', position: { x: 50, y: 20 }, data: { label: 'Start', date: "01-01-01" }, sourcePosition: Position.Right, targetPosition: Position.Left },
-  { id: '2', position: { x: 250, y: 20 }, data: { label: 'End', date: '01-01-99999' }, sourcePosition: Position.Right, targetPosition: Position.Left }
+  { id: '1', position: { x: 50, y: 20 }, data: { label: 'Start', date: "01-01-01", completed: true }, sourcePosition: Position.Right, targetPosition: Position.Left },
+  { id: '2', position: { x: 250, y: 20 }, data: { label: 'End', date: '01-01-99999', completed: false }, sourcePosition: Position.Right, targetPosition: Position.Left }
 ];
 
 export const beginningEdges: Edge[] = [{ id: '1-2', source: '1', target: '2', type: 'straight' }];
@@ -54,7 +55,7 @@ export const sortnodes = (nodes: Node[]) => {
     return ([...nodes].sort((a,b) => new Date(a.data.date).getTime() - new Date(b.data.date).getTime()));
 }
 
-export const addCheckpointNode = (nodes: Node[], newCheckpointDate: string, newCheckpointName: string, setNodes: React.Dispatch<React.SetStateAction<Checkpoint[]>>, setEdges: React.Dispatch<React.SetStateAction<Edge[]>>) => {
+export const addCheckpointNode = (nodes: Node[], newCheckpointDate: string, newCheckpointName: string, isCompleted: boolean, setNodes: React.Dispatch<React.SetStateAction<Checkpoint[]>>, setEdges: React.Dispatch<React.SetStateAction<Edge[]>>) => {
     if (!newCheckpointDate || !newCheckpointName) {
       return;
     }
@@ -63,10 +64,10 @@ export const addCheckpointNode = (nodes: Node[], newCheckpointDate: string, newC
     let lastNode = nodes[length - 1]; // Get the last node
 
     // Create a new checkpoint node
-    const newNode = {
+    const newNode: Checkpoint = {
       id: (length + 1).toString(), // Generate a new unique id
       position: { x: lastNode.position.x + 200, y: lastNode.position.y }, // Position it based on the last node
-      data: { label: newCheckpointName, date: newCheckpointDate },
+      data: { label: newCheckpointName, date: newCheckpointDate, completed: isCompleted },
       sourcePosition: Position.Right,
       targetPosition: Position.Left,
       

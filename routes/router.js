@@ -18,7 +18,7 @@ const upload = multer({ storage: storage });
 const pool = mysql.createPool({
 	host: 'localhost',
 	user: 'root',
-	password: 'BottledchairsarealsoMice',
+	password: 'ConstellationgoalsDecidetheWorld',
 	database: 'csc403'
 });
 
@@ -160,16 +160,28 @@ router.post('/deleteGoal', (req,res) => {
 });
 
 router.post('/addCheckpoint', (req,res) => {
-	const { goalId, name, date} = req.body;
-	const addQuery = "insert into checkpoints (name, date) values (?,?)";
+	const { goalId, name, date, completed} = req.body;
+	const addQuery = "insert into checkpoints (name, date, completed) values (?,?,?)";
 	const addConnectionQuery = "insert into goal_checkpoints (goal_id, checkpoint_id) values (?,?)";
 
-	pool.query(addQuery, [name, date],(error, results) => {
+	pool.query(addQuery, [name, date, completed],(error, results) => {
                 if (error) {
-                        return res.status(500).json({ error: error.message });
+					console.log(error.message);
+                    return res.status(500).json({ error: error.cause });
                 }
 		addGoalCheckpointConnection(results.insertId,goalId,addConnectionQuery,req,res);
         });
+});
+
+router.delete('/deleteCheckpoints', (req,res) => {
+	const { goalId } = req.body;
+	const deleteQuery = "delete from checkpoints where id in (select checkpoint_id from goal_checkpoints where goal_id = ?)";
+
+	pool.query(deleteQuery, [goalId], (error, results) => {
+		if (error) {
+			return res.status(500).json({ error: error.message });
+		}
+	});
 });
 
 router.post('/incrementLikes', (req,res) => {

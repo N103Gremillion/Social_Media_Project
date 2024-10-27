@@ -88,15 +88,20 @@ router.post('/existingUsers', (req, res) => {
 })
 
 router.post('/checkForUser', (req,res) => {
-	const { userName, userPassword } = req.body;
+	
+	const { email, password } = req.body;
 
-	const checkForUserCommand = 'select id from users where name = ? and password = ?';
+	const checkForUserCommand = 'select id from users where email = ? and password = ?';
 
-	pool.query(checkForUserCommand, [userName, userPassword], (error, results) => {
+	pool.query(checkForUserCommand, [email, password], (error, results) => {
+
 		if (error) {
 			return res.status(500).json({ error: error.message });
 		}
-		res.status(201).json({ results });
+		else if(results.length !== 1) {
+			return res.status(500).json({ error: "User not found" });
+		}
+		res.status(201).json(results);
 	})
 })
 

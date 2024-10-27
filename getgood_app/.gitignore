@@ -21,6 +21,7 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+=======
 # Logs
 logs
 *.log
@@ -45,3 +46,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+<<<<<<< HEAD
+>>>>>>> myGoals
+=======
+>>>>>>> backend

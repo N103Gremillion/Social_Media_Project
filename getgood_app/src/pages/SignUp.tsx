@@ -1,20 +1,94 @@
 import {
     Box,
     Button,
-    Container,
     TextField,
     Typography,
 } from "@mui/material";
 import {useState} from "react";
-import {Link} from "react-router-dom"
+import {Link, useNavigate} from "react-router-dom"
 
 const SignUp = () => {
-    const [username, setUsername] = useState("");
+    
+    const navigate = useNavigate()
+
+    //Variables to keep track of information from the user
+    const [name, setUsername] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
-    const handleSignUp = () => {
-        alert(username + " " + email + " " + password)
+    //
+    const [nameError, setNameError] = useState(false)
+    const [emailError, setEmailError] = useState(false)
+    const [passwordError, setPasswordError] = useState(false)
+
+    const [emailErrorType, setErrorType] = useState("")
+
+    const handleSignUp = async () => {
+
+        const emailFormat = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i
+
+        var err = false
+
+        if(name === ""){
+            setNameError(true)
+            err = true
+        } else {
+            setNameError(false)
+        }
+        if(email === "" || emailFormat.test(email) === false){
+            setEmailError(true)
+            setErrorType("Please enter a valid Email")
+            err = true
+        } else {
+            setEmailError(false)
+        }
+        if(password === ""){
+            setPasswordError(true)
+            err = true
+        } else {
+            setPasswordError(false)
+        }
+
+        if(err) {
+            return
+        }
+
+        try {
+            const existingUsers = await fetch ('http://localhost:4000/existingUsers', {
+                method: 'POST',
+                headers: {
+                    'Content-type': "application/json"
+                },
+                body: JSON.stringify({email})
+            })
+
+            if(existingUsers.status > 499) {
+                throw new Error("User already exists")
+            }
+
+            const signupInfo = await fetch('http://localhost:4000/addUser', {
+                method: "POST",
+                headers: {
+                    'Content-type': "application/json"
+                },
+                body: JSON.stringify({name, email, password})
+            })
+
+            if(signupInfo.status > 499) {
+                throw new Error("Create user error")
+            }
+
+            const signUpResults = await signupInfo.json()
+
+            //userID is the key
+            sessionStorage.setItem('userID', signUpResults.id)
+            navigate("/Dashboard")
+
+        } catch (error) {
+            console.error(error)
+            setEmailError(true)
+            setErrorType("Email is already being used by an existing account")
+        }
     }
 
     return (
@@ -25,7 +99,6 @@ const SignUp = () => {
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            backgroundColor: "lightblue", 
             paddingBottom: "10%"
         }}
         >
@@ -45,7 +118,9 @@ const SignUp = () => {
                     id="username"
                     name="username"
                     label="Username"
-                    value={username}
+                    error = {nameError}
+                    helperText = {!nameError ? '' : 'Please enter a Username'}
+                    value={name}
                     onChange={(e) => setUsername(e.target.value)}
                 />
 
@@ -56,8 +131,10 @@ const SignUp = () => {
                     id="email"
                     name="email"
                     label="Email Address"
+                    error = {emailError}
+                    helperText = {!emailError ? '' : emailErrorType}
                     value={email}
-                    onChange={(e) => setEmail(e. target.value)}
+                    onChange={(e) => setEmail(e.target.value)}
                 />
 
                 <TextField
@@ -68,6 +145,8 @@ const SignUp = () => {
                     name="password"
                     label="Password"
                     type="password"
+                    error = {passwordError}
+                    helperText = {!passwordError ? '' : 'Please enter a Password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                 />

@@ -1,3 +1,4 @@
+import React from "react";
 import {
     Box,
     Typography,
@@ -65,8 +66,10 @@ const Login = () => {
         } else {
             const checkResults = await checkForUser.json()
 
+            const id = checkResults[0].id
             //userID is the key
-            sessionStorage.setItem('userID', checkResults[0].id)
+            sessionStorage.setItem('userID', id)
+
             navigate("/Dashboard")
         }
 

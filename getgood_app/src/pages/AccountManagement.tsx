@@ -12,24 +12,75 @@ import {
 } from "@mui/material";
 import PersonIcon from "@mui/icons-material/Person"
 import { blue } from "@mui/material/colors"
-import React, { useState } from "react";
-
-const username = 'User1'
-const password = "acmjkewoc"
+import React, { useState, useEffect } from "react";
 
 const AccountManagement = () => {
+    const [username, setUsername] = useState("")
+    const [password, setPassword] = useState("")
+    const id = sessionStorage.getItem('userID')
+
+    useEffect(() => {
+        fetch('http://localhost:4000/getUsername', {
+            method: 'POST',
+            headers: {
+                'Content-type': "application/json"
+            },
+            body: JSON.stringify({id})
+        })
+        .then(response => response.json())
+        .then(data => setUsername(data[0].name))
+    }, [])
+    
+    const getUsername = async () => {
+
+        const getUsername = await fetch('http://localhost:4000/getUsername', {
+            method: 'POST',
+            headers: {
+                'Content-type': "application/json"
+            },
+            body: JSON.stringify({id})
+        })
+        
+        const usernameResults = await getUsername.json()
+        setUsername(usernameResults[0].name)
+    }
+
+    const getPassword = async () => {
+        const getPassword = await fetch('http://localhost:4000/getPassword', {
+            method: 'POST',
+            headers: {
+                'Content-type': "application/json"
+            },
+            body: JSON.stringify({id})
+        })
+
+        const passwordResults = await getPassword.json()
+        setPassword(passwordResults[0].password)
+    }
+    
+    getUsername()
+    getPassword()
+
     const [openUser, setOpenUser] = useState(false)
     const [openPassword, setOpenPassword] = useState(false)
     const [openAvatar, setOpenAvatar] = useState(false)
 
-    const [userValue, setUserValue] = useState(username)
-    const [passwordValue, setPasswordValue] = useState(password)
+    var userValue = username
+    var passwordValue = password
 
     const handleClickUser = () => {
         setOpenUser(true)
     }
 
-    const handleCloseUser = () => {
+    const handleCloseUser = async () => {
+        const changeUsername = await fetch('http://localhost:4000/changeUserName', {
+            method: 'POST',
+            headers: {
+                'Content-type': "application/json"
+            },
+            body: JSON.stringify({id, userValue})
+        })
+        getUsername()
         setOpenUser(false)
     }
 
@@ -37,7 +88,16 @@ const AccountManagement = () => {
         setOpenPassword(true)
     }
 
-    const handleClosePassword = () => {
+    const handleClosePassword = async () => {
+        const changePassword = await fetch('http://localhost:4000/changeUserPassword', {
+            method: 'POST',
+            headers: {
+                'Content-type': "application/json"
+            },
+            body: JSON.stringify({id, passwordValue})
+        })
+        console.log(changePassword.status)
+        getPassword()
         setOpenPassword(false)
     }
 
@@ -85,7 +145,7 @@ const AccountManagement = () => {
                     alignItems: "center"
                 }}
                 >
-                    <Typography variant="h5">User: {userValue}</Typography>
+                    <Typography variant="h5">User: {username}</Typography>
                     
                     <Button
                         variant="contained" onClick={handleClickUser}
@@ -101,7 +161,7 @@ const AccountManagement = () => {
                                 const formData = new FormData(event.currentTarget)
                                 const formJson = Object.fromEntries((formData as any).entries())
                                 const username = formJson.username
-                                setUserValue(username)
+                                userValue = username
                                 handleCloseUser()
                             }
                         }}
@@ -136,8 +196,8 @@ const AccountManagement = () => {
                                 event.preventDefault()
                                 const formData = new FormData(event.currentTarget)
                                 const formJson = Object.fromEntries((formData as any).entries())
-                                const password = formJson.username
-                                setPasswordValue(password)
+                                const password = formJson.password
+                                passwordValue = password
                                 handleClosePassword()
                             }
                         }}

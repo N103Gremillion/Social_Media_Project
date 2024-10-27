@@ -1,26 +1,16 @@
 import React, { useState } from "react";
 import { useNavigate } from 'react-router-dom'; 
 import DeleteConfirmationModal from "./DeleteConfirmationModal";
-import './styles/Goal.css'
 import "bootstrap/dist/css/bootstrap.min.css";
 
-export interface RawGoalProps {
-  id: number;
-  name: string;
-  description: string;
-  start_date: string;
-  end_date: string;
-  userId: number
-}
-
 export interface GoalProps {
-  id : number | null,
+  id : number
   name: string; 
   description: string;
-  startDate: Date;
-  endDate: Date; 
+  startDate: string;
+  endDate: string; 
   userId: number; 
-  onRemoveGoal?: (goalId: number) => void; 
+  onRemoveGoal: (goalId: number) => void; 
 }
 
 const PORT = 4000;
@@ -62,10 +52,7 @@ const Goal: React.FC<GoalProps> = (props) => {
       if (response.ok) {
         alert('Goal deleted successfully!');
         setShowModal(false);
-        if (goalId !== null && props.onRemoveGoal) {
-          props.onRemoveGoal(goalId)
-        }
-        navigate('/dashboard/my-goals');
+        navigate('/Dashboard/my-goals');
       } else {
         return response.json().then(errorData => {
           throw new Error(errorData.error || 'Failed to delete goal.'); 
@@ -77,20 +64,21 @@ const Goal: React.FC<GoalProps> = (props) => {
       alert('An error occured: ' + error.message); 
     })
 
+    
     setShowModal(false);
   };
 
   const handleEdit = () => {
-    const goalData = { name, description, startDate, endDate, onRemoveGoal: undefined }; 
-    console.log("Navigating with goal:", goalData)
-    navigate('/dashboard/create-goal', { state: goalData });
+    navigate('/Dashboard/create-goal', {
+      state: { name, description, startDate, endDate }
+    });
   };
 
   const handleManage = () => {
-    const goalData = { name, description, startDate, endDate, onRemoveGoal: undefined }; 
-    console.log("Navigating with goal:", goalData)
     sessionStorage.setItem('goalId', `${props.id}`);
-    navigate('/dashboard/edit-goal-progress', { state: goalData });
+    navigate('/Dashboard/edit-goal-progress', {
+      state: { name, description, startDate, endDate }
+    });
   }
 
   return (
@@ -99,15 +87,15 @@ const Goal: React.FC<GoalProps> = (props) => {
         <div className="card-header">{name}</div>
         <div className="card-body">
           <h5 className="card-title">{description}</h5>
-          <p className="card-text">{startDate.toLocaleDateString()}</p>
-          <p className="card-text">{endDate.toLocaleDateString()}</p>
-          <a href="#" className="btn btn-primary goal-button" onClick={handleManage}>
-          Manage
+          <p className="card-text">{startDate}</p>
+          <p className="card-text">{endDate}</p>
+          <a href="#" className="btn btn-primary" onClick={handleManage}>
+            Manage
           </a>
-          <a href="#" className="btn btn-primary goal-button" onClick={handleEdit}>
-          Edit
+          <a href="#" className="btn btn-primary" onClick={handleEdit}>
+            Edit
           </a>
-          <a href="#" className="btn btn-primary goal-button" onClick={handleShowModal}>
+          <a href="#" className="btn btn-primary" onClick={handleShowModal}>
             Delete
           </a>
         </div>

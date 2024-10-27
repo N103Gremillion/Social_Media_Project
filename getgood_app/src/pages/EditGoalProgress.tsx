@@ -1,19 +1,23 @@
 import React, { useState,useEffect } from 'react';
 import ReactFlow, { Edge, Position } from 'reactflow';
+import { useNavigate } from 'react-router-dom';
 import { Checkpoint, updateEdges, addCheckpointNode } from '../components/goalFunctions';
+import { addCheckpointsToDataBase, deleteCheckpointsFromDataBase } from '../components/databaseFunctions';
 //import 'reactflow/dist/style.css';
 
 const EditGoalProgess = () => {
     const PORT = 4000;
     const userId = 1;
     const goalId = sessionStorage.getItem('goalId');
-    const currentTime = new Date().getTime();
+    const navigate = useNavigate();
+    let [modifiedList, setModifiedList] = useState<boolean>(true);
+    
 
     
 
     const beginningNodes: Checkpoint[] = [
-      { id: '1', position: { x: 50, y: 20 }, data: { label: 'Start', date: "01-01-01" }, sourcePosition: Position.Right, targetPosition: Position.Left },
-      { id: '2', position: { x: 250, y: 20 }, data: { label: 'End', date: '01-01-99999' }, sourcePosition: Position.Right, targetPosition: Position.Left }
+      { id: '1', position: { x: 50, y: 20 }, data: { label: 'Start', date: "01-01-01", completed: true }, sourcePosition: Position.Right, targetPosition: Position.Left },
+      { id: '2', position: { x: 250, y: 20 }, data: { label: 'End', date: '01-01-99999', completed: false }, sourcePosition: Position.Right, targetPosition: Position.Left }
     ];
     const beginningEdges: Edge[] = [{ id: '1-2', source: '1', target: '2', type: 'straight' }];
 
@@ -21,25 +25,39 @@ const EditGoalProgess = () => {
     const [edges, setEdges] = useState<Edge[]>(beginningEdges);
 
     const addCheckpoints = (nodes: Checkpoint[], newNodes: any) => {
-      console.log("newnodes: ", newNodes);
       for (let i=0; i < newNodes.length; i++) {
-        addCheckpointNode(nodes, newNodes[i].date, newNodes[i].name, setNodes, setEdges);
+        addCheckpointNode(nodes, newNodes[i].date, newNodes[i].name, (newNodes[i].completed == "1"), setNodes, setEdges);
       }
       
     }
     useEffect(() => {
       
       const fetchCheckpoints = async () => {
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        
         const newCheckpoints = await getCheckpoints();
         if (newCheckpoints) {
+          setModifiedList(true);
           addCheckpoints(nodes, newCheckpoints);
+          
           setEdges(updateEdges(nodes));
+          
         }
       }
-      console.log("here");
-      fetchCheckpoints();
+      fetchCheckpoints();      
     }, []);
+
+    useEffect(() => {
+      
+      if (modifiedList) {
+        setModifiedList(false);
+        const newNodes = markCompletionDisplay(nodes);
+        setNodes(newNodes);
+      }
+      
+      
+
+    }, [nodes])
+
     const getCheckpoints = async () => {
 
       try {
@@ -55,7 +73,6 @@ const EditGoalProgess = () => {
   
         if (response.ok) {
           const result = await response.json();
-          console.log('result', result, result.checkpoints[0], goalId);
           return result.checkpoints;
         }else {
           console.error(response.statusText);
@@ -65,30 +82,53 @@ const EditGoalProgess = () => {
       }
     }
 
+    const markCompletionDisplay = (oldNodes: Checkpoint[]) => {
+      const currentTime = new Date().getTime();
+      const newNodes = [ ...oldNodes ];
+
+      for (let i=1; i<oldNodes.length; i++) {
+        let nodeTime = new Date(oldNodes[i].data.date).getTime();
+
+        if (currentTime > nodeTime && !oldNodes[i].data.completed) {
+          newNodes[i].style = { border: '1px dashed red' };
+          
+        } else if (oldNodes[i].data.completed) {
+          newNodes[i].style = { border: '1px solid green' };
+        } else {
+          newNodes[i].style = { border: '1px solid black' };
+        }
+      }
+      return newNodes;
+    }
+
     
     const handeCheckpointClick = (event: React.MouseEvent, node: Checkpoint) => {
-      if (node.id === '1' || node.id === `${nodes.length}`) {
+      if (node.id === '1') {
         event.stopPropagation();
         return;
       }
-      const currentTime = new Date().getTime();
-      setNodes(() => {
-        const newCheckpoints: Checkpoint[] = { ...nodes };
-        for (let i=0; i < newCheckpoints.length; i++) {
-          if (`${i+2}` === newCheckpoints[i].id) {
-            break;
-          }
-          newCheckpoints[i].style = {border: '5px solid green'};
-        }
-        for (let i=parseInt(node.id); i < newCheckpoints.length; i++) {
-          if (new Date(newCheckpoints[i].data.date).getTime() < currentTime) {
-            newCheckpoints[i].style = {border: '5px dashed red'};
-          } else {
-            break;
-          }
-        }
-        return newCheckpoints;
-      });
+
+      const newNodes = [ ...nodes ];
+      const nodeIndex = parseInt(node.id)-1;
+      newNodes[nodeIndex].data.completed = newNodes[nodeIndex].data.completed ? false : true;
+
+      setModifiedList(true);
+      setNodes(newNodes);
+      
+    }
+
+    const handleCheckpointsSave = () => {
+      let goalId = sessionStorage.getItem('goalId');
+      if (goalId) {
+        deleteCheckpointsFromDataBase(PORT, goalId);
+        addCheckpointsToDataBase(goalId, PORT, nodes);
+        navigate('/dashboard/my-goals');
+      }
+      
+    }
+
+    const handleCancel = () => {
+      navigate('/dashboard/my-goals');
     }
   
 
@@ -110,31 +150,35 @@ const EditGoalProgess = () => {
     return (
     <div className='Edit-Goal-Progress' style={EditProgressPageStyle}>
       <div className="checkpoint-display" style={{height: "90%"}} >
-            <h2>Edit Checkpoint Progress:</h2>
-            <div style={{ width: '1000px', overflowX: 'auto'}}>
-              <div 
-                style={{display: 'flex', height: '100px', 
-                width: `${Math.max(nodes.length * 500, 1000)}px`, 
-                justifyContent: 'center', 
-                whiteSpace: 'nowrap'}}>
-                <ReactFlow 
-                  nodes={nodes} 
-                  edges={edges} 
-                  nodesDraggable={false} 
-                  panOnDrag = {false} 
-                  fitView={true}
-                  elevateNodesOnSelect={false}
-                  elevateEdgesOnSelect={false}
-                  edgesFocusable={false}
-                  zoomOnDoubleClick={false}
-                  zoomOnScroll={false}
-                  zoomOnPinch={false}
-                  connectOnClick={false}
-                  //onNodeClick={handeCheckpointClick}
-                  />
-              </div>
-            </div>
+        <h2>Edit Checkpoint Progress:</h2>
+        <div style={{ width: '1000px', overflowX: 'auto'}}>
+          <div 
+            style={{display: 'flex', height: '100px', 
+            width: `${Math.max(nodes.length * 500, 1000)}px`, 
+            justifyContent: 'center', 
+            whiteSpace: 'nowrap'}}>
+            <ReactFlow 
+              nodes={nodes} 
+              edges={edges} 
+              nodesDraggable={false} 
+              panOnDrag = {false} 
+              fitView={true}
+              elevateNodesOnSelect={false}
+              elevateEdgesOnSelect={false}
+              edgesFocusable={false}
+              zoomOnDoubleClick={false}
+              zoomOnScroll={false}
+              zoomOnPinch={false}
+              connectOnClick={false}
+              onNodeClick={handeCheckpointClick}
+              />
           </div>
+        </div>
+      </div>
+      <div className='buttons'>
+        <button onClick={handleCheckpointsSave}>Save Progress</button>
+        <button onClick={handleCancel}>Cancel</button>
+      </div>
     </div>
     );
 };

@@ -2,6 +2,7 @@ import React, { useState,useEffect } from 'react';
 import ReactFlow, { Edge, Node, Position } from 'reactflow';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Checkpoint, updateCheckpointIDs, updateCheckpointPositions, updateEdges, addCheckpointNode } from '../components/goalFunctions';
+import { addCheckpointsToDataBase } from '../components/databaseFunctions';
 import AddCheckpointModal from '../components/AddCheckpointModal';
 import EditCheckpointModal from '../components/EditCheckpointModal';
 import ErrorModal from '../components/ErrorModal';
@@ -68,8 +69,8 @@ const CreateGoalPage: React.FC = () => {
     setNewCheckpointDate('');
   };
   const beginningNodes: Checkpoint[] = [
-    { id: '1', position: { x: 50, y: 20 }, data: { label: 'Start', date: "01-01-01" }, sourcePosition: Position.Right, targetPosition: Position.Left },
-    { id: '2', position: { x: 250, y: 20 }, data: { label: 'End', date: '01-01-99999' }, sourcePosition: Position.Right, targetPosition: Position.Left }
+    { id: '1', position: { x: 50, y: 20 }, data: { label: 'Start', date: "01-01-01", completed: true }, sourcePosition: Position.Right, targetPosition: Position.Left },
+    { id: '2', position: { x: 250, y: 20 }, data: { label: 'End', date: '01-01-99999', completed: false }, sourcePosition: Position.Right, targetPosition: Position.Left }
   ];
   const beginningEdges: Edge[] = [{ id: '1-2', source: '1', target: '2', type: 'straight' }];
   let [nodes, setNodes] = useState<Checkpoint[]>(beginningNodes);
@@ -173,7 +174,7 @@ const CreateGoalPage: React.FC = () => {
         console.log(result);
         sessionStorage.setItem('goalId', result.id);
         console.log(sessionStorage.getItem('goalId'));
-        addCheckpointsToDataBase(result.id);
+        addCheckpointsToDataBase(result.id, PORT, nodes);
       }else {
         const result = await response.json();
         console.error(result);
@@ -187,6 +188,7 @@ const CreateGoalPage: React.FC = () => {
     navigate('/dashboard/my-goals');
   }
 
+<<<<<<< HEAD
   const addCheckpointsToDataBase = async (goalId: string) => {
     for (let i=1; i<nodes.length-1; i++) {
       addCheckpointToDataBase(nodes[i], goalId);
@@ -223,6 +225,8 @@ const CreateGoalPage: React.FC = () => {
     }); 
   }; 
 
+=======
+>>>>>>> createGoals
   const CreatGoalPageStyle: React.CSSProperties = {
     backgroundColor: 'white',
     width: '95%',
@@ -326,7 +330,7 @@ const CreateGoalPage: React.FC = () => {
             setCheckpointName={setNewCheckpointName}
             checkpointDate={newCheckpointDate}
             setCheckpointDate={setNewCheckpointDate}
-            addCheckpoint={() => addCheckpointNode(nodes, newCheckpointDate, newCheckpointName, setNodes, setEdges)}
+            addCheckpoint={() => addCheckpointNode(nodes, newCheckpointDate, newCheckpointName, false, setNodes, setEdges)}
             clearCheckpointFields={clearCheckpointFields}
           />
           <EditCheckpointModal

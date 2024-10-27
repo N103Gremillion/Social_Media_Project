@@ -30,7 +30,8 @@ CREATE TABLE checkpoints (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     description TEXT,
-    date DATE
+    date DATE,
+    completed INT DEFAULT 0
 );
 
 CREATE TABLE goal_checkpoints (
@@ -56,4 +57,4 @@ CREATE TABLE mainFeedPosts (
     date DATE NOT NULL,
     imagePath VARCHAR(255),
     likes INT DEFAULT 0 
-)
+)INSERT INTO users (name, email, password) VALUES ('testuser', 'testuser@something.com', 'password');

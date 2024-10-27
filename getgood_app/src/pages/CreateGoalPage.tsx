@@ -8,16 +8,17 @@ import ErrorModal from '../components/ErrorModal';
 import { GoalProps } from '../components/Goal'
 import 'reactflow/dist/style.css';
 
-const CreateGoalPage = () => {
+const CreateGoalPage: React.FC = () => {
   const location = useLocation(); 
 
-  const [goal, setGoal] = useState({
+  const [goal, setGoal] = useState<Partial<GoalProps>>({
     id: null, 
-    goalName: '',
-    goalDescription: '', 
-    goalStartDate: '',
-    goalEndDate: '', 
+    name: '',
+    description: '', 
+    startDate: new Date(),
+    endDate: new Date(), 
   });
+
   const [checkpoints, setCheckpoints] = useState<Checkpoint[]>([]);
   const [newCheckpointName, setNewCheckpointName] = useState<string>('');
   const [newCheckpointDate, setNewCheckpointDate] = useState<string>('');
@@ -32,24 +33,25 @@ const CreateGoalPage = () => {
 
   useEffect (() => {
     if (location.state) {
-      const { name, description, startDate, endDate } = location.state as GoalProps; 
-      setGoal((prevGoal) => ({
-        ...prevGoal,
-        goalName: name, 
-        goalDescription: description,
-        goalStartDate: startDate, 
-        goalEndDate: endDate,
-      }));
+      console.log("Recieved location state:", location.state)
+      const { id, name, description, startDate, endDate } = location.state as GoalProps; 
+      setGoal({
+        id: id || null, 
+        name: name || '', 
+        description: description || '', 
+        startDate: startDate instanceof Date ? startDate: new Date(startDate),
+        endDate: endDate instanceof Date ? endDate: new Date(endDate),
+      });
     }
   }, [location.state]); 
 
   const clearGoalFields = () => {
     setGoal({
       id: null,
-      goalName: '',
-      goalDescription: '', 
-      goalStartDate: '',
-      goalEndDate: '',
+      name: '',
+      description: '', 
+      startDate: undefined,
+      endDate: undefined,
     })
   };
 
@@ -127,8 +129,8 @@ const CreateGoalPage = () => {
   }
 
   const checkDates = () => {
-    const startDate = new Date(goal.goalStartDate).getTime();
-    const endDate = new Date(goal.goalEndDate).getTime();
+    const startDate = new Date(goal.startDate || '2024-01-01').getTime();
+    const endDate = new Date(goal.endDate || '2024-01-01').getTime();
     const firstCheckpointDate = new Date(nodes[1].data.date).getTime();
     const lastCheckpointDate = new Date(nodes[nodes.length-2].data.date).getTime();
     let finalState = true;
@@ -153,10 +155,10 @@ const CreateGoalPage = () => {
     }
     const goalInfo = {
       userId,
-      goalName: goal.goalName,
-      goalDescription: goal.goalDescription,
-      goalStartDate: goal.goalStartDate,
-      goalEndDate: goal.goalEndDate,
+      goalName: goal.name,
+      goalDescription: goal.description,
+      goalStartDate: goal.startDate,
+      goalEndDate: goal.endDate,
     };
 
     try {
@@ -214,10 +216,10 @@ const CreateGoalPage = () => {
     }
     setGoal({
       id: null,
-      goalName: '',
-      goalDescription: '',
-      goalStartDate: '',
-      goalEndDate: ''
+      name: '',
+      description: '',
+      startDate: undefined,
+      endDate: undefined
     }); 
   }; 
 
@@ -245,7 +247,7 @@ const CreateGoalPage = () => {
               type="text"
               id="goal-name"
               name="goalName"
-              value={goal.goalName}
+              value={goal.name}
               onChange={handleChange}
               placeholder="Enter your goal name"
             />
@@ -256,7 +258,7 @@ const CreateGoalPage = () => {
           <textarea
             id="goal-description"
             name="goalDescription"
-            value={goal.goalDescription}
+            value={goal.description}
             onChange={handleChange}
             placeholder="Enter a description of your goal"
           />
@@ -268,10 +270,10 @@ const CreateGoalPage = () => {
           <p>From</p>
           <input
             type="date"
-            value={goal.goalStartDate}
+            value={goal.startDate ? goal.startDate.toISOString().split('T')[0] : ''}
             onChange={(e) => setGoal(() => {
               const newGoal = {...goal};
-              newGoal.goalStartDate = e.target.value;
+              newGoal.startDate = new Date(e.target.value);
               return newGoal;
             } )}
             placeholder="YYYY-MM-DD"
@@ -279,10 +281,10 @@ const CreateGoalPage = () => {
           <p>to</p>
           <input
             type="date"
-            value={goal.goalEndDate}
+            value={goal.endDate ? goal.endDate.toISOString().split('T')[0] : ''}
             onChange={(e) => setGoal(() => {
               const newGoal = {...goal};
-              newGoal.goalEndDate = e.target.value;
+              newGoal.endDate = new Date(e.target.value);
               return newGoal;
             } )}
             placeholder="YYYY-MM-DD"

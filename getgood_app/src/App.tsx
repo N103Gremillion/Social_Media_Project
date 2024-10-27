@@ -12,7 +12,8 @@ import { createBrowserRouter, RouterProvider, Outlet} from "react-router-dom";
 
 
 const dashboardStyle : React.CSSProperties = {
-  marginLeft: '5%',
+  marginLeft: '7%',
+  width: 'calc(100vw - 7%)',
   height: '100vh',
   boxSizing: 'border-box',
   overflow: 'auto',

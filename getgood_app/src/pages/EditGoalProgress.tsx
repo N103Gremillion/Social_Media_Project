@@ -7,6 +7,9 @@ const EditGoalProgess = () => {
     const PORT = 4000;
     const userId = 1;
     const goalId = sessionStorage.getItem('goalId');
+    const currentTime = new Date().getTime();
+
+    
 
     const beginningNodes: Checkpoint[] = [
       { id: '1', position: { x: 50, y: 20 }, data: { label: 'Start', date: "01-01-01" }, sourcePosition: Position.Right, targetPosition: Position.Left },
@@ -24,7 +27,19 @@ const EditGoalProgess = () => {
       }
       
     }
-
+    useEffect(() => {
+      
+      const fetchCheckpoints = async () => {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        const newCheckpoints = await getCheckpoints();
+        if (newCheckpoints) {
+          addCheckpoints(nodes, newCheckpoints);
+          setEdges(updateEdges(nodes));
+        }
+      }
+      console.log("here");
+      fetchCheckpoints();
+    }, []);
     const getCheckpoints = async () => {
 
       try {
@@ -50,17 +65,32 @@ const EditGoalProgess = () => {
       }
     }
 
-    useEffect(() => {
-      const fetchCheckpoints = async () => {
-        const newCheckpoints = await getCheckpoints();
-        if (newCheckpoints) {
-          addCheckpoints(nodes, newCheckpoints);
-          setEdges(updateEdges(nodes));
-        }
+    
+    const handeCheckpointClick = (event: React.MouseEvent, node: Checkpoint) => {
+      if (node.id === '1' || node.id === `${nodes.length}`) {
+        event.stopPropagation();
+        return;
       }
-      console.log("here");
-      fetchCheckpoints();
-    }, []);
+      const currentTime = new Date().getTime();
+      setNodes(() => {
+        const newCheckpoints: Checkpoint[] = { ...nodes };
+        for (let i=0; i < newCheckpoints.length; i++) {
+          if (`${i+2}` === newCheckpoints[i].id) {
+            break;
+          }
+          newCheckpoints[i].style = {border: '5px solid green'};
+        }
+        for (let i=parseInt(node.id); i < newCheckpoints.length; i++) {
+          if (new Date(newCheckpoints[i].data.date).getTime() < currentTime) {
+            newCheckpoints[i].style = {border: '5px dashed red'};
+          } else {
+            break;
+          }
+        }
+        return newCheckpoints;
+      });
+    }
+  
 
     const EditProgressPageStyle: React.CSSProperties = {
       backgroundColor: 'white',
@@ -80,7 +110,7 @@ const EditGoalProgess = () => {
     return (
     <div className='Edit-Goal-Progress' style={EditProgressPageStyle}>
       <div className="checkpoint-display" style={{height: "90%"}} >
-            <h2>Checkpoints:</h2>
+            <h2>Edit Checkpoint Progress:</h2>
             <div style={{ width: '1000px', overflowX: 'auto'}}>
               <div 
                 style={{display: 'flex', height: '100px', 
@@ -100,6 +130,7 @@ const EditGoalProgess = () => {
                   zoomOnScroll={false}
                   zoomOnPinch={false}
                   connectOnClick={false}
+                  //onNodeClick={handeCheckpointClick}
                   />
               </div>
             </div>

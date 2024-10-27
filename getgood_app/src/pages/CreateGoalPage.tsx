@@ -188,45 +188,6 @@ const CreateGoalPage: React.FC = () => {
     navigate('/dashboard/my-goals');
   }
 
-<<<<<<< HEAD
-  const addCheckpointsToDataBase = async (goalId: string) => {
-    for (let i=1; i<nodes.length-1; i++) {
-      addCheckpointToDataBase(nodes[i], goalId);
-    }
-  };
-
-  const addCheckpointToDataBase = async (checkpoint: Node, goalId: string) => {
-    const name = checkpoint.data.label;
-    const date = checkpoint.data.date;
-
-    try {
-      const response = await fetch(`http://localhost:${PORT}/addCheckpoint`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({name, date, goalId}),
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        console.log(result);
-      }else {
-        console.error(response.statusText);
-      }
-
-    } catch (error) {
-      console.error(error);
-    }
-    setGoal({
-      id: null,
-      name: '',
-      description: '',
-      startDate: undefined,
-      endDate: undefined
-    }); 
-  }; 
-
-=======
->>>>>>> createGoals
   const CreatGoalPageStyle: React.CSSProperties = {
     backgroundColor: 'white',
     width: '95%',

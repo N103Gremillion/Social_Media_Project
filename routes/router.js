@@ -18,11 +18,7 @@ const upload = multer({ storage: storage });
 const pool = mysql.createPool({
 	host: 'localhost',
 	user: 'root',
-<<<<<<< HEAD
-	password: 'root', //BottledchairsarealsoMice
-=======
-	password: 'ConstellationgoalsDecidetheWorld',
->>>>>>> createGoals
+	password: 'BottledchairsarealsoMice',
 	database: 'csc403'
 });
 

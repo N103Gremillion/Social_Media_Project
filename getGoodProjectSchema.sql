@@ -57,4 +57,6 @@ CREATE TABLE mainFeedPosts (
     date DATE NOT NULL,
     imagePath VARCHAR(255),
     likes INT DEFAULT 0 
-)INSERT INTO users (name, email, password) VALUES ('testuser', 'testuser@something.com', 'password');
+);
+
+INSERT INTO users (name, email, password) VALUES ('testuser', 'testuser@something.com', 'password');

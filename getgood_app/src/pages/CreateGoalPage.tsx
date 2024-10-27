@@ -29,7 +29,7 @@ const CreateGoalPage: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
   let [currentCheckpoint, setcurrentCheckpoint] = useState<Node>();
-  const userId = 1;
+  const userId = sessionStorage.getItem('userID');
   const PORT = 4000;
 
   useEffect (() => {
@@ -151,15 +151,15 @@ const CreateGoalPage: React.FC = () => {
   }
 
   const createGoal = async () => {
-    if (!checkDates()) {
+    if (!checkDates() || !goal.startDate || !goal.endDate) {
       return;
     }
     const goalInfo = {
       userId,
       goalName: goal.name,
       goalDescription: goal.description,
-      goalStartDate: goal.startDate,
-      goalEndDate: goal.endDate,
+      goalStartDate: goal.startDate.toISOString().slice(0,10),
+      goalEndDate: goal.endDate.toISOString().slice(0,10),
     };
 
     try {
@@ -211,7 +211,7 @@ const CreateGoalPage: React.FC = () => {
           <input
               type="text"
               id="goal-name"
-              name="goalName"
+              name="name"
               value={goal.name}
               onChange={handleChange}
               placeholder="Enter your goal name"
@@ -222,7 +222,7 @@ const CreateGoalPage: React.FC = () => {
           <h3>Description:</h3>
           <textarea
             id="goal-description"
-            name="goalDescription"
+            name="description"
             value={goal.description}
             onChange={handleChange}
             placeholder="Enter a description of your goal"

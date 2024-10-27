@@ -267,18 +267,24 @@ const CreateGoalPage = () => {
           <h3>Length:</h3> 
           <p>From</p>
           <input
-            type="text"
-            name="goalStartDate"
+            type="date"
             value={goal.goalStartDate}
-            onChange={handleChange}
+            onChange={(e) => setGoal(() => {
+              const newGoal = {...goal};
+              newGoal.goalStartDate = e.target.value;
+              return newGoal;
+            } )}
             placeholder="YYYY-MM-DD"
           />
           <p>to</p>
           <input
-            type="text"
-            name="goalEndDate"
+            type="date"
             value={goal.goalEndDate}
-            onChange={handleChange}
+            onChange={(e) => setGoal(() => {
+              const newGoal = {...goal};
+              newGoal.goalEndDate = e.target.value;
+              return newGoal;
+            } )}
             placeholder="YYYY-MM-DD"
           />
           <div className="checkpoint-display" >

@@ -12,6 +12,9 @@ export interface GoalProps {
   userId: number; 
   onRemoveGoal: (goalId: number) => void; 
 }
+
+const PORT = 4000;
+
 const Goal: React.FC<GoalProps> = (props) => {
   const {
     id: goalId,
@@ -37,7 +40,7 @@ const Goal: React.FC<GoalProps> = (props) => {
     console.log("Deleting goalId:", goalId); 
     console.log("For userId:", userId); 
     
-    fetch("http://localhost:3231/deleteGoal", {
+    fetch(`http://localhost:${PORT}/deleteGoal`, {
       method: 'POST',
       headers: { 'Content-Type' : 'application/json'},
       body:  JSON.stringify({

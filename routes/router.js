@@ -43,6 +43,32 @@ router.get('/getProfilePicture', (req, res) => {
     });
 })
 
+router.post('/getUsername', (req, res) => {
+	const userId = req.body.id;
+	
+	const getUsername = 'select name from users where id = ?';
+	
+	pool.query(getUsername, [userId], (error, results) => {
+		if(error) {
+			return res.status(500).json({ error: error.message});
+		}
+		res.json(results);
+	})
+})
+
+router.post('/getPassword', (req, res) => {
+	const userId = req.body.id;
+	
+	const getUsername = 'select password from users where id = ?';
+	
+	pool.query(getUsername, [userId], (error, results) => {
+		if(error) {
+			return res.status(500).json({ error: error.message});
+		}
+		res.json(results);
+	})
+})
+
 router.get('/getUserGoals', (req,res) => {
 	const  userId  = req.query.userId;
 
@@ -106,11 +132,11 @@ router.post('/checkForUser', (req,res) => {
 })
 
 router.post('/changeUserName', (req,res) => {
-	const {userId, newName} = req.body;
+	const {id, userValue} = req.body;
 
 	const changeNameQuery = 'update users set name = ? where id = ?';
 
-	pool.query(changeNameQuery, [newName, userId], (error,results) => {
+	pool.query(changeNameQuery, [userValue, id], (error,results) => {
 		if (error) {
 			return res.status(500).json({ error: error.message });
 		}
@@ -119,11 +145,11 @@ router.post('/changeUserName', (req,res) => {
 });
 
 router.post('/changeUserPassword', (req,res) => {
-	const {userId, newPassword} = req.body;
+	const {id, passwordValue} = req.body;
 
 	const changeNameQuery = 'update users set password = ? where id = ?';
 
-	pool.query(changeNameQuery, [newPassword, userId], (error,results) => {
+	pool.query(changeNameQuery, [passwordValue, id], (error,results) => {
 		if (error) {
 			return res.status(500).json({ error: error.message });
 		}

@@ -130,7 +130,7 @@ const MainFeedPage : React.FC = () => {
   }
 
   const mainDivStyle : React.CSSProperties = {
-    backgroundColor: 'lightyellow',
+    backgroundColor: 'white',
     width: '100%',
     height: '100vh',
     textAlign: 'center',

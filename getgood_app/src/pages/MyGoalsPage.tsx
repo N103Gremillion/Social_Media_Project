@@ -5,11 +5,12 @@ import Goal, { GoalProps, RawGoalProps } from "../components/Goal"
 
 const MyGoalsPage: React.FC = () => {
   const PORT = '4000'
-  const [userId] = useState<number>(1);   // hardcoded userId for testing
+  const [userId] = sessionStorage.getItem('userID') || '1';   
   const [goals, setGoals] = useState<GoalProps[]>([]);    
   const [isHovered, setIsHovered] = useState(false); 
 
   useEffect(() => {
+    
     fetch(`http://localhost:${PORT}/getUserGoals?userId=${userId}`, {
       headers: {
         'Accept' : 'application/json',
@@ -31,7 +32,8 @@ const MyGoalsPage: React.FC = () => {
             userId: goal.userId,
           }
         });
-        console.log('Formatted Goals:', formattedGoals)
+        console.log('Formatteds Goals:', formattedGoals)
+        console.log(`UserID in my goals: ${userId}`);
         setGoals(formattedGoals)
       })
       .catch((error) => {
@@ -92,7 +94,7 @@ const MyGoalsPage: React.FC = () => {
               description={goal.description}
               startDate={goal.startDate}
               endDate={goal.endDate} 
-              userId = {userId} 
+              userId = {parseInt(userId)} 
               onRemoveGoal={handleRemoveGoal}
             />  
           ))}

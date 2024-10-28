@@ -67,6 +67,7 @@ const Login = () => {
 
             //userID is the key
             sessionStorage.setItem('userID', checkResults[0].id)
+            console.log(`user ID in login: ${sessionStorage.getItem('userID')}`)
             navigate("/Dashboard")
         }
 

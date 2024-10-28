@@ -21,6 +21,11 @@ const Toolbar : React.FC = () => {
     navigate('/dashboard/create-goal');
   }
 
+  const handleLogout = () => {
+    sessionStorage.clear();
+    navigate("/");
+  }
+
   const divStyle : React.CSSProperties = {
     backgroundColor: 'skyblue',
     width: '7%',
@@ -98,14 +103,14 @@ const Toolbar : React.FC = () => {
       >
         Main Feed
       </Link>
-      <Link
+      <button
+        onClick={handleLogout}
         style={toolbarButtonStyle('Button5')} 
-        to="Page5"
         onMouseEnter={() => handleMouseEnter('Button5')}
         onMouseLeave={handleMouseLeave}
       >
-        Button 5
-      </Link>
+        Logout
+      </button>
     </div>
   );
 }

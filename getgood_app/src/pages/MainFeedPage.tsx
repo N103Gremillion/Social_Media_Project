@@ -117,8 +117,6 @@ const MainFeedPage : React.FC = () => {
       console.log("No image file");
     }
 
-    console.log("about to post");
-
     setIsReqestInProgress(true);
     await axios.post(`${BASE_URL}api/posts`, formData)
     .then(res => console.log(res))

@@ -60,3 +60,4 @@ CREATE TABLE mainFeedPosts (
 );
 
 INSERT INTO users (name, email, password) VALUES ('testuser', 'testuser@something.com', 'password');
+

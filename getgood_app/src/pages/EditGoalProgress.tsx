@@ -7,10 +7,10 @@ import { addCheckpointsToDataBase, deleteCheckpointsFromDataBase } from '../comp
 
 const EditGoalProgess = () => {
     const PORT = 4000;
-    const userId = 1;
+    const userId = sessionStorage.getItem('userID');
     const goalId = sessionStorage.getItem('goalId');
     const navigate = useNavigate();
-    let [modifiedList, setModifiedList] = useState<boolean>(true);
+    let [modifiedList, setModifiedList] = useState<boolean>(false);
     
 
     
@@ -38,7 +38,6 @@ const EditGoalProgess = () => {
         if (newCheckpoints) {
           setModifiedList(true);
           addCheckpoints(nodes, newCheckpoints);
-          
           setEdges(updateEdges(nodes));
           
         }
@@ -47,15 +46,11 @@ const EditGoalProgess = () => {
     }, []);
 
     useEffect(() => {
-      
       if (modifiedList) {
         setModifiedList(false);
         const newNodes = markCompletionDisplay(nodes);
         setNodes(newNodes);
       }
-      
-      
-
     }, [nodes])
 
     const getCheckpoints = async () => {
@@ -73,7 +68,7 @@ const EditGoalProgess = () => {
   
         if (response.ok) {
           const result = await response.json();
-          return result.checkpoints;
+          return result;
         }else {
           console.error(response.statusText);
         }

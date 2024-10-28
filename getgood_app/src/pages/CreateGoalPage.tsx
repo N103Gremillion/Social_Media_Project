@@ -29,7 +29,13 @@ const CreateGoalPage: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
   let [currentCheckpoint, setcurrentCheckpoint] = useState<Node>();
-  const userId = sessionStorage.getItem('userID');
+  const [userId, setUserId] = useState<string>(sessionStorage.getItem('userID') || '');
+  const [pastGoalId, setPastGoalId] = useState<string>(sessionStorage.getItem('pastGoalID') || '');
+  const [isEditing, setIsEditing] = useState<string>(sessionStorage.getItem("editing") || '');
+  const [deleted, setDeleted] = useState<boolean>(false);
+  const [shouldNavigate, setShouldNavigate] = useState<boolean>(false);
+  const [title, setTitle] = useState<string>('');
+  const [submitText, setSubmitText] = useState<string>('');
   const PORT = 4000;
 
   useEffect (() => {
@@ -45,6 +51,38 @@ const CreateGoalPage: React.FC = () => {
       });
     }
   }, [location.state]); 
+
+  useEffect (() => {
+    console.log(`Editing: ${isEditing}`);
+    setTitle((isEditing=="true") ? "Edit Your Goal" : "Create A Goal");
+    setSubmitText((isEditing=="true") ? "Save Changes" : "Create Goal");
+    if (isEditing == "true") {
+      const fetchCheckpoints = async () => {
+        
+        const newCheckpoints = await getCheckpoints();
+        if (newCheckpoints) {
+          addCheckpoints(nodes, newCheckpoints);
+          setEdges(updateEdges(nodes));
+          
+        }
+      }
+      fetchCheckpoints(); 
+    } else {
+      clearGoalFields();
+      setNodes(beginningNodes);
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!shouldNavigate) {
+      return;
+    }
+    setShouldNavigate(false);
+    setDeleted(false);
+    console.log('erorr deletion')
+    navigate('/dashboard/my-goals');
+
+  }, [deleted]);
 
   const clearGoalFields = () => {
     setGoal({
@@ -82,9 +120,13 @@ const CreateGoalPage: React.FC = () => {
   }
 
   const handeCheckpointClick = (event: React.MouseEvent, node: Node) => {
+    if (node.id === '1' || node.id == `${nodes.length}`) {
+      event.stopPropagation();
+      return;
+    }
     setcurrentCheckpoint(node);
     setNewCheckpointName(node.data.label);
-    setNewCheckpointDate(node.data.date);
+    setNewCheckpointDate(node.data.date.slice(0,10));
     setIsEditCheckpointModalOpen(true);
   }
 
@@ -127,6 +169,36 @@ const CreateGoalPage: React.FC = () => {
     })
     
     clearCheckpointFields();
+  }
+
+  const getCheckpoints = async () => {
+
+    try {
+      const goalInfo = {
+          userId: userId,
+          goalId: pastGoalId
+      };
+      const response = await fetch(`http://localhost:${PORT}/getCheckpoints`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(goalInfo),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        return result;
+      }else {
+        console.error(response.statusText);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  const addCheckpoints = (nodes: Checkpoint[], newNodes: any) => {
+    for (let i=0; i < newNodes.length; i++) {
+      addCheckpointNode(nodes, newNodes[i].date, newNodes[i].name, (newNodes[i].completed == "1"), setNodes, setEdges);
+    }
   }
 
   const checkDates = () => {
@@ -172,6 +244,7 @@ const CreateGoalPage: React.FC = () => {
       if (response.ok) {
         const result = await response.json();
         console.log(result);
+        
         sessionStorage.setItem('goalId', result.id);
         console.log(sessionStorage.getItem('goalId'));
         addCheckpointsToDataBase(result.id, PORT, nodes);
@@ -185,7 +258,46 @@ const CreateGoalPage: React.FC = () => {
 
     clearGoalFields();
     setNodes(beginningNodes);
-    navigate('/dashboard/my-goals');
+    
+  }
+
+  const deleteGoal = () => {
+      console.log("Deleting goalId:", pastGoalId); 
+    console.log("For userId:", userId); 
+    console.log(`Editing: ${sessionStorage.getItem('editing')}`)
+    fetch(`http://localhost:${PORT}/deleteGoal`, {
+      method: 'POST',
+      headers: { 'Content-Type' : 'application/json'},
+      body:  JSON.stringify({
+        userId: userId,
+        goalId: pastGoalId,
+      }),
+    })
+    .then(response => {
+      if (!response.ok) {
+        return response.json().then(err => { throw err; });
+      }
+      sessionStorage.setItem("editing", "false");
+      setShouldNavigate(true);
+      setDeleted(true);
+    })
+    .catch(error => {
+      console.log(error);
+      if (error.code === 'ER_LOCK_DEADLOCK') {
+        setTimeout(() => deleteGoal(), 200);
+      }
+    })
+    
+  };
+
+  const handleSubmit = async () => {
+    await createGoal();
+    if (isEditing == "true") {
+      deleteGoal();
+    } else {
+      navigate('/dashboard/my-goals');
+    }
+    
   }
 
   const CreatGoalPageStyle: React.CSSProperties = {
@@ -205,7 +317,7 @@ const CreateGoalPage: React.FC = () => {
 
   return (
     <div className="CreateGoal" style={CreatGoalPageStyle}>
-      <h1>Create A Goal</h1>
+      <h1>{title}</h1>
         <div className='goal-name'>
           <h3>Name:</h3>
           <input
@@ -313,7 +425,7 @@ const CreateGoalPage: React.FC = () => {
         </div>
 
         <div className='create-goal'>
-          <p><button onClick={createGoal}>Create Goal</button></p>
+          <p><button onClick={handleSubmit}>{submitText}</button></p>
         </div>
 
         

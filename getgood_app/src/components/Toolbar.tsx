@@ -1,7 +1,9 @@
 import React,{ useState } from "react"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 
 const Toolbar : React.FC = () => {
+
+  const navigate = useNavigate();
 
   // state to keep track of hover event
   const [hovered, setHovered] = useState<string | null>(null);
@@ -12,6 +14,11 @@ const Toolbar : React.FC = () => {
 
   const handleMouseLeave = () => {
     setHovered(null)
+  }
+
+  const hangleCreateGoalNavigation = () => {
+    sessionStorage.setItem("editing", "false");
+    navigate('/dashboard/create-goal');
   }
 
   const divStyle : React.CSSProperties = {
@@ -67,14 +74,14 @@ const Toolbar : React.FC = () => {
       >
         My Goals
       </Link>
-      <Link
+      <button
+        onClick={hangleCreateGoalNavigation}
         style={toolbarButtonStyle('Button2')}
-        to="create-goal"
         onMouseEnter={() => handleMouseEnter('Button2')}
         onMouseLeave={handleMouseLeave}
       >
         Create Goal
-      </Link>
+      </button>
       <Link
         style={toolbarButtonStyle('Button3')} 
         to="account-management"

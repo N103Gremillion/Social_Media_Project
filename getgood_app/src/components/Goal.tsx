@@ -60,21 +60,24 @@ const Goal: React.FC<GoalProps> = (props) => {
     })
     .then(response => {
       if (response.ok) {
-        alert('Goal deleted successfully!');
+        //alert('Goal deleted successfully!');
         setShowModal(false);
         if (goalId !== null && props.onRemoveGoal) {
           props.onRemoveGoal(goalId)
         }
         navigate('/dashboard/my-goals');
       } else {
-        return response.json().then(errorData => {
-          throw new Error(errorData.error || 'Failed to delete goal.'); 
-        });
+        return response.json().then(err => { throw err; });
       }
     })
     .catch(error => {
-      console.error('Error deleting goal:', error);
+      if (error.code === 'ER_LOCK_DEADLOCK') {
+        setTimeout(() => handleConfirmDelete(), 200);
+      } else {
+        console.error('Error deleting goal:', error);
       alert('An error occured: ' + error.message); 
+      }
+      
     })
 
     setShowModal(false);
@@ -83,6 +86,8 @@ const Goal: React.FC<GoalProps> = (props) => {
   const handleEdit = () => {
     const goalData = { name, description, startDate, endDate, onRemoveGoal: undefined }; 
     console.log("Navigating with goal:", goalData)
+    sessionStorage.setItem('editing', 'true');
+    sessionStorage.setItem('pastGoalID', `${goalId}`);
     navigate('/dashboard/create-goal', { state: goalData });
   };
 

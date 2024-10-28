@@ -53,7 +53,7 @@ const upload = multer({
 const pool = mysql.createPool({
 	host: 'localhost',
 	user: 'root',
-	password: 'Chi538Burger',
+	password: 'ConstellationgoalsDecidetheWorld',
 	database: 'csc403'
 });
 
@@ -213,13 +213,15 @@ router.post('/deleteGoal', (req,res) => {
 	const deleteConnectionQuery = "delete from user_goals where user_id=? and goal_id=?";
 	pool.query(deleteQuery, [goalId], (error,results) => {
 		if (error) {
-			return res.status(500).json({error: error.message});
+			console.log(error.name);
+			return res.status(500).json({error: error });
 		}
 	});
 
 	pool.query(deleteConnectionQuery, [userId, goalId], (error, results) => {
 		if (error) {
-			return res.status(500).json({ error: error.message });
+			console.log(error);
+			return res.status(500).json({ error: error });
 		}
 		res.status(201).json({ deleted: true });
 	});

@@ -107,8 +107,8 @@ const CreateGoalPage: React.FC = () => {
     setNewCheckpointDate('');
   };
   const beginningNodes: Checkpoint[] = [
-    { id: '1', position: { x: 50, y: 20 }, data: { label: 'Start', date: "01-01-01", completed: true }, sourcePosition: Position.Right, targetPosition: Position.Left },
-    { id: '2', position: { x: 250, y: 20 }, data: { label: 'End', date: '01-01-99999', completed: false }, sourcePosition: Position.Right, targetPosition: Position.Left }
+    { id: '1', position: { x: 50, y: 0 }, data: { label: 'Start', date: "01-01-01", completed: true }, sourcePosition: Position.Bottom },
+      { id: '2', position: { x: 50, y: 200 }, data: { label: 'End', date: '01-01-99999', completed: false }, targetPosition: Position.Top }
   ];
   const beginningEdges: Edge[] = [{ id: '1-2', source: '1', target: '2', type: 'straight' }];
   let [nodes, setNodes] = useState<Checkpoint[]>(beginningNodes);
@@ -368,12 +368,13 @@ const CreateGoalPage: React.FC = () => {
           />
           <div className="checkpoint-display" >
             <h2>Checkpoints:</h2>
-            <div style={{ width: '1000px', overflowX: 'auto'}}>
+            <div style={{ width: '400px', height: '550px', overflowY: 'scroll', overflowX: 'hidden'}}>
               <div 
-                style={{display: 'flex', height: '10vh', 
-                width: `${Math.max(nodes.length * 500, 1000)}px`, 
-                justifyContent: 'center', 
-                whiteSpace: 'nowrap'}}>
+                style={{display: 'flex', 
+                  height: `${Math.max(nodes.length * 200, 400)}px`, 
+                  width: `390px`, 
+                  justifyContent: 'center', 
+                  whiteSpace: 'nowrap'}}>
                 <ReactFlow 
                   nodes={nodes} 
                   edges={edges} 

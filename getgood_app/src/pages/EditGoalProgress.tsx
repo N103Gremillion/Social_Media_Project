@@ -16,8 +16,8 @@ const EditGoalProgess = () => {
     
 
     const beginningNodes: Checkpoint[] = [
-      { id: '1', position: { x: 50, y: 20 }, data: { label: 'Start', date: "01-01-01", completed: true }, sourcePosition: Position.Right, targetPosition: Position.Left },
-      { id: '2', position: { x: 250, y: 20 }, data: { label: 'End', date: '01-01-99999', completed: false }, sourcePosition: Position.Right, targetPosition: Position.Left }
+      { id: '1', position: { x: 50, y: 0 }, data: { label: 'Start', date: "01-01-01", completed: true }, sourcePosition: Position.Bottom },
+      { id: '2', position: { x: 50, y: 200 }, data: { label: 'End', date: '01-01-99999', completed: false }, targetPosition: Position.Top }
     ];
     const beginningEdges: Edge[] = [{ id: '1-2', source: '1', target: '2', type: 'straight' }];
 
@@ -81,14 +81,14 @@ const EditGoalProgess = () => {
       const currentTime = new Date().getTime();
       const newNodes = [ ...oldNodes ];
 
-      for (let i=1; i<oldNodes.length; i++) {
+      for (let i=0; i<oldNodes.length; i++) {
         let nodeTime = new Date(oldNodes[i].data.date).getTime();
 
         if (currentTime > nodeTime && !oldNodes[i].data.completed) {
-          newNodes[i].style = { border: '1px dashed red' };
+          newNodes[i].style = { border: '3px dashed red' };
           
         } else if (oldNodes[i].data.completed) {
-          newNodes[i].style = { border: '1px solid green' };
+          newNodes[i].style = { border: '3px solid green' };
         } else {
           newNodes[i].style = { border: '1px solid black' };
         }
@@ -146,10 +146,11 @@ const EditGoalProgess = () => {
     <div className='Edit-Goal-Progress' style={EditProgressPageStyle}>
       <div className="checkpoint-display" style={{height: "90%"}} >
         <h2>Edit Checkpoint Progress:</h2>
-        <div style={{ width: '1000px', overflowX: 'auto'}}>
+        <div style={{ width: '400px', height: '550px', overflowY: 'scroll', overflowX: 'hidden'}}>
           <div 
-            style={{display: 'flex', height: '100px', 
-            width: `${Math.max(nodes.length * 500, 1000)}px`, 
+            style={{display: 'flex', 
+            height: `${Math.max(nodes.length * 200, 400)}px`, 
+            width: `390px`, 
             justifyContent: 'center', 
             whiteSpace: 'nowrap'}}>
             <ReactFlow 
@@ -161,6 +162,7 @@ const EditGoalProgess = () => {
               elevateNodesOnSelect={false}
               elevateEdgesOnSelect={false}
               edgesFocusable={false}
+              minZoom={100}
               zoomOnDoubleClick={false}
               zoomOnScroll={false}
               zoomOnPinch={false}

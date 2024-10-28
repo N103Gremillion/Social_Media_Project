@@ -27,7 +27,7 @@ export const updateCheckpointIDs = (oldCheckpoints: Node[]) => {
 export const updateCheckpointPositions = (nodes: Node[]) => {
     const newNodes: Node[] = Array.from(nodes);
     for (let i=0; i<newNodes.length; i++) {
-        newNodes[i].position.x = 50 + 200*i;
+        newNodes[i].position.y = 50 + 100*i;
     }
 return newNodes;
 }
@@ -66,10 +66,10 @@ export const addCheckpointNode = (nodes: Node[], newCheckpointDate: string, newC
     // Create a new checkpoint node
     const newNode: Checkpoint = {
       id: (length + 1).toString(), // Generate a new unique id
-      position: { x: lastNode.position.x + 200, y: lastNode.position.y }, // Position it based on the last node
+      position: { x: lastNode.position.x, y: lastNode.position.y + 200 }, // Position it based on the last node
       data: { label: newCheckpointName, date: newCheckpointDate, completed: isCompleted },
-      sourcePosition: Position.Right,
-      targetPosition: Position.Left,
+      sourcePosition: Position.Bottom,
+      targetPosition: Position.Top,
       
     };
 

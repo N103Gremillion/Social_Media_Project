@@ -147,10 +147,10 @@ const MainFeedPage : React.FC = () => {
   const addPostButtonStyle : React.CSSProperties = {
     backgroundColor: 'orange',
     borderRadius: '25%',
-    width: '5%',
-    height: '5%',
+    width: '10%',
+    height: '10%',
     position: 'absolute',
-    left: '85%',
+    left: '83%',
     bottom: '5%'
   }
 
@@ -160,8 +160,8 @@ const MainFeedPage : React.FC = () => {
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'space',
-    height: '100vh',
-    width: '98vw',
+    height: '150vh',
+    width: '88vw',
     margin: '3%',
     padding: '3%',
     border: '2px solid blue' 
@@ -202,7 +202,7 @@ const MainFeedPage : React.FC = () => {
         <input
         style={titleInputStyle}
         placeholder="Title"
-        maxLength={50}
+        maxLength={20}
         type="text"
         value={title}
         onChange={handlePostTitleChange}
@@ -232,8 +232,10 @@ const MainFeedPage : React.FC = () => {
         <textarea  
           style={{
             width: '80vw',
-            height: '40%',
-            resize: 'none' 
+            height: '10vw',
+            outline: 'none',
+            overflow: 'auto',
+            boxSizing: 'border-box',
           }}
           placeholder="Enter your content here."
           value={content}

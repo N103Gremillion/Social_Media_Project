@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import likeImage from "../sprites/like.png";
+import deleteImage from "../sprites/delete.png";
 
 const Post : React.FC<{
   title : string; 
@@ -10,21 +11,32 @@ const Post : React.FC<{
   likes: number
 }>  = ({title, content, author, date, imagePath, likes}) => {
   
-  const [hoveringLike, setHoveringLike] = useState<boolean>(false);
+  const [hoveringLike, setHoverLike] = useState<boolean>(false);
+  const [hoveringDelete, setHoverDelete] = useState<boolean>(false);
   const [likeCounter, setLikeCounter] = useState(likes);
 
   const handleMouseEnterLike = () => {
-    setHoveringLike(true);
+    setHoverLike(true);
   }
 
   const handleMouseLeaveLike = () => {
-    setHoveringLike(false);
+    setHoverLike(false);
+  }
+
+  const handleMouseEnterDelete = () => {
+    setHoverDelete(true);
+  }
+
+  const handleMouseLeaveDelete = () => {
+    setHoverDelete(false);
   }
 
   const handleLikeButtonClick = () => {
     setLikeCounter(likeCounter + 1);
+  }
 
-    // change on backend
+  const handleDeleteButtonClick = () => {
+    console.log("Delete");
   }
 
   const postStyle = {
@@ -39,13 +51,14 @@ const Post : React.FC<{
   }
 
   const titleStyle = {
+    overflow: 'hidden',
     fontSize: '2rem',
     fontWeight: 'bold',
     marginBottom: '10px',
-    color: '#333'
+    color: '#333',
   };
 
-  const contentStyle = {
+  const contentStyle : React.CSSProperties = {
     fontSize: '1rem',
     margin: '8px',
     overflow: 'hidden',
@@ -70,42 +83,44 @@ const Post : React.FC<{
     marginBottom: '20px',
   };
 
-  const likeButtonStyle = {
+  const buttonStyle: React.CSSProperties = {
     padding: '1% 2%',
-    backgroundColor: hoveringLike === true ? '#007BFF' : 'darkBlue',
-    color: hoveringLike === true ? 'black' : 'white',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    border: '1px solid #ccc',
+    backgroundColor: 'none',
+    alignItems: 'right',
     cursor: 'pointer',
-    width: '10%', 
+    width: '7%',
+    height: '6%',
     borderRadius: '12px',
-    margin: '0 auto', 
+    margin: '0 auto',
+    display: 'block',
+    border: 'none',      
+    outline: 'none',
+  }
+
+  const deleteImageStyle = {
+    ...buttonStyle,
+    marginRight: '95%',
+    opacity: hoveringDelete ? 0.7 : 1
   };
 
   const likeImageStyle = {
-    width: '100%', 
-    height: 'auto', 
-    marginRight: '5%', 
-  };
-
-  const deleteButtonStyle = {
-    padding: '1% 2%',
-    backgroundColor: 'red',
-    color: hoveringLike === true ? 'black' : 'white',
-    alignItems: 'right',
-    border: '1px solid #ccc',
-    cursor: 'pointer',
+    ...buttonStyle,
+    marginRight: '45%', 
     width: '10%', 
-    borderRadius: '12px',
-    margin: '0 auto',
-  }
+    height: '9%', 
+    opacity: hoveringLike ? 0.7 : 1
+  };
 
   return (
     <div style={postStyle}>
+      <img 
+        src={deleteImage} alt="Delete"
+        style={deleteImageStyle}
+        onMouseEnter={handleMouseEnterDelete}
+        onMouseLeave={handleMouseLeaveDelete}
+        onClick={handleDeleteButtonClick}
+      />
       <h2 style={titleStyle}>{title}</h2>
-      <div/>
       <div 
       style={contentStyle}
       // replace all \n with appropriate <br /> (new line)
@@ -121,16 +136,12 @@ const Post : React.FC<{
       </div>
       <div>
         {/* like and comment buttons */}
-        <button 
-          style={likeButtonStyle}
-          onMouseEnter={() => handleMouseEnterLike()}
-          onMouseLeave={() => handleMouseLeaveLike()}
-          onClick={() => handleLikeButtonClick()}
-          >
-          <img src={likeImage} alt="LikeButton" 
-            style={likeImageStyle}
-          />
-        </button>
+        <img src={likeImage} alt="LikeButton" 
+          style={likeImageStyle}
+          onClick={handleLikeButtonClick}
+          onMouseEnter={handleMouseEnterLike}
+          onMouseLeave={handleMouseLeaveLike}
+        />
         {likeCounter}
       </div>
     </div>

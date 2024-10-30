@@ -36,7 +36,7 @@ const storage = multer.diskStorage({
 // upload images to backend
 const upload = multer({ 
 	storage: storage,
-	limits: { fileSize: 5 * 1024 * 1024 },
+	limits: { fileSize: 10 * 1024 * 1024 },
 	fileFilter: function (req, file, cb) {
 		const filetypes = /jpeg|jpg|png|gif/;
 		const mimetype = filetypes.test(file.mimetype);
@@ -296,19 +296,23 @@ let posts = [];
 
 router.get('/api/posts', (req, res) => {
 
+	const offset = parseInt(req.query.offset) || 0;
+	const limit = parseInt(req.query.limit) || 10;
+
 	const query = `
-	SELECT 
-		title,
-		content,
-		author,
-		DATE_FORMAT(date, '%d-%m-%Y') AS formatted_date,
-		imagePath,
-		likes
+		SELECT 
+    title,
+    content,
+    author,
+    DATE_FORMAT(date, '%d-%m-%Y') AS formatted_date,
+    imagePath,
+    likes
 	FROM
-		mainFeedPosts;
+			mainFeedPosts
+	LIMIT ? OFFSET ?;
 	`;
 
-	pool.query(query, (error, results) => {
+	pool.query(query, [limit, offset], (error, results) => {
 		if (error){
 			console.error("error fetching the posts form database", error);
 			return res.status(500).json();

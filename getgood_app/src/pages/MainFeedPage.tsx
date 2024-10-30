@@ -2,6 +2,7 @@ import React, { ChangeEvent, KeyboardEvent, useState, useEffect } from "react";
 import Post from "./Post";
 import axios from "axios";
 import FormData from 'form-data';
+import InfiniteScroll from 'react-infinite-scroll-component';
 
 const MainFeedPage : React.FC = () => {
 
@@ -22,13 +23,16 @@ const MainFeedPage : React.FC = () => {
   const [content, setContent] = useState<string>('');
   const [imagePath, setImagePath] = useState<string>('');
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imageError, setImageError] = useState<string>('');
   const [likes] = useState<number>(0);
-  // list of current posts
   const [posts, setPosts] = useState<PostType[]>([]);
+  const [postIndex, setPostIndex] = useState(1);
+  const [hasMorePosts, setHasMorePosts] = useState<boolean>(true);
   const BASE_URL : string = 'http://localhost:4000/';
 
-  const fetchPosts = async () => {
-    await axios.get(`${BASE_URL}api/posts`)
+  const fetchPosts = async () => { 
+    // fetches the inital 1st 10 posts
+    await axios.get(`${BASE_URL}api/posts?offset=0&limit=10`)
     .then( response => {
       setPosts(response.data);
     })
@@ -38,6 +42,22 @@ const MainFeedPage : React.FC = () => {
   useEffect( () => {
     fetchPosts();
   }, []);
+
+  const fetchMorePosts = async () => {
+
+    console.log("trying to get more posts");
+
+    if (!hasMorePosts) return;
+
+    await axios.get(`${BASE_URL}api/posts?offset=${postIndex * 10}&limit=10`)
+    .then( response => {
+      setPosts(posts => [...posts, ...response.data]);
+
+      response.data.length > 0 ? setHasMorePosts(true) : setHasMorePosts(false);
+    })
+    .catch(error => console.error('error fetching posts: ', error))
+    setPostIndex((postIndex) => postIndex + 1)
+  }
 
   const openPromptForPost = () => {
     setIsPostPromptOpen(true);
@@ -81,10 +101,17 @@ const MainFeedPage : React.FC = () => {
 
   const handleImageChange = (event : ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
+    const maxSize = 5 * 1024 * 1024;
     if (file) {
-      const imageUrl = URL.createObjectURL(file); 
-      setImagePath(imageUrl); 
-      setImageFile(file);
+      if (file.size > maxSize) {
+        setImageError('Image is above limit of 5 MB');
+      }
+      else {
+        setImageError('');
+        const imageUrl = URL.createObjectURL(file); 
+        setImagePath(imageUrl); 
+        setImageFile(file);
+      }
     }
   }
 
@@ -131,25 +158,30 @@ const MainFeedPage : React.FC = () => {
 
   const mainDivStyle : React.CSSProperties = {
     backgroundColor: 'white',
-    width: '100%',
-    height: '100vh',
     textAlign: 'center',
-    // make the items in div vertially align
     display: 'flex',
-    alignItems:'center',
-    justifyContent: 'space-evenly',
+    alignItems: 'center',
     flexDirection: 'column',
-    position: 'fixed',
-    marginLeft: '5vw',
-    zIndex: '0'
+    zIndex: '0',
+    height: '100vw'
   };
+
+  const scrollerStyling : React.CSSProperties = {
+    width: '80%',
+    marginRight: '20%',
+    paddingRight: '3%',
+    boxSizing: 'border-box',
+    overflowY: 'auto',
+    textAlign: 'center',
+    padding: 8
+  }
 
   const addPostButtonStyle : React.CSSProperties = {
     backgroundColor: 'orange',
     borderRadius: '25%',
     width: '10%',
     height: '10%',
-    position: 'absolute',
+    position: 'fixed',
     left: '83%',
     bottom: '5%'
   }
@@ -160,7 +192,7 @@ const MainFeedPage : React.FC = () => {
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'space',
-    height: '150vh',
+    height: '80vh',
     width: '88vw',
     margin: '3%',
     padding: '3%',
@@ -177,11 +209,6 @@ const MainFeedPage : React.FC = () => {
 
   const dateInputStyle : React.CSSProperties = {
     width: '20vw'
-  }
-
-  const paragraphInputStyle : React.CSSProperties = {
-    width: '80vw',
-    height: '40%'
   }
 
   const submitPostButtonStyle : React.CSSProperties ={
@@ -249,6 +276,8 @@ const MainFeedPage : React.FC = () => {
           onChange={handleImageChange}
         />
 
+        <p style={{color:'red'}}>{imageError}</p>
+
         <div className="postPromptButtonContainer" style={{
           display: "flex",
           flexDirection: "row", 
@@ -275,38 +304,46 @@ const MainFeedPage : React.FC = () => {
   }
 
   return (
-    <div style={mainDivStyle}>
-      <div 
-        className="postContainer" 
-        id="displayContainer"
-        style={{
-          width: '80%',
-          marginRight: '20%',
-          overflowY: 'auto',
-          paddingRight: '3%',
-          boxSizing: 'border-box'
-        }}
-      >
-        {/* display all posts in the post array */}
-        {posts.map((post, index) => (
-          <Post
-            key={index}
-            title={post.title}
-            content={post.content}
-            author={post.author}
-            date={post.date}
-            imagePath={post.imagePath}
-            likes={post.likes}
-          />
-        ))}
+    <div>
+
+      <div className="fixedHeader">
+        <h2> </h2>
       </div>
-      <button 
-        style={addPostButtonStyle} 
-        className="addPostButton"
-        onClick={openPromptForPost}
-      >
-        + Post
-      </button>
+
+      <InfiniteScroll 
+          dataLength={posts.length}
+          next={fetchMorePosts}
+          hasMore={hasMorePosts}
+          loader={<h4>Loading...</h4>}
+          style={scrollerStyling}
+          scrollableTarget="scrollableDiv"
+          height={'100vw'}
+        >
+        <div className="mainFeedContainer" id="scrollableDiv" style={mainDivStyle}>
+            {/* display all posts in the post array */}
+            {posts.map((post, index) => (
+              <Post
+                key={index}
+                title={post.title}
+                content={post.content}
+                author={post.author}
+                date={post.date}
+                imagePath={post.imagePath}
+                likes={post.likes}
+              />
+            ))}
+            {!hasMorePosts && <h4>There are not more Posts.</h4>}
+          <button 
+            style={addPostButtonStyle} 
+            className="addPostButton"
+            onClick={openPromptForPost}
+          >
+            + Post
+          </button>
+        </div>
+
+      </InfiniteScroll>
+
     </div>
   );  
 }

@@ -89,7 +89,6 @@ const Post : React.FC<{
     alignItems: 'right',
     cursor: 'pointer',
     width: '7%',
-    height: '6%',
     borderRadius: '12px',
     margin: '0 auto',
     display: 'block',

@@ -6,24 +6,16 @@ import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
 import AccountManagement from "./pages/AccountManagement";
 import CreateGoalPage from "./pages/CreateGoalPage";
-import MainFeedPage from "./pages/MainFeedPage";
 import EditGoalProgress from "./pages/EditGoalProgress";
+import Explore from "./pages/Explore";
 import { createBrowserRouter, RouterProvider, Outlet} from "react-router-dom";
-
-
-const dashboardStyle : React.CSSProperties = {
-  marginLeft: '7%',
-  width: 'calc(100vw - 7%)',
-  height: '100vh',
-  boxSizing: 'border-box',
-  overflow: 'auto',
-};
+import "./components/styles/app.css"
 
 const Dashboard  = () => {
   return (
-    <div>   
+    <div className="content">   
       <Toolbar />
-      <div style={dashboardStyle}>
+      <div className="dashboard">
         <Outlet />
         </div>
     </div>
@@ -40,35 +32,21 @@ const router = createBrowserRouter([
       { path: "my-goals", element: <MyGoalsPage /> },
       { path: "create-goal", element: <CreateGoalPage /> },
       { path: "account-management", element: <AccountManagement /> },
-      { path: "main-feed", element: <MainFeedPage /> },
-      { path: "edit-goal-progress", element: <EditGoalProgress />}
+      { path: "edit-goal-progress", element: <EditGoalProgress />},
+      { path: "explore", element: <Explore />}
     ],
   },
   
 ]);
 
-
 function App() {
-
-  const examplePost = {
-    title: "Hello World",
-    content: "this is the first of my posts asdlkfjasdklfjasdl;kfjsd;lfsdkfjasdklfjasdfkljasdfkl;asdjfl;kasdf",
-    author: "Nathan Gremillion",
-    date: "October 6th 2024"
-  };
 
   return (
     <div>
-
-      {/* <MainFeedPage/> */}
-      {/* <MainFeedPage/> */}
-      
       <RouterProvider router={router} />
     </div>
   );
 };
-
-
 
 export default App;
 

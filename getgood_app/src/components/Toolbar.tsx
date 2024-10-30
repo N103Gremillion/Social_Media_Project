@@ -1,20 +1,11 @@
-import React,{ useState } from "react"
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom"
+import './styles/Toolbar.css';
+import CreatePostModal from "./CreatePostModal";
 
 const Toolbar : React.FC = () => {
 
   const navigate = useNavigate();
-
-  // state to keep track of hover event
-  const [hovered, setHovered] = useState<string | null>(null);
-
-  const handleMouseEnter = (buttonId : string) =>{
-    setHovered(buttonId)
-  }
-
-  const handleMouseLeave = () => {
-    setHovered(null)
-  }
 
   const hangleCreateGoalNavigation = () => {
     sessionStorage.setItem("editing", "false");
@@ -26,93 +17,54 @@ const Toolbar : React.FC = () => {
     navigate("/");
   }
 
-  const divStyle : React.CSSProperties = {
-    backgroundColor: 'skyblue',
-    width: '7%',
-    height: '100vh',
-    padding: '20px',
-    borderRadius: '10px',
-    textAlign: 'center',
-    // make the items in div vertially align
-    display: 'flex',
-    alignItems:'center',
-    justifyContent: 'space-evenly',
-    flexDirection: 'column',
-    border: '2px solid royalblue',
-    position: 'fixed',
-    top: '0',
-    left: '0',
-    // make sure it renders on top of pages
-    zIndex: '10',
-  };
+  const [showCreatePost, setShowCreatePost] = useState<boolean>(false);
 
-  const toolbarButtonStyle  = (buttonId : string) : React.CSSProperties => ({
-    backgroundColor: hovered === buttonId ? 'lightgrey' : 'lightblue',
-    color: hovered === buttonId ? 'white' : 'blue',
-    width: '125%', 
-    height: '10%',
-    border: '2px solid blue',
-    borderRadius: '10px',
-    textAlign: 'center',
-    fontSize: '16px',
-    cursor: 'pointer',
-    boxSizing: 'border-box',
-    textDecoration: 'none',
-    fontWeight: 'bold',
-    fontFamily: 'Arial, sans-serif',
-    // Use flexbox to center text
-    display: 'flex', 
-    // Center text vertically
-    alignItems: 'center', 
-    justifyContent: 'center',
-    // this adds a smother transition on hover events
-    transition: 'background-color 0.3s, color 0.3s'
-  });
 
   return (
-    <div style={divStyle}>
+    <div className="toolbar">
+      <img className="logo" src={require("../assets/get_goals_logo.png")}/>
+      <div className="nav-items">
       <Link
-        style ={toolbarButtonStyle('Button1')}
+        className="nav-item"
         to="my-goals"
-        onMouseEnter={() => handleMouseEnter('Button1')}
-        onMouseLeave={handleMouseLeave}
       >
         My Goals
       </Link>
       <button
+        className="nav-item"
         onClick={hangleCreateGoalNavigation}
-        style={toolbarButtonStyle('Button2')}
-        onMouseEnter={() => handleMouseEnter('Button2')}
-        onMouseLeave={handleMouseLeave}
       >
         Create Goal
       </button>
       <Link
-        style={toolbarButtonStyle('Button3')} 
+        className="nav-item"
         to="account-management"
-        onMouseEnter={() => handleMouseEnter('Button3')}
-        onMouseLeave={handleMouseLeave}
       >
         Account Manager
       </Link>
       <Link
-        style={toolbarButtonStyle('Button4')}
-        to="main-feed"
-        onMouseEnter={() => handleMouseEnter('Button4')}
-        onMouseLeave={handleMouseLeave}
+        className="nav-item"
+        to="explore"
       >
-        Main Feed
+        Explore
       </Link>
       <button
+        className="nav-item"
+        onClick={() => setShowCreatePost(true)}
+      >
+        Create Post
+      </button>
+      <button
+        className="nav-item"
         onClick={handleLogout}
-        style={toolbarButtonStyle('Button5')} 
-        onMouseEnter={() => handleMouseEnter('Button5')}
-        onMouseLeave={handleMouseLeave}
       >
         Logout
       </button>
+      {showCreatePost && <CreatePostModal onClose={() => setShowCreatePost(false)}/>}
+      </div>
     </div>
   );
+  
 }
 
 export default Toolbar

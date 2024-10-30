@@ -302,7 +302,7 @@ const CreateGoalPage: React.FC = () => {
 
   const CreatGoalPageStyle: React.CSSProperties = {
     backgroundColor: 'white',
-    width: '95%',
+    width: '100%',
     height: '100vh',
     textAlign: 'center',
     display: 'flex',
@@ -310,7 +310,6 @@ const CreateGoalPage: React.FC = () => {
     justifyContent: 'space-evenly',
     flexDirection: 'column',
     position: 'fixed',
-    marginLeft: '5vw',
     zIndex: '0', 
     overflowY: 'auto'   
   };

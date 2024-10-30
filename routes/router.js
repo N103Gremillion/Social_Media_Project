@@ -5,6 +5,7 @@ const router = express.Router();
 const mysql = require('mysql2');
 const multer = require('multer');
 const baseUrl = 'http://localhost:4000';
+const config = require(path.resolve('../config.json'));
 
 const storage = multer.diskStorage({
 
@@ -50,12 +51,12 @@ const upload = multer({
 	}
  });
 
-const pool = mysql.createPool({
-	host: 'localhost',
-	user: 'root',
-	password: 'ConstellationgoalsDecidetheWorld',
-	database: 'csc403'
-});
+ const pool = mysql.createPool({
+	host: config.MYSQL_HOST,
+	user: config.MYSQL_USER,
+	password: config.MYSQL_PASSWORD,
+	database: config.MYSQL_DATABASE
+  });
 
 router.get('/getProfilePicture', (req, res) => {
   const userId = req.query.userId;

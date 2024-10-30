@@ -1,0 +1,47 @@
+.toolbar {
+  background-color: black;
+  width: 300px;
+  height: 100vh;
+  padding-top: 20px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  border-right: 2px solid rgb(78, 77, 77);
+}
+
+.toolbar .logo {
+  width: 80px;
+  margin-bottom: 2rem;
+}
+
+.toolbar .nav-items {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+  width: 100%;
+}
+
+.nav-item {
+  background-color: black;
+  width: 80%; 
+  padding: 10px 15px;
+  border-radius: 10px;
+  text-align: center;
+  font-size: 16px;
+  font-weight: bold;
+  font-family: Arial, sans-serif;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s, color 0.3s;
+  text-decoration: none;
+  color: white; 
+  align-items: center;
+}
+
+.nav-item:hover {
+  background-color: white;
+  color: black;
+}

@@ -1,5 +1,7 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
+config.json
+
 # Node modules
 /getgood_app/node_modules/
 
@@ -88,5 +90,3 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-
-config.json

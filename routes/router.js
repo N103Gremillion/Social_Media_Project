@@ -5,7 +5,7 @@ const router = express.Router();
 const mysql = require('mysql2');
 const multer = require('multer');
 const baseUrl = 'http://localhost:4000';
-const config = require(path.resolve('../config.json'));
+const config = require(path.resolve(__dirname, '../config.json'));
 
 const storage = multer.diskStorage({
 
@@ -37,7 +37,7 @@ const storage = multer.diskStorage({
 // upload images to backend
 const upload = multer({ 
 	storage: storage,
-	limits: { fileSize: 5 * 1024 * 1024 },
+	limits: { fileSize: 10 * 1024 * 1024 },
 	fileFilter: function (req, file, cb) {
 		const filetypes = /jpeg|jpg|png|gif/;
 		const mimetype = filetypes.test(file.mimetype);
@@ -297,6 +297,9 @@ let posts = [];
 
 router.get('/api/posts', (req, res) => {
 
+	const offset = parseInt(req.query.offset) || 0;
+	const limit = parseInt(req.query.limit) || 12;
+
 	const query = `
 	SELECT 
 		title,
@@ -306,10 +309,11 @@ router.get('/api/posts', (req, res) => {
 		imagePath,
 		likes
 	FROM
-		mainFeedPosts;
+		mainFeedPosts
+	LIMIT ? OFFSET ?;
 	`;
 
-	pool.query(query, (error, results) => {
+	pool.query(query, [limit, offset], (error, results) => {
 		if (error){
 			console.error("error fetching the posts form database", error);
 			return res.status(500).json();

@@ -9,7 +9,7 @@
     align-items: flex-start;
     overflow: auto;
 }
-  
+
 .images-display {
     display: grid;
     grid-template-columns: repeat(3, 350px);

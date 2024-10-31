@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Modal, Form, Button } from "react-bootstrap";
+import { Modal, Form, Button, Spinner } from "react-bootstrap";
 import axios from 'axios';
 
 interface CreatePostModalProps {
@@ -11,12 +11,22 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({onClose}) => {
     const [author, setAuthor] = useState<string>('author');
     const [date, setDate] = useState<string>(new Date().toISOString().slice(0,10));
     const [content, setContent] = useState<string>('');
+    const [postLoading, setPostLoading] = useState<boolean>(false);
     const BASE_URL : string = 'http://localhost:4000/';
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files) {
-            setImage(e.target.files[0]);
-        }
+        const maxFileSize = 10 * 1024 * 1024;
+
+        if  (e.target.files) {
+            const file = e.target.files[0];
+            if (file.size > maxFileSize) {
+                alert("File size excedes 5MB please choose a different file.");
+                e.target.value = "";
+            }
+            else {
+                setImage(e.target.files[0]);
+            }
+        } 
     }
 
     const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -28,9 +38,10 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({onClose}) => {
     }
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault()
-        const formData = new FormData();
+        e.preventDefault();
+        setPostLoading(true);
 
+        const formData = new FormData();
         formData.append('title', title);
         formData.append('author', author);
         formData.append('date', date);
@@ -45,6 +56,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({onClose}) => {
         .then(res => console.log(res))
         .catch(err => console.log('Error submitting the post:', err))
         .finally(() => {
+            setPostLoading(false);
             onClose();
         })
 
@@ -88,7 +100,10 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({onClose}) => {
                         />
                     </Form.Group>
                     <Button variant='primary' type='submit'>
-                        Submit
+                        {postLoading ? (
+                            <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" />) 
+                            : ("Submit")
+                        }
                     </Button>
                 </Form>
             </Modal.Body>

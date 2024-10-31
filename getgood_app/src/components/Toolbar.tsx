@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom"
-import './styles/Toolbar.css';
+import './styles/toolbar.css';
 import CreatePostModal from "./CreatePostModal";
 
 const Toolbar : React.FC = () => {

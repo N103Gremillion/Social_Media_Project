@@ -11,7 +11,7 @@ interface ImageModalProps {
         imagePath: string;
         likes: number;
         visibilityStatus: string;
-        };
+    };
 
     onClose: () => void;
 }

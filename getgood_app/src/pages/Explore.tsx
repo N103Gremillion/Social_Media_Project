@@ -63,7 +63,7 @@ const Explore = () => {
     };
 
     return (
-        <div className="explore-page">
+        <div className="explore-page" id="explore-page">
             <InfiniteScroll
                 dataLength={posts.length}
                 next={fetchMorePosts}
@@ -75,14 +75,13 @@ const Explore = () => {
                     </p>
                 } 
                 className={"images-display"}
-                height={'100vh'}
+            scrollableTarget="explore-page"
             >
                 {posts.map((post) => (
                     <img
                         key={post.id}
                         src={post.imagePath}
                         onClick={() => openModal(post)}
-                        height={'90vh'}
                         className="image"
                     />
                 ))}

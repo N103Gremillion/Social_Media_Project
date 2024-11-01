@@ -79,6 +79,31 @@ router.get('/getProfilePicture', (req, res) => {
     });
 })
 
+router.get('/usersWithSub', (req, res) => {
+	const subString = req.query.query;
+
+	const query = `
+		SELECT 
+			name
+		FROM
+			users;
+	`;
+
+	pool.query(query, (error, results) => {
+		if (error){
+			console.error("error fetching the users form database", error);
+			return res.status(500).json();
+		}
+		// add all name in the users table[]
+		const usersWithSubstring = results.map(user => ({
+			name: user.name,
+			id: user.id
+		}));
+		
+		res.status(200).json(usersWithSubstring);
+	});
+})
+
 router.post('/getUsername', (req, res) => {
 	const userId = req.body.id;
 	
@@ -291,9 +316,6 @@ router.post('/getCheckpoints', (req,res) => {
 	
 
 });
-
-// for the posts on the mainFeed
-let posts = [];
 
 router.get('/api/posts', (req, res) => {
 

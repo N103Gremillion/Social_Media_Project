@@ -39,6 +39,13 @@
   text-decoration: none;
   color: white; 
   align-items: center;
+  outline: black;
+  box-shadow: black;
+}
+
+.nav-item:focus {
+  outline: none; 
+  box-shadow: none; 
 }
 
 .nav-item:hover {

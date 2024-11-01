@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom"
 import './styles/toolbar.css';
+import SearchButton from "./SearchButton";
 import CreatePostModal from "./CreatePostModal";
 
 const Toolbar : React.FC = () => {
@@ -23,7 +24,9 @@ const Toolbar : React.FC = () => {
   return (
     <div className="toolbar">
       <img className="logo" src={require("../assets/get_goals_logo.png")}/>
+      
       <div className="nav-items">
+      <SearchButton/>
       <Link
         className="nav-item"
         to="my-goals"

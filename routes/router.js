@@ -4,6 +4,7 @@ const fs = require('fs');
 const router = express.Router();
 const mysql = require('mysql2');
 const multer = require('multer');
+const { error } = require('console');
 const baseUrl = 'http://localhost:4000';
 const config = require(path.resolve(__dirname, '../../config.json'));
 
@@ -302,6 +303,7 @@ router.get('/api/posts', (req, res) => {
 
 	const query = `
 	SELECT 
+		id,
 		title,
 		content,
 		author,
@@ -356,6 +358,34 @@ router.post('/api/posts', upload.single('image'), (req, res) => {
   
 	  });
   
+});
+
+router.post('/api/comments', (req,res) => {
+	const { postId, content } = req.body;
+
+	const query = 'insert into comments (post_id, content) values (?, ?)';
+
+	pool.query(query, [postId, content], (error, results) => {
+		if (error) {
+			return res.status(500).json({error: error});
+		}
+		res.status(200).json({comments: results});
+	});
+	
+});
+
+router.get('/api/comments', (req,res) => {
+	const postId = req.query.postId;
+	const query = 'select * from comments where post_id = ?';
+
+	pool.query(query, [postId], (error, results) => {
+		if (error) {
+			return res.status(500).json({error: error});
+		}
+		res.status(201).json({comments: results});
+	});
+
+	
 });
 
 function addGoalUserConnection(userId,goalId,query,req,res) {

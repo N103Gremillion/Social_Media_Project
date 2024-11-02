@@ -59,5 +59,12 @@ CREATE TABLE mainFeedPosts (
     likes INT DEFAULT 0 
 );
 
+CREATE TABLE comments (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    content TEXT,
+    post_id INT,
+    FOREIGN KEY (post_id) REFERENCES mainFeedPosts(id) ON DELETE CASCADE
+);
+
 INSERT INTO users (name, email, password) VALUES ('testuser', 'testuser@something.com', 'password');
 

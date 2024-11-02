@@ -156,7 +156,7 @@ const Login = () => {
 
                 </Box>
                 <Box sx={{
-                    mt: 5,
+                    mt: 2,
                     minHeight: "75px",
                     minWidth: "350px",
                     display: "flex",
@@ -167,6 +167,7 @@ const Login = () => {
                     border: "2px solid gray"
                 }}>
                     <Typography>Don't have an account?
+                        <> </>
                     <Link to="SignUp">Sign Up</Link>
                     </Typography>
                 </Box>

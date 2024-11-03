@@ -1,14 +1,14 @@
 {
   "files": {
     "main.css": "/static/css/main.b04ed513.css",
-    "main.js": "/static/js/main.534f3518.js",
+    "main.js": "/static/js/main.70db53c3.js",
     "static/media/get_goals_logo.png": "/static/media/get_goals_logo.7c001055040eb93bb9d2.png",
     "index.html": "/index.html",
     "main.b04ed513.css.map": "/static/css/main.b04ed513.css.map",
-    "main.534f3518.js.map": "/static/js/main.534f3518.js.map"
+    "main.70db53c3.js.map": "/static/js/main.70db53c3.js.map"
   },
   "entrypoints": [
     "static/css/main.b04ed513.css",
-    "static/js/main.534f3518.js"
+    "static/js/main.70db53c3.js"
   ]
 }

@@ -51,12 +51,18 @@ CREATE TABLE user_images (
 
 CREATE TABLE mainFeedPosts (
     id INT AUTO_INCREMENT PRIMARY KEY,
+    owner_id INT,
+    goal_id INT,
+    checkpoint_id INT,
     title VARCHAR(255) NOT NULL,
     content TEXT NOT NULL,
     author VARCHAR(100) NOT NULL,
     date DATE NOT NULL,
     imagePath VARCHAR(255),
-    likes INT DEFAULT 0 
+    likes INT DEFAULT 0,
+    FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (checkpoint_id) REFERENCES checkpoints(id) ON DELETE CASCADE,
+    FOREIGN KEY (goal_id) REFERENCES goals(id) ON DELETE CASCADE
 );
 
 CREATE TABLE comments (

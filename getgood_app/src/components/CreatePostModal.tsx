@@ -1,10 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Modal, Form, Button, Spinner } from "react-bootstrap";
 import axios from 'axios';
 
 interface CreatePostModalProps {
     onClose: () => void;
 }
+
+interface Goal {
+    id: number;
+    name: string;
+}
+
+interface Checkpoint {
+    id: number;
+    name: string;
+    goalId: number;
+}
+
 const CreatePostModal: React.FC<CreatePostModalProps> = ({onClose}) => {
     const [title, setTitle] = useState<string>('');
     const [image, setImage] = useState<File | null>(null);
@@ -12,6 +24,10 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({onClose}) => {
     const [date, setDate] = useState<string>(new Date().toISOString().slice(0,10));
     const [content, setContent] = useState<string>('');
     const [postLoading, setPostLoading] = useState<boolean>(false);
+    const [goals, setGoals] = useState<Goal[]>([]); 
+    const [selectedGoal, setSelectedGoal] = useState<number | null>(null);
+    const [checkpoints, setCheckpoints] = useState<Checkpoint[]>([]);
+    const [selectedCheckpoint, setSelectedCheckpoint] = useState<number | null>(null);
     const BASE_URL : string = 'http://localhost:4000/';
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -42,6 +58,9 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({onClose}) => {
         setPostLoading(true);
 
         const formData = new FormData();
+        formData.append('goal_id', `${selectedGoal}`);
+        formData.append('checkpoint_id', `${selectedCheckpoint}`);
+        formData.append('owner_id', (sessionStorage.getItem('userID') || "1"));
         formData.append('title', title);
         formData.append('author', author);
         formData.append('date', date);
@@ -61,6 +80,21 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({onClose}) => {
         })
 
     }
+
+    useEffect(() => {
+        axios.get(`${BASE_URL}getUserGoals?userId=${sessionStorage.getItem("userID")}`)
+            .then(response => setGoals(response.data))
+            .catch(err => console.error(err));
+        
+    }, []);
+
+    useEffect(() => {
+        if (selectedGoal) {
+            axios.get(`${BASE_URL}api/checkpoints?goalId=${selectedGoal}&userId=${sessionStorage.getItem("userID")}`)
+                .then(response => setCheckpoints(response.data))
+                .catch(err => console.error(err));
+        }
+    }, [selectedGoal]);
 
     return (
         <Modal show={true} onHide={onClose} >
@@ -88,6 +122,34 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({onClose}) => {
                             onChange={handleContentChange}
                             required
                         />
+                    </Form.Group>
+                    <Form.Group controlId='selectGoal'>
+                        <Form.Label>Goal</Form.Label>
+                        <Form.Control
+                            as="select"
+                            value={selectedGoal || ''}
+                            onChange={(e) => setSelectedGoal(Number(e.target.value))}
+                            required
+                        >
+                            <option value="">Select a Goal</option>
+                            {goals.map(goal => (
+                                <option key={goal.id} value={goal.id}>{goal.name}</option>
+                            ))}
+                        </Form.Control>
+                    </Form.Group>
+                    <Form.Group controlId='selectCheckpoint'>
+                        <Form.Label>Checkpoint</Form.Label>
+                        <Form.Control
+                            as="select"
+                            value={selectedCheckpoint || ''}
+                            onChange={(e) => setSelectedCheckpoint(Number(e.target.value))}
+                            required
+                        >
+                            <option value="">Select a Checkpoint</option>
+                            {selectedGoal && checkpoints.map(checkpoint => (
+                                <option key={checkpoint.id} value={checkpoint.id}>{checkpoint.name}</option>
+                            ))}
+                        </Form.Control>
                     </Form.Group>
                     <Form.Group controlId='imageFile'>
                         <Form.Label>Image</Form.Label>

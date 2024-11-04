@@ -59,6 +59,22 @@ const upload = multer({
 	database: config.MYSQL_DATABASE
   });
 
+router.post('/addProfilePicture', (req, res) => {
+	const id = req.body;
+	console.log('User id', id)
+	const image_path = req.file ? `${baseUrl}/ProfilePic` : null;
+	console.log('image path', image_path)
+	
+	const addPic = 'INSERT INTO user_images (user_id, image_path) VALUES (?, ?)';
+
+	pool.query(addPic, [id, image_path], (error, results) => {
+		if (error) {
+			return res.status(500).json({ error: error.message });
+		}
+		res.status(201).json({ id: results.insertId });
+	})
+})
+
 router.get('/getProfilePicture', (req, res) => {
   const userId = req.query.userId;
 
@@ -308,6 +324,22 @@ router.post('/getCheckpoints', (req,res) => {
 
 });
 
+router.get('/api/checkpoints', (req,res) => {
+	const userId = req.query.userId;
+	const goalId = req.query.goalId;
+	console.log(userId, goalId);
+	const query = "select * from checkpoints where (id in (select checkpoint_id from goal_checkpoints where goal_id = ?) and ? in (select goal_id from user_goals where user_id = ?))";
+
+	pool.query(query, [goalId,goalId,userId], (error, results) => {
+		if (error){
+			return res.status(500).json({ error });
+		}
+		res.status(201).json(results);
+	});
+	
+
+});
+
 // for the posts on the mainFeed
 let posts = [];
 
@@ -319,6 +351,9 @@ router.get('/api/posts', (req, res) => {
 	const query = `
 	SELECT 
 		id,
+		owner_id,
+		goal_id,
+		checkpoint_id,
 		title,
 		content,
 		author,
@@ -339,6 +374,9 @@ router.get('/api/posts', (req, res) => {
 		// add all elements in the table to the posts[]
 		const formattedPosts = results.map(post => ({
 			id: post.id,
+			ownerId: post.owner_id,
+			goalId: post.goal_id,
+			checkpointId: post.checkpoint_id,
 			title: post.title,
 			content: post.content,
 			author: post.author,
@@ -346,21 +384,21 @@ router.get('/api/posts', (req, res) => {
 			imagePath: post.imagePath,
 			likes: post.likes,
 		}));
-
+		
 		res.status(200).json(formattedPosts);
 	});
 });
 
 router.post('/api/posts', upload.single('image'), (req, res) => {
 
-	const { title, content, author, date } = req.body;
+	const { goal_id, checkpoint_id, owner_id, title, content, author, date } = req.body;
 	const imagePath = req.file ? `${baseUrl}/mainFeedImages/${req.file.filename}` : null;
-	const newPost = { title, content, author, date, imagePath, likes: 0 };
+	const newPost = { goal_id, checkpoint_id, owner_id, title, content, author, date, imagePath, likes: 0 };
   
 	// add post to the sql database
-	const query = 'INSERT INTO mainFeedPosts (title, content, author, date, imagePath, likes) VALUES (?, ?, ?, ?, ?, ?)';
+	const query = 'INSERT INTO mainFeedPosts (title, content, author, date, imagePath, likes, goal_id, checkpoint_id, owner_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)';
 	  
-	  pool.query(query, [newPost.title, newPost.content, newPost.author, newPost.date, newPost.imagePath, newPost.likes], (error, results) => {
+	  pool.query(query, [newPost.title, newPost.content, newPost.author, newPost.date, newPost.imagePath, newPost.likes, newPost.goal_id, newPost.checkpoint_id, newPost.owner_id], (error, results) => {
 		
 		if (error){
 			console.error("error when trying to send the post to database:", error);

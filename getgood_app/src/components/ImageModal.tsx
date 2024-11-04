@@ -5,6 +5,9 @@ import axios from 'axios';
 
 interface ImageModalProps {
     image: {
+        goalId: number;
+        checkpointId: number;
+        ownerId: number;
         id: number;
         title: string;
         content: string;

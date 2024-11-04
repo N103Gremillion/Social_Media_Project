@@ -80,29 +80,36 @@ router.get('/getProfilePicture', (req, res) => {
 })
 
 router.get('/usersWithSub', (req, res) => {
-	const subString = req.query.query;
+    const subString = req.query.query;
 
-	const query = `
-		SELECT 
-			name
-		FROM
-			users;
-	`;
+    const query = `
+        SELECT 
+            id, name
+        FROM
+            users
+        WHERE
+            name LIKE ?;
+    `;
 
-	pool.query(query, (error, results) => {
-		if (error){
-			console.error("error fetching the users form database", error);
-			return res.status(500).json();
-		}
-		// add all name in the users table[]
-		const usersWithSubstring = results.map(user => ({
-			name: user.name,
-			id: user.id
-		}));
-		
-		res.status(200).json(usersWithSubstring);
-	});
-})
+    // Adding wildcards for substring matching
+    const wildcardSubString = `%${subString}%`;
+
+    pool.query(query, [wildcardSubString], (error, results) => {
+        if (error) {
+            console.error("Error fetching the users from database", error);
+            return res.status(500).json();
+        }
+
+        // Map results to the desired format
+        const usersWithSubstring = results.map(user => ({
+            name: user.name,
+            id: user.id
+        }));
+        
+        res.status(200).json(usersWithSubstring);
+    });
+});
+
 
 router.post('/getUsername', (req, res) => {
 	const userId = req.body.id;

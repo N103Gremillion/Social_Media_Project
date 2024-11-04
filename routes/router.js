@@ -154,18 +154,33 @@ router.post('/checkForUser', (req,res) => {
 	
 	const { email, password } = req.body;
 
-	const checkForUserCommand = 'select id from users where email = ? and password = ?';
+	if(password === null) {
+		const checkForUserCommand = 'select id from users where email = ?';
+		pool.query(checkForUserCommand, [email], (error, results) => {
+	
+			if (error) {
+				return res.status(500).json({ error: error.message });
+			}
+			else if(results.length !== 1) {
+				return res.status(500).json({ error: "User not found" });
+			}
+			res.status(201).json(results);
+		})
+	}
+	else {
+		const checkForUserCommand = 'select id from users where email = ? and password = ?';
+		pool.query(checkForUserCommand, [email, password], (error, results) => {
+	
+			if (error) {
+				return res.status(500).json({ error: error.message });
+			}
+			else if(results.length !== 1) {
+				return res.status(500).json({ error: "User not found" });
+			}
+			res.status(201).json(results);
+		})
+	}
 
-	pool.query(checkForUserCommand, [email, password], (error, results) => {
-
-		if (error) {
-			return res.status(500).json({ error: error.message });
-		}
-		else if(results.length !== 1) {
-			return res.status(500).json({ error: "User not found" });
-		}
-		res.status(201).json(results);
-	})
 })
 
 router.post('/changeUserName', (req,res) => {

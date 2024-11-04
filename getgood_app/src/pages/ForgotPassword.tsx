@@ -8,22 +8,14 @@ import {
 import {useState} from "react";
 import {Link, useNavigate} from "react-router-dom"
 
-
-const Login = () => {
-
-    const navigate = useNavigate()
+const Forgot = () => {
 
     const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-
     const [emailError, setEmailError] = useState(false)
-    const [passwordError, setPasswordError] = useState(false)
-
     const [emailErrorType, setEmailErrorType] = useState("")
-    const [passwordErrorType, setPasswordErrorType] = useState("")
 
-    const handleLogin = async () => {
-
+    const handleRequest = async () => {
+        
         const emailFormat = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i
 
         var err = false
@@ -35,42 +27,22 @@ const Login = () => {
         } else {
             setEmailError(false)
         }
-        if(password === ""){
-            setPasswordError(true)
-            setPasswordErrorType("Please enter a Password")
-            err = true
-        } else {
-            setPasswordError(false)
-        }
-
-        if(err) {
-            return
-        }
 
         const checkForUser = await fetch('http://localhost:4000/checkForUser', {
             method: 'POST',
             headers: {
                 'Content-type': "application/json"
             },
-            body: JSON.stringify({email, password})
+            body: JSON.stringify({email, })
         })
 
         if(checkForUser.status > 499) {
             setEmail("")
             setEmailError(true)
             setEmailErrorType("Account not found")
-
-            setPassword("")
-            setPasswordError(true)
-            setPasswordErrorType("Account not found")
         } else {
-            const checkResults = await checkForUser.json()
-
-            //userID is the key
-            sessionStorage.setItem('userID', checkResults[0].id)
-            navigate("/Dashboard")
+            console.log(checkForUser.status)
         }
-
     }
 
     return (
@@ -97,7 +69,7 @@ const Login = () => {
             }}
             >
                 <Typography sx={{mt: 5}}
-                variant="h4">Login</Typography>
+                variant="h4">Trouble logging in?</Typography>
                 <TextField sx={{
                     mt: 2,
                     width: "20vw",
@@ -116,33 +88,11 @@ const Login = () => {
                     onChange={(e) => setEmail(e.target.value)}
                     />
 
-                    <TextField sx={{
-                        mt: 0.5,
-                        width: "20vw",
-                        backgroundColor: "white",
-                        borderRadius: 1
-                    }}
-                        margin="normal"
-                        required
-                        fullWidth
-                        id="password"
-                        name="password"
-                        label="Password"
-                        type="password"
-                        error = {passwordError}
-                        helperText = {!passwordError ? '' : passwordErrorType}
-                        value={password}
-                        onChange={(e) => {
-                        setPassword(e.target.value);
-                        }}
-                    />
-
-                    <Button 
-                        fullWidth
+                    <Button
                         variant="contained"
                         sx={{mt: 0.5, mb: 2, width: "20vw"}}
-                        onClick={handleLogin}
-                    >Login
+                        onClick={handleRequest}
+                    >Send login link
                     </Button>
 
                     <Divider sx={{
@@ -151,28 +101,13 @@ const Login = () => {
                         alignSelf: "stretch"}}
                     >OR</Divider>
 
-                    {/* <Typography sx={{mt: 2, mb: 5}}>Forgot Password?</Typography> */}
-                    <Link to="forgot-password">Forgot Password?</Link>
+                    <Link to="/signup">Create new account</Link>
+
+                    <Link to="/">Back to login</Link>
 
                 </Box>
-                <Box sx={{
-                    mt: 2,
-                    minHeight: "75px",
-                    minWidth: "350px",
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    backgroundColor: "lightgray",
-                    border: "2px solid gray"
-                }}>
-                    <Typography>Don't have an account?
-                        <> </>
-                    <Link to="SignUp">Sign Up</Link>
-                    </Typography>
-                </Box>
             </div>
-        )
-    }
-    
-    export default Login
+    )
+}
+
+export default Forgot

@@ -8,6 +8,7 @@ import AccountManagement from "./pages/AccountManagement";
 import CreateGoalPage from "./pages/CreateGoalPage";
 import EditGoalProgress from "./pages/EditGoalProgress";
 import Explore from "./pages/Explore";
+import Forgot from "./pages/ForgotPassword"
 import { createBrowserRouter, RouterProvider, Outlet} from "react-router-dom";
 import "./components/styles/app.css"
 
@@ -25,6 +26,7 @@ const Dashboard  = () => {
 const router = createBrowserRouter([
   { path: "/", element: <Login />, errorElement: <ErrorPage /> },
   { path: "signup", element: <SignUp /> },
+  {path: "forgot-password", element: <Forgot />},
   {
     path: "dashboard",
     element: <Dashboard />,

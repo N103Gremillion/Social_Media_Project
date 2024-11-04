@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Offcanvas, Form, ListGroup } from 'react-bootstrap';
+import { Offcanvas, Form, ListGroup, Image } from 'react-bootstrap';
 import axios from "axios";
 import AccountOverview from '../pages/AccountOverview';
+import PersonIcon from "@mui/icons-material/Person"
 
 interface SlideOutDivProps {
     show: boolean;       
@@ -61,7 +62,12 @@ const SlideOutDiv: React.FC<SlideOutDivProps> = ({ show, handleClose }) => {
                                 onMouseLeave={() => setHoveredUserId(null)} 
                                 className={hoveredUserId === user.id ? 'bg-primary text-white' : ''}
                             >
+                                <div>
+                                {/* <Image src="..." roundedCircle={true} className="rounded-circle border border-dark"></Image> */}
+                                <PersonIcon style={{ fontSize: 40, color: 'gray' }} />
                                 {user.name}
+                                </div>
+                                
                             </ListGroup.Item>
                         ))}
                     </ListGroup>

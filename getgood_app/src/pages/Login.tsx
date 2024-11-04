@@ -3,6 +3,7 @@ import {
     Typography,
     TextField,
     Button,
+    Divider,
 } from "@mui/material";
 import {useState} from "react";
 import {Link, useNavigate} from "react-router-dom"
@@ -79,20 +80,31 @@ const Login = () => {
             height: "100vh",
             width: "100vw",  
             display: "flex",
+            flexDirection: "column",
             justifyContent: "center",
             alignItems: "center",
-            paddingBottom: "10%"
+            paddingBottom: "10%",
+            paddingTop: "2%"
         }}
         >
             <Box sx={{
-                mt: 20,
+                mt: 1,
+                minWidth: "350px",
                 display: "flex",
                 flexDirection: "column",
-                alignItems: "center"
+                alignItems: "center",
+                backgroundColor: "lightgray",
+                border: "2px solid gray"
             }}
             >
-                <Typography variant="h5">Login</Typography>
-                <TextField
+                <Typography sx={{mt: 5}}
+                variant="h4">Login</Typography>
+                <TextField sx={{
+                    mt: 2,
+                    width: "20vw",
+                    backgroundColor: "white",
+                    borderRadius: 1
+                }}
                     margin="normal"
                     required
                     fullWidth
@@ -105,7 +117,12 @@ const Login = () => {
                     onChange={(e) => setEmail(e.target.value)}
                     />
 
-                    <TextField
+                    <TextField sx={{
+                        mt: 0.5,
+                        width: "20vw",
+                        backgroundColor: "white",
+                        borderRadius: 1
+                    }}
                         margin="normal"
                         required
                         fullWidth
@@ -121,15 +138,38 @@ const Login = () => {
                         }}
                     />
 
-                    <Button
+                    <Button 
                         fullWidth
                         variant="contained"
-                        sx={{ mt: 3, mb: 2 }}
+                        sx={{mt: 0.5, mb: 2, width: "20vw"}}
                         onClick={handleLogin}
                     >Login
                     </Button>
 
+                    <Divider sx={{
+                        paddingLeft: "10%",
+                        paddingRight: "10%",
+                        alignSelf: "stretch"}}
+                    >OR</Divider>
+
+                    <Typography sx={{mt: 2, mb: 5}}>Forgot Password?</Typography>
+
+                </Box>
+                <Box sx={{
+                    mt: 2,
+                    minHeight: "75px",
+                    minWidth: "350px",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    backgroundColor: "lightgray",
+                    border: "2px solid gray"
+                }}>
+                    <Typography>Don't have an account?
+                        <> </>
                     <Link to="SignUp">Sign Up</Link>
+                    </Typography>
                 </Box>
             </div>
         )

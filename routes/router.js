@@ -59,6 +59,22 @@ const upload = multer({
 	database: config.MYSQL_DATABASE
   });
 
+router.post('/addProfilePicture', (req, res) => {
+	const id = req.body;
+	console.log('User id', id)
+	const image_path = req.file ? `${baseUrl}/ProfilePic` : null;
+	console.log('image path', image_path)
+	
+	const addPic = 'INSERT INTO user_images (user_id, image_path) VALUES (?, ?)';
+
+	pool.query(addPic, [id, image_path], (error, results) => {
+		if (error) {
+			return res.status(500).json({ error: error.message });
+		}
+		res.status(201).json({ id: results.insertId });
+	})
+})
+
 router.get('/getProfilePicture', (req, res) => {
   const userId = req.query.userId;
 

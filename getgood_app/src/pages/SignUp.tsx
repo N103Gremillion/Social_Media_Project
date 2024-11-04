@@ -94,24 +94,35 @@ const SignUp = () => {
     return (
         <div
         style={{
-            height: "100vh",  
-            width: "100vw",   
+            height: "100vh",
+            width: "100vw",  
             display: "flex",
+            flexDirection: "column",
             justifyContent: "center",
             alignItems: "center",
-            paddingBottom: "10%"
+            paddingBottom: "10%",
+            paddingTop: "2%"
         }}
         >
             <Box
                 sx={{
-                    mt: 20,
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
+                    mt: 1,
+                minWidth: "350px",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                backgroundColor: "lightgray",
+                border: "2px solid gray"
                 }}
             >
-                <Typography variant="h5">Sign Up</Typography>
-                <TextField
+                <Typography sx={{mt: 5}}
+                variant="h4">Sign Up</Typography>
+                <TextField sx={{
+                    mt: 2,
+                    width: "20vw",
+                    backgroundColor: "white",
+                    borderRadius: 1
+                }}
                     margin="normal"
                     required
                     fullWidth
@@ -124,7 +135,12 @@ const SignUp = () => {
                     onChange={(e) => setUsername(e.target.value)}
                 />
 
-                <TextField
+                <TextField sx={{
+                    mt: 0.5,
+                    width: "20vw",
+                    backgroundColor: "white",
+                    borderRadius: 1
+                }}
                     margin="normal"
                     required
                     fullWidth
@@ -137,7 +153,12 @@ const SignUp = () => {
                     onChange={(e) => setEmail(e.target.value)}
                 />
 
-                <TextField
+                <TextField sx={{
+                    mt: 0.5,
+                    width: "20vw",
+                    backgroundColor: "white",
+                    borderRadius: 1
+                }}
                     margin="normal"
                     required
                     fullWidth
@@ -154,13 +175,28 @@ const SignUp = () => {
                 <Button
                     fullWidth
                     variant="contained"
-                    sx={{ mt: 3, mb: 2 }}
+                    sx={{ mt: 0.5, mb: 2, width: "20vw" }}
                     onClick={handleSignUp}
                 >Sign Up
                 </Button>
 
-                <Link to="/">Login</Link>
             </Box>
+            <Box sx={{
+                mt: 2,
+                minHeight: "75px",
+                minWidth: "350px",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: "lightgray",
+                border: "2px solid gray"
+            }}>
+                <Typography>Have an account?
+                    <> </>
+                    <Link to="/">Login</Link>
+                </Typography>
+                </Box>
         </div>
     )
 }

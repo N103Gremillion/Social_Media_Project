@@ -27,6 +27,9 @@ const AccountManagement = () => {
     const [avatar, setAvatar] = useState("Person2Icon")
     const id = sessionStorage.getItem('userID')
 
+    const [picState, setPicState] = useState('ready')
+    const [picFile, setPicFile] = useState<File | null>(null)
+
     useEffect(() => {
         fetch('http://localhost:4000/getUsername', {
             method: 'POST',
@@ -105,7 +108,6 @@ const AccountManagement = () => {
             },
             body: JSON.stringify({id, passwordValue})
         })
-        console.log(changePassword.status)
         getPassword()
         setOpenPassword(false)
     }
@@ -113,12 +115,46 @@ const AccountManagement = () => {
     const handleClickAvatar = () => {
         setOpenAvatar(true)
     }
-
-    const handleCloseAvatar = () => {
+    
+    const handleCloseAvatar = async (e: React.SyntheticEvent) => {
+        e.preventDefault()
+        console.log(id)
+        const formData = new FormData()
+        if(id) {
+            formData.append('id', id)
+        }
+        if(picFile) {
+            formData.append('Picture', picFile)
+        }
+        console.log(picFile)
+        const addProfilePicture = await fetch('http://localhost:4000/addProfilePicture', {
+            method: 'POST',
+            body: formData
+        })
+        .then(results => results.json())
+        
+        console.log(addProfilePicture.status)
         setOpenAvatar(false)
     }
 
-    console.log(avatar)
+    const handlePictureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const maxFileSize = 10 * 1024 * 1024
+        
+        if(e.target.files) {
+            const pic = e.target.files[0]
+            if(pic.size > maxFileSize) {
+                alert("File size excedes 5MB please choose a different file.")
+                e.target.value = ""
+                return
+            }
+            else {
+                setPicFile(pic)
+            }
+            
+        }
+        
+    }
+
     return (
         <div
             style={{
@@ -135,7 +171,8 @@ const AccountManagement = () => {
             position: 'fixed',
             marginLeft: '5vw',
             zIndex: '0',
-            paddingBottom: "10%"
+            paddingBottom: "10%",
+            border: "2px solid black"
             }}
             >
             <Box sx={{
@@ -238,9 +275,47 @@ const AccountManagement = () => {
                     <Dialog 
                         open={openAvatar}
                         onClose={handleCloseAvatar}
+                        PaperProps={{
+                        component: 'form',
+                            onSubmit: (event: React.FormEvent<HTMLFormElement>) => {
+                                event.preventDefault()
+                                const formData = new FormData(event.currentTarget)
+                                const formJson = Object.fromEntries((formData as any).entries())
+                                const avatar = formJson.avatar
+                                avatarValue = avatar
+                                handleCloseAvatar(event)
+                        //         event.preventDefault()
+                        //         const formData = new FormData()
+                        //         if(id) {
+                        //             formData.append('id', id)
+                        //         }
+                        //         if(picFile) {
+                        //             formData.append('Picture', picFile)
+                        //         }
+                        //         handleCloseAvatar()
+                            } 
+                                // event.preventDefault()
+                                // const formData = new FormData()
+                                // if(id) {
+                                //     formData.append('id', id)
+                                // }
+                                // if(picFile) {
+                                //     formData.append('Picture', picFile)
+                                // }
+
+                                // const results = await fetch('http://localhost:4000/addProfilePicture', {
+                                //     method: 'POST',
+                                //     body: formData
+                                //     })
+                                // .then(results => results.json())
+
+                                // console.log(results.status)
+                            }
+                        }
                     >
                         <DialogTitle>Change Avatar</DialogTitle>
-                            <List sx={{pt:0, 
+                            <input type = "file" name = "Picture" onChange={handlePictureChange}/>
+                            {/* <List sx={{pt:0, 
                             mt: 1,
                             display: "flex",
                             flexDirection: "row",
@@ -265,9 +340,10 @@ const AccountManagement = () => {
                                         <Person4Icon />
                                     </Avatar>
                                 </ListItemButton>
-                            </List>
+                            </List> */}
                         <DialogActions>
                             <Button onClick={handleCloseAvatar}>Cancel</Button>
+                            <Button type="submit">Confirm</Button>
                         </DialogActions>
                     </Dialog>
                 </Box>

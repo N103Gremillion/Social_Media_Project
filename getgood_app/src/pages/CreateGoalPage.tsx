@@ -307,11 +307,11 @@ const CreateGoalPage: React.FC = () => {
     textAlign: 'center',
     display: 'flex',
     alignItems:'center',
-    justifyContent: 'space-evenly',
+    justifyContent: 'flex-start',
     flexDirection: 'column',
     position: 'fixed',
     zIndex: '0', 
-    overflowY: 'auto'   
+    overflow: 'auto'   
   };
 
   return (

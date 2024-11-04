@@ -357,6 +357,8 @@ router.get('/api/checkpoints', (req,res) => {
 
 });
 
+let posts = []
+
 router.get('/api/posts', (req, res) => {
 	console.log("hit backend")
 	const offset = parseInt(req.query.offset) || 0;

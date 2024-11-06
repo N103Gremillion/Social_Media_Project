@@ -362,6 +362,52 @@ router.get('/api/checkpoints', (req,res) => {
 
 let posts = []
 
+router.get('/api/postsOfUser', (req, res) => {
+
+	const userId = req.query.userId;
+
+	const query = `
+	SELECT 
+		id,
+		owner_id,
+		goal_id,
+		checkpoint_id,
+		title,
+		content,
+		author,
+		DATE_FORMAT(date, '%d-%m-%Y') AS formatted_date,
+		imagePath,
+		likes
+	FROM
+		mainFeedPosts
+	WHERE
+		owner_id = ?;
+	`;
+
+	pool.query(query, [userId], (error, results) => {
+		if (error){
+			console.error("error fetching the posts form database", error);
+			return res.status(500).json();
+		}
+		
+		// add all elements in the table to the posts[]
+		const formattedPosts = results.map(post => ({
+			id: post.id,
+			ownerId: post.owner_id,
+			goalId: post.goal_id,
+			checkpointId: post.checkpoint_id,
+			title: post.title,
+			content: post.content,
+			author: post.author,
+			date: post.formatted_date,
+			imagePath: post.imagePath,
+			likes: post.likes,
+		}));
+		
+		res.status(200).json(formattedPosts);
+	});
+});
+
 router.get('/api/posts', (req, res) => {
 	const offset = parseInt(req.query.offset) || 0;
 	const limit = parseInt(req.query.limit) || 12;

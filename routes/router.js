@@ -347,7 +347,6 @@ router.post('/getCheckpoints', (req,res) => {
 router.get('/api/checkpoints', (req,res) => {
 	const userId = req.query.userId;
 	const goalId = req.query.goalId;
-	console.log(userId, goalId);
 	const query = "select * from checkpoints where (id in (select checkpoint_id from goal_checkpoints where goal_id = ?) and ? in (select goal_id from user_goals where user_id = ?))";
 
 	pool.query(query, [goalId,goalId,userId], (error, results) => {

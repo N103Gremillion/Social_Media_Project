@@ -66,14 +66,14 @@ const AccountOverview = ({ userInfo, show, handleClose }: AccountOverviewProps) 
                 </div>
                 </Modal.Title>
             </Modal.Header>
-            <Modal.Body>
-                <div className="explore-page">
+            <Modal.Body className="overview-page">
+                <div className={"overviewImages-display"}>
                     {posts.map((post) => (
                         <img
                             key={post.id}
                             src={post.imagePath}
                             // onClick={() => openModal(post)}
-                            className="image"
+                            className="overviewImage"
                         />
                     ))}
                 </div>

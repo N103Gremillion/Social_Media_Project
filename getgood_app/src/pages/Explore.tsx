@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import '../components/styles/explore.css';
+import '../components/styles/accountOverviewModal.css';
 import ImageModal from '../components/ImageModal.tsx';
 import Loader from "../components/Loader.tsx";
 import InfiniteScroll from 'react-infinite-scroll-component';

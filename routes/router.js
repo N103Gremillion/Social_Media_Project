@@ -103,7 +103,7 @@ router.get('/usersWithSub', (req, res) => {
 
     const query = `
         SELECT 
-            id, name
+            id, name, profilePicture
         FROM
             users
         WHERE
@@ -122,6 +122,7 @@ router.get('/usersWithSub', (req, res) => {
         // Map results to the desired format
         const usersWithSubstring = results.map(user => ({
             name: user.name,
+			profilePictureUrl: user.profilePicture,
             id: user.id
         }));
         

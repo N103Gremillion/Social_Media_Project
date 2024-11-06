@@ -25,7 +25,6 @@ const Explore = () => {
     const BASE_URL: string = 'http://localhost:4000/';
 
     const fetchPosts = async () => { 
-        console.log("fetching inital posts")
         // fetches the inital 1st 10 posts
         await axios.get(`${BASE_URL}api/posts?offset=0&limit12`)
         .then( response => {

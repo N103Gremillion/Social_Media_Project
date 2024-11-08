@@ -477,4 +477,69 @@ function addGoalCheckpointConnection(checkpointId,goalId,query,req,res) {
         });
 }
 
+router.post('/follow', async (req, res) => {
+	const {followerId, userId} = req.body;
+	if (followerId == userId) {
+		return res.status(400).json({ error: "User cannot follow themselves." })
+	}
+
+	try {
+		await db.query(
+			`INSERT INTO followers (follower_id, user_id) VALUES (?, ?)`,
+			[followerId, userId]
+		);
+		res.status(201).json({ message: "User followed successfully." });
+	} catch (error) {
+		if (error.code === `ER_DUP_ENTRY`) {
+			res.status(409).json({ error: "Already following this user." })
+		} else {
+			res.status(500).json({ error: "Database error." });
+		}
+	}
+});
+
+router.post('/unfollow', async(req, res) => {
+	const { followerId, userId } = req.body;
+
+	try {
+		const [result] = await db.query(
+			`DELETE FROM followers WHERE follower_id = ? AND user_id = ?`,
+			[followerId, userId]
+		);
+		if (result.affectedRows > 0) {
+			res.status(200).json({ message: "User unfollowed successfully." });
+		} else {
+			res.status(404).json({ error: "Follow relationship not found." });
+		}
+	} catch (error) {
+		res.status(500).json({ error: "Database error." });
+	}
+});
+
+router.get('/user/:userId/followers', async(req, res) => {
+	const { userID } = req.params; 
+
+	try {
+		cosnt [followers] = await db.query(
+			`SELECT u.id, u.name, u.profilePicture
+			 FROM followers f
+			 JOIN users u ON f.follower_id = u.id
+			 WHERE f.user_id = ?`,
+			[userId]
+		);
+
+		const [following] = await db.query(
+			`SELECT u.id, u.name, u.profilePicture
+			 FROM followers f
+			 JOIN users u ON f.user_id = u.id
+			 WHERE f.follower_id = ?`,
+			[userId]
+		);
+
+		res.status(200).json({ followers, following });
+	} catch (error) {
+		res.status(500).json({ error: "Database error." });
+	}
+});
+
 module.exports = router

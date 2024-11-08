@@ -1,5 +1,6 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../components/styles/explore.css';
+import ImageModal from '../components/ImageModal';
 import { useState, useEffect } from 'react';
 import { Modal, Button, Image } from 'react-bootstrap';
 import axios from 'axios';
@@ -30,6 +31,7 @@ interface ImageData {
 const AccountOverview = ({ userInfo, show, handleClose }: AccountOverviewProps) => {
 
     const [posts, setPosts] = useState<ImageData[]>([]);
+    const [selectedImage, setSelectedImage] = useState<ImageData | null>(null)
     const BASE_URL: string = 'http://localhost:4000/';
 
     const fetchUsersPosts = async () => { 
@@ -45,9 +47,17 @@ const AccountOverview = ({ userInfo, show, handleClose }: AccountOverviewProps) 
         fetchUsersPosts();
     }, []);
 
+    const openModal = (image: ImageData) => {
+        setSelectedImage(image);
+    };
+
+    const closeModal = () => {
+        setSelectedImage(null);
+    };
+
     return (
         <Modal show={show} onHide={handleClose} dialogClassName="modal-lg">
-            <Modal.Header closeButton>
+            <Modal.Header style={{backgroundColor:'#2e2e2e', color: 'white'}}closeButton>
                 <Modal.Title>
                 <div style={{ display: 'flex', alignItems: 'center' }}>
                     <div>
@@ -66,19 +76,24 @@ const AccountOverview = ({ userInfo, show, handleClose }: AccountOverviewProps) 
                 </div>
                 </Modal.Title>
             </Modal.Header>
-            <Modal.Body className="overview-page">
+            <Modal.Body className="overview-body">
                 <div className={"overviewImages-display"}>
                     {posts.map((post) => (
                         <img
                             key={post.id}
                             src={post.imagePath}
-                            // onClick={() => openModal(post)}
+                            onClick={() => openModal(post)}
                             className="overviewImage"
                         />
                     ))}
+                    {selectedImage && (
+                    <div className="image-modal">
+                        <ImageModal image={selectedImage} onClose={closeModal} />
+                    </div>
+                )}
                 </div>
             </Modal.Body>
-            <Modal.Footer>
+            <Modal.Footer style={{backgroundColor:'#2e2e2e', color: 'white'}}>
                 <Button variant="secondary" onClick={handleClose}>
                     Close
                 </Button>

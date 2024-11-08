@@ -1,6 +1,7 @@
-.overview-page {
+.overview-body {
   background-color: black;
   min-height: 100vh;
+  max-height: 400px;
   width: 100%;
   padding-top: 20px;
   padding-bottom: 20px;
@@ -8,6 +9,7 @@
   justify-content: center;
   align-items: flex-start;
   overflow: auto;
+
 }
 
 .overviewImages-display {

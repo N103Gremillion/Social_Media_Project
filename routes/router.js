@@ -59,15 +59,14 @@ const upload = multer({
 	database: config.MYSQL_DATABASE
   });
 
-router.post('/addProfilePicture', (req, res) => {
-	const id = req.body;
-	console.log('User id', id)
-	const image_path = req.file ? `${baseUrl}/ProfilePic` : null;
-	console.log('image path', image_path)
+router.post('/addProfilePicture', upload.single('image'), (req, res) => {
+	const id = req.body.id;
+	const type = req.body.type;
+	const imagePath = req.file ? `${baseUrl}/profilePictures/${req.file.filename}` : null;
 	
-	const addPic = 'INSERT INTO user_images (user_id, image_path) VALUES (?, ?)';
+	const addPic = 'UPDATE users SET profilePicture = ? WHERE id = ?';
 
-	pool.query(addPic, [id, image_path], (error, results) => {
+	pool.query(addPic, [imagePath, id], (error, results) => {
 		if (error) {
 			return res.status(500).json({ error: error.message });
 		}
@@ -76,9 +75,13 @@ router.post('/addProfilePicture', (req, res) => {
 })
 
 router.get('/getProfilePicture', (req, res) => {
-  const userId = req.query.userId;
+  	const userId = req.query.uId;
 
-    const getImagePathQuery = 'SELECT image_path FROM user_images WHERE user_id = ?';
+	if (!userId){
+		return res.status(400).send('User ID is required');
+	}
+
+    const getImagePathQuery = 'SELECT profilePicture FROM users WHERE id = ?';
 
     pool.query(getImagePathQuery, [userId], (err, results) => {
         if (err) {
@@ -89,10 +92,9 @@ router.get('/getProfilePicture', (req, res) => {
             return res.status(404).json({ error: 'Image not found' });
         }
 
-        const imagePath = results[0].image_path;
-
         // Send the file located at the image path
-        res.sendFile(path.resolve(__dirname, imagePath));
+		const profilePictureUrl = results[0].profilePicture;
+        res.json({profilePictureUrl});
     });
 })
 
@@ -101,7 +103,7 @@ router.get('/usersWithSub', (req, res) => {
 
     const query = `
         SELECT 
-            id, name
+            id, name, profilePicture
         FROM
             users
         WHERE
@@ -120,6 +122,7 @@ router.get('/usersWithSub', (req, res) => {
         // Map results to the desired format
         const usersWithSubstring = results.map(user => ({
             name: user.name,
+			profilePictureUrl: user.profilePicture,
             id: user.id
         }));
         
@@ -360,7 +363,6 @@ router.get('/api/checkpoints', (req,res) => {
 let posts = []
 
 router.get('/api/posts', (req, res) => {
-	console.log("hit backend")
 	const offset = parseInt(req.query.offset) || 0;
 	const limit = parseInt(req.query.limit) || 12;
 
@@ -488,5 +490,70 @@ function addGoalCheckpointConnection(checkpointId,goalId,query,req,res) {
                 res.status(201).json({ id: results.insertId});
         });
 }
+
+router.post('/follow', async (req, res) => {
+	const {followerId, userId} = req.body;
+	if (followerId == userId) {
+		return res.status(400).json({ error: "User cannot follow themselves." })
+	}
+
+	try {
+		await db.query(
+			`INSERT INTO followers (follower_id, user_id) VALUES (?, ?)`,
+			[followerId, userId]
+		);
+		res.status(201).json({ message: "User followed successfully." });
+	} catch (error) {
+		if (error.code === `ER_DUP_ENTRY`) {
+			res.status(409).json({ error: "Already following this user." })
+		} else {
+			res.status(500).json({ error: "Database error." });
+		}
+	}
+});
+
+router.post('/unfollow', async(req, res) => {
+	const { followerId, userId } = req.body;
+
+	try {
+		const [result] = await db.query(
+			`DELETE FROM followers WHERE follower_id = ? AND user_id = ?`,
+			[followerId, userId]
+		);
+		if (result.affectedRows > 0) {
+			res.status(200).json({ message: "User unfollowed successfully." });
+		} else {
+			res.status(404).json({ error: "Follow relationship not found." });
+		}
+	} catch (error) {
+		res.status(500).json({ error: "Database error." });
+	}
+});
+
+router.get('/user/:userId/followers', async(req, res) => {
+	const { userID } = req.params; 
+
+	try {
+		cosnt [followers] = await db.query(
+			`SELECT u.id, u.name, u.profilePicture
+			 FROM followers f
+			 JOIN users u ON f.follower_id = u.id
+			 WHERE f.user_id = ?`,
+			[userId]
+		);
+
+		const [following] = await db.query(
+			`SELECT u.id, u.name, u.profilePicture
+			 FROM followers f
+			 JOIN users u ON f.user_id = u.id
+			 WHERE f.follower_id = ?`,
+			[userId]
+		);
+
+		res.status(200).json({ followers, following });
+	} catch (error) {
+		res.status(500).json({ error: "Database error." });
+	}
+});
 
 module.exports = router

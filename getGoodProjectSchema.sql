@@ -6,7 +6,8 @@ CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
-    password VARCHAR(100) NOT NULL
+    password VARCHAR(100) NOT NULL,
+    profilePicture VARCHAR(255) DEFAULT './defaultProfile.jpg'
 );
 
 CREATE TABLE goals (
@@ -70,6 +71,15 @@ CREATE TABLE comments (
     content TEXT,
     post_id INT,
     FOREIGN KEY (post_id) REFERENCES mainFeedPosts(id) ON DELETE CASCADE
+);
+
+CREATE TABLE followers (
+    follower_id INT,
+    user_id INT,
+    follow_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (follower_id, user_id),
+    FOREIGN KEY (follower_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 INSERT INTO users (name, email, password) VALUES ('testuser', 'testuser@something.com', 'password');

@@ -20,58 +20,20 @@ import Person3Icon from "@mui/icons-material/Person3"
 import Person4Icon from "@mui/icons-material/Person4"
 import { blue } from "@mui/material/colors"
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 
 const AccountManagement = () => {
     const [username, setUsername] = useState("")
     const [password, setPassword] = useState("")
-    const [avatar, setAvatar] = useState("Person2Icon")
+    const [avatar, setAvatar] = useState<string>("Person2Icon")
     const id = sessionStorage.getItem('userID')
 
     const [picState, setPicState] = useState('ready')
     const [picFile, setPicFile] = useState<File | null>(null)
-
-    useEffect(() => {
-        fetch('http://localhost:4000/getUsername', {
-            method: 'POST',
-            headers: {
-                'Content-type': "application/json"
-            },
-            body: JSON.stringify({id})
-        })
-        .then(response => response.json())
-        .then(data => setUsername(data[0].name))
-    }, [])
+    const [picUrl, setPicUrl] = useState<string>("")
+    const [profilePicLoading, setProfilePicLoading] = useState<boolean>(false)
+    const BASE_URL: string = 'http://localhost:4000/';
     
-    const getUsername = async () => {
-
-        const getUsername = await fetch('http://localhost:4000/getUsername', {
-            method: 'POST',
-            headers: {
-                'Content-type': "application/json"
-            },
-            body: JSON.stringify({id})
-        })
-        
-        const usernameResults = await getUsername.json()
-        setUsername(usernameResults[0].name)
-    }
-
-    const getPassword = async () => {
-        const getPassword = await fetch('http://localhost:4000/getPassword', {
-            method: 'POST',
-            headers: {
-                'Content-type': "application/json"
-            },
-            body: JSON.stringify({id})
-        })
-
-        const passwordResults = await getPassword.json()
-        setPassword(passwordResults[0].password)
-    }
-    
-    getUsername()
-    getPassword()
-
     const [openUser, setOpenUser] = useState(false)
     const [openPassword, setOpenPassword] = useState(false)
     const [openAvatar, setOpenAvatar] = useState(false)
@@ -79,6 +41,66 @@ const AccountManagement = () => {
     var userValue = username
     var passwordValue = password
     var avatarValue = avatar
+
+    const getUsername = async () => {
+        try {
+            const response = await fetch('http://localhost:4000/getUsername', {
+                method: 'POST',
+                headers: {
+                    'Content-type': 'application/json'
+                },
+                body: JSON.stringify({ id })
+            });
+            const data = await response.json();
+            setUsername(data[0].name);
+        } catch (error) {
+            console.error('Error fetching username:', error);
+        }
+    };
+    
+    const getPassword = async () => {
+        try {
+            const response = await fetch('http://localhost:4000/getPassword', {
+                method: 'POST',
+                headers: {
+                    'Content-type': 'application/json'
+                },
+                body: JSON.stringify({ id })
+            });
+            const data = await response.json();
+            setPassword(data[0].password);
+        } catch (error) {
+            console.error('Error fetching password:', error);
+        }
+    };
+    
+    const getProfilePic = async () => {
+        const uid = sessionStorage.getItem('userID') || "1";
+    
+        try {
+            const response = await axios.get(`${BASE_URL}getProfilePicture`, { params: { uId: uid } });
+            const profilePicUrl = response.data.profilePictureUrl;
+            // Set avatar as image URL
+            setPicUrl(profilePicUrl);
+            setAvatar(profilePicUrl);
+        } catch (error) {
+            console.error('Error fetching profile picture:', error);
+        }
+    };
+    
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                await getUsername();
+                await getProfilePic();
+                await getPassword();
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+    
+        fetchData();
+    }, []);   
 
     const handleClickUser = () => {
         setOpenUser(true)
@@ -116,44 +138,52 @@ const AccountManagement = () => {
         setOpenAvatar(true)
     }
     
-    const handleCloseAvatar = async (e: React.SyntheticEvent) => {
-        e.preventDefault()
-        console.log(id)
-        const formData = new FormData()
-        if(id) {
-            formData.append('id', id)
-        }
-        if(picFile) {
-            formData.append('Picture', picFile)
-        }
-        console.log(picFile)
-        const addProfilePicture = await fetch('http://localhost:4000/addProfilePicture', {
-            method: 'POST',
-            body: formData
-        })
-        .then(results => results.json())
-        
-        console.log(addProfilePicture.status)
+    const handleCloseAvatar = async (e: React.SyntheticEvent) => {   
         setOpenAvatar(false)
     }
 
     const handlePictureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const maxFileSize = 10 * 1024 * 1024
-        
         if(e.target.files) {
             const pic = e.target.files[0]
             if(pic.size > maxFileSize) {
-                alert("File size excedes 5MB please choose a different file.")
+                alert("File size excedes 10MB please choose a different file.")
                 e.target.value = ""
                 return
             }
             else {
                 setPicFile(pic)
-            }
-            
+                setPicUrl(URL.createObjectURL(pic))
+            }   
+        }      
+    }
+
+    const handleProfilePicSubmit = async(e: React.FormEvent<HTMLFormElement>) => {
+        setOpenAvatar(false)
+        e.preventDefault()
+
+        // set on frontend
+        if (picUrl) {
+            setAvatar(picUrl);
+        }
+    
+        const formData = new FormData();
+        formData.append('id', (sessionStorage.getItem('userID') || "1"));
+        formData.append('type', 'profile');
+        if (picFile) {
+            formData.append('image', picFile);
+            formData.append('imageName', picFile.name)
         }
         
+        await axios.post(`${BASE_URL}addProfilePicture`, formData)
+            .then(res => {
+                console.log(res);
+            })
+            .catch(err => {
+                console.log('Error submitting the profilePic:', err)
+            })
     }
+    
 
     return (
         <div
@@ -274,7 +304,7 @@ const AccountManagement = () => {
                     
                     <Dialog 
                         open={openAvatar}
-                        onClose={handleCloseAvatar}
+                        // onClose={handleCloseAvatar}
                         PaperProps={{
                         component: 'form',
                             onSubmit: (event: React.FormEvent<HTMLFormElement>) => {
@@ -283,7 +313,7 @@ const AccountManagement = () => {
                                 const formJson = Object.fromEntries((formData as any).entries())
                                 const avatar = formJson.avatar
                                 avatarValue = avatar
-                                handleCloseAvatar(event)
+                                // handleCloseAvatar(event)
                         //         event.preventDefault()
                         //         const formData = new FormData()
                         //         if(id) {
@@ -314,7 +344,7 @@ const AccountManagement = () => {
                         }
                     >
                         <DialogTitle>Change Avatar</DialogTitle>
-                            <input type = "file" name = "Picture" onChange={handlePictureChange}/>
+                            <input type = "file" accept="image/*" name = "Picture" onChange={handlePictureChange}/>
                             {/* <List sx={{pt:0, 
                             mt: 1,
                             display: "flex",
@@ -343,7 +373,7 @@ const AccountManagement = () => {
                             </List> */}
                         <DialogActions>
                             <Button onClick={handleCloseAvatar}>Cancel</Button>
-                            <Button type="submit">Confirm</Button>
+                            <Button type="submit" onClick={handleProfilePicSubmit}>Confirm</Button>
                         </DialogActions>
                     </Dialog>
                 </Box>

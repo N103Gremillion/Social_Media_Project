@@ -11,6 +11,7 @@ interface SlideOutDivProps {
 
 interface User {
     name: string;
+    profilePictureUrl: string;
     id: number;
 }
 
@@ -23,6 +24,7 @@ const SlideOutDiv: React.FC<SlideOutDivProps> = ({ show, handleClose }) => {
     const fetchUsersWithSubstring = async (curTextInput: string) => { 
         await axios.get(`${BASE_URL}usersWithSub?query=${curTextInput}`)
             .then(response => {
+                console.log(response.data);
                 setUsers(response.data);
             })
             .catch(error => console.error('Error fetching users:', error));
@@ -62,10 +64,18 @@ const SlideOutDiv: React.FC<SlideOutDivProps> = ({ show, handleClose }) => {
                                 onMouseLeave={() => setHoveredUserId(null)} 
                                 className={hoveredUserId === user.id ? 'bg-primary text-white' : ''}
                             >
-                                <div>
-                                {/* <Image src="..." roundedCircle={true} className="rounded-circle border border-dark"></Image> */}
-                                <PersonIcon style={{ fontSize: 40, color: 'gray' }} />
-                                {user.name}
+                                <div className="d-flex align-items-center">
+                                    {user.profilePictureUrl && user.profilePictureUrl !== './defaultProfile.jpg' ? (
+                                        <Image 
+                                            src={user.profilePictureUrl} 
+                                            roundedCircle 
+                                            className="me-2" 
+                                            style={{ width: 40, height: 40 }} 
+                                        />
+                                    ) : (
+                                        <PersonIcon style={{ fontSize: 40, color: 'gray' }} />
+                                    )}
+                                    {user.name}
                                 </div>
                                 
                             </ListGroup.Item>

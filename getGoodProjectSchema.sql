@@ -72,5 +72,5 @@ CREATE TABLE comments (
     FOREIGN KEY (post_id) REFERENCES mainFeedPosts(id) ON DELETE CASCADE
 );
 
--- INSERT INTO users (name, email, password) VALUES ('testuser', 'testuser@something.com', 'password');
+INSERT INTO users (name, email, password) VALUES ('testuser', 'testuser@something.com', 'password');
 

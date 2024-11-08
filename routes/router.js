@@ -6,7 +6,7 @@ const mysql = require('mysql2');
 const multer = require('multer');
 const { error } = require('console');
 const baseUrl = 'http://localhost:4000';
-const config = require(path.resolve(__dirname, '../config.json'));
+const config = require(path.resolve(__dirname, '../../config.json'));
 
 const storage = multer.diskStorage({
 
@@ -455,6 +455,20 @@ router.get('/api/comments', (req,res) => {
 	});
 
 	
+});
+
+router.get('/api/postsFromCheckpoint', (req, res) => {
+	const checkpointId = req.query.checkpointId;
+
+	const query = "select id, owner_id, goal_id, checkpoint_id, title, content, author, date, imagepath, likes from mainFeedPosts where checkpoint_id = ?";
+
+	pool.query(query, [checkpointId], (error, results) => {
+		if (error) {
+			return res.status(500).json({error: error});
+		}
+
+		res.status(200).json({results});
+	})
 });
 
 function addGoalUserConnection(userId,goalId,query,req,res) {

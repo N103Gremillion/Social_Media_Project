@@ -91,7 +91,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({onClose}) => {
     useEffect(() => {
         if (selectedGoal) {
             axios.get(`${BASE_URL}api/checkpoints?goalId=${selectedGoal}&userId=${sessionStorage.getItem("userID")}`)
-                .then(response => setCheckpoints(response.data))
+                .then(response => setCheckpoints(response.data.checkpoints))
                 .catch(err => console.error(err));
         }
     }, [selectedGoal]);
@@ -146,7 +146,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({onClose}) => {
                             required
                         >
                             <option value="">Select a Checkpoint</option>
-                            {selectedGoal && checkpoints.map(checkpoint => (
+                            {selectedGoal && Array.isArray(checkpoints)  && checkpoints.map(checkpoint => (
                                 <option key={checkpoint.id} value={checkpoint.id}>{checkpoint.name}</option>
                             ))}
                         </Form.Control>

@@ -340,8 +340,6 @@ router.post('/getCheckpoints', (req,res) => {
 		}
 		res.status(201).json(results);
 	});
-	
-
 });
 
 router.get('/api/checkpoints', (req,res) => {
@@ -354,10 +352,8 @@ router.get('/api/checkpoints', (req,res) => {
 		if (error){
 			return res.status(500).json({ error });
 		}
-		res.status(201).json(results);
+		res.status(201).json({checkpoints: results});
 	});
-	
-
 });
 
 let posts = []
@@ -462,7 +458,7 @@ router.get('/api/comments', (req,res) => {
 router.get('/api/postsFromCheckpoint', (req, res) => {
 	const checkpointId = req.query.checkpointId;
 
-	const query = "select id, owner_id, goal_id, checkpoint_id, title, content, author, date, imagepath, likes from mainFeedPosts where checkpoint_id = ?";
+	const query = "select id, owner_id, goal_id, checkpoint_id, title, content, author, date, imagePath, likes from mainFeedPosts where checkpoint_id = ?";
 
 	pool.query(query, [checkpointId], (error, results) => {
 		if (error) {

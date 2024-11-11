@@ -8,11 +8,6 @@ const Toolbar : React.FC = () => {
 
   const navigate = useNavigate();
 
-  const hangleCreateGoalNavigation = () => {
-    sessionStorage.setItem("editing", "false");
-    navigate('/dashboard/create-goal');
-  }
-
   const handleLogout = () => {
     sessionStorage.clear();
     navigate("/");
@@ -29,16 +24,10 @@ const Toolbar : React.FC = () => {
       <SearchButton/>
       <Link
         className="nav-item"
-        to="my-goals"
+        to="goals"
       >
-        My Goals
+        Goals
       </Link>
-      <button
-        className="nav-item"
-        onClick={hangleCreateGoalNavigation}
-      >
-        Create Goal
-      </button>
       <Link
         className="nav-item"
         to="account-management"

@@ -2,8 +2,22 @@ import React, { useState, useEffect } from 'react';
 import { Modal, Form, Button, Spinner } from "react-bootstrap";
 import axios from 'axios';
 
-interface CreatePostModalProps {
+interface EditPostModalProps {
     onClose: () => void;
+    post: Post;
+}
+
+interface Post {
+    id: number;
+    goal_id: number;
+    checkpoint_id: number;
+    title: string;
+    content: string;
+    author: string;
+    date: string;
+    imagePath: string;
+    likes: number;
+    visibilityStatus: string;
 }
 
 interface Goal {
@@ -17,17 +31,17 @@ interface Checkpoint {
     goalId: number;
 }
 
-const CreatePostModal: React.FC<CreatePostModalProps> = ({onClose}) => {
-    const [title, setTitle] = useState<string>('');
+const EditPostModal: React.FC<EditPostModalProps> = ({onClose, post}) => {
+    const [title, setTitle] = useState<string>(post.title);
     const [image, setImage] = useState<File | null>(null);
-    const [author, setAuthor] = useState<string>('author');
-    const [date, setDate] = useState<string>(new Date().toISOString().slice(0,10));
-    const [content, setContent] = useState<string>('');
+    const [author, setAuthor] = useState<string>(post.author);
+    const [date, setDate] = useState<string>(post.date);
+    const [content, setContent] = useState<string>(post.content);
     const [postLoading, setPostLoading] = useState<boolean>(false);
     const [goals, setGoals] = useState<Goal[]>([]); 
-    const [selectedGoal, setSelectedGoal] = useState<number | null>(null);
+    const [selectedGoal, setSelectedGoal] = useState<number | null>(post.goal_id);
     const [checkpoints, setCheckpoints] = useState<Checkpoint[]>([]);
-    const [selectedCheckpoint, setSelectedCheckpoint] = useState<number | null>(null);
+    const [selectedCheckpoint, setSelectedCheckpoint] = useState<number | null>(post.checkpoint_id);
     const BASE_URL : string = 'http://localhost:4000/';
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -71,7 +85,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({onClose}) => {
             formData.append('imageName', image.name)
         }
 
-        await axios.post(`${BASE_URL}api/posts`, formData)
+        await axios.put(`${BASE_URL}api/posts/${post.id}`, formData)
         .then(res => console.log(res))
         .catch(err => console.log('Error submitting the post:', err))
         .finally(() => {
@@ -99,7 +113,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({onClose}) => {
     return (
         <Modal show={true} onHide={onClose} >
             <Modal.Header closeButton={true}>
-                Create Post
+                Edit Post
             </Modal.Header>
             <Modal.Body>
                 <Form onSubmit={handleSubmit}>
@@ -158,13 +172,13 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({onClose}) => {
                             placeholder="image-File"
                             onChange={handleFileChange}
                             accept='image/*'
-                            required
+                            
                         />
                     </Form.Group>
                     <Button variant='primary' type='submit'>
                         {postLoading ? (
                             <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" />) 
-                            : ("Submit")
+                            : ("Save Changes")
                         }
                     </Button>
                 </Form>
@@ -174,5 +188,5 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({onClose}) => {
 
 }
 
-export default CreatePostModal;
+export default EditPostModal;
 

@@ -74,15 +74,18 @@ const Explore = () => {
                     </p>
                 } 
                 className={"images-display"}
-            scrollableTarget="explore-page"
+                scrollableTarget="explore-page"
             >
                 {posts.map((post) => (
-                    <img
+                    <div className="post-image" >
+                        <img
                         key={post.id}
                         src={post.imagePath}
                         onClick={() => openModal(post)}
                         className="image"
-                    />
+                        />
+                    </div>
+                    
                 ))}
 
             </InfiniteScroll>

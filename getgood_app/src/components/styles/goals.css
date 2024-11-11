@@ -1,0 +1,68 @@
+.goals-page {
+    display: flex;
+    flex: 1;
+    height: 100vh;
+    background-color: black;
+    color: white;
+    flex-direction: row;
+}
+
+.goals-sidebar {
+    width: 20%;
+    padding: 10px;
+    background-color: rgb(60, 60, 60);
+    border-right: 1px solid gray;
+}
+
+.goals-sidebar li {
+    cursor: pointer;
+    padding: 5px;
+    border-bottom: 1px solid rgb(144, 144, 144);
+}
+
+.checkpoints-display {
+    width: 30%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    overflow-y: auto;
+  }
+
+.checkpoints-display.image-container {
+    display: flex;
+    width: 30%;
+    height: auto;
+    padding: 5px;
+}
+
+.goals-list {
+    border-bottom: 1px solid gray;
+}
+
+.goal-item {
+    cursor: pointer;
+}
+
+.goal-item:hover .edit-goal-icon {
+    opacity: 1;
+}
+
+.edit-goal-icon {
+    opacity: 0;
+}
+
+.edit-goal-icon
+
+.add-goal-icon {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.add-checkpoint-button {
+    flex-direction: column;
+    align-self: flex-end;
+    margin-top: auto;
+    cursor: pointer;
+}

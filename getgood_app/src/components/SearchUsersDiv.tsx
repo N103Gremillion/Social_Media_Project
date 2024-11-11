@@ -16,8 +16,8 @@ interface User {
 }
 
 interface UserFollowers {
-    followers: User[];  
-    following: User[];  
+    followers: number;  
+    following: number;  
 }
 
 const SlideOutDiv: React.FC<SlideOutDivProps> = ({ show, handleClose }) => {
@@ -27,6 +27,7 @@ const SlideOutDiv: React.FC<SlideOutDivProps> = ({ show, handleClose }) => {
     const [hoveredUserId, setHoveredUserId] = useState<number | null>(null); 
     const BASE_URL: string = 'http://localhost:4000/';
 
+    // Fetch users based on the search input
     const fetchUsersWithSubstring = async (curTextInput: string) => { 
         await axios.get(`${BASE_URL}usersWithSub?query=${curTextInput}`)
             .then(response => {
@@ -37,26 +38,28 @@ const SlideOutDiv: React.FC<SlideOutDivProps> = ({ show, handleClose }) => {
     }
 
     const fetchUserFollowers = async (userId: number) => {
-        await axios.get(`${BASE_URL}user/:userId/followers`, {
-            params: {
-                userId: userId,
+        await axios.get(`${BASE_URL}followers`, {
+            params:
+            {
+                userId: userId
             }
-        })
-        .then(response => {
-            console.log(response.data);
-            setSelectedUserFollowers({
-                followers: response.data.followers,  
-                following: response.data.following   
-            });
-        })
-        .catch(error => console.error('Error fetching followers:', error));
+        }) 
+            .then(response => {;
+                setSelectedUserFollowers({
+                    followers: response.data.followersCount,  
+                    following: response.data.followingCount   
+                });
+            })
+            .catch(error => console.error('Error fetching followers:', error));
     }
 
+    // Handle the input change event and fetch users with the substring
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const curTextInput = event.target.value;
         fetchUsersWithSubstring(curTextInput);
     }
 
+    // Handle user name click to select a user and fetch their followers
     const handleNamePressed = (user: User) => {
         setSelectedUser(user); 
         fetchUserFollowers(user.id);
@@ -109,8 +112,8 @@ const SlideOutDiv: React.FC<SlideOutDivProps> = ({ show, handleClose }) => {
             {selectedUser && (
                 <AccountOverview 
                     userInfo={selectedUser} 
-                    userFollowerCount={selectedUserFollowers ? selectedUserFollowers.followers.length : 0}
-                    userFollowingCount={selectedUserFollowers ? selectedUserFollowers.following.length : 0}
+                    userFollowerCount={selectedUserFollowers ? selectedUserFollowers.followers : 0} 
+                    userFollowingCount={selectedUserFollowers ? selectedUserFollowers.following : 0} 
                     show={!!selectedUser} 
                     handleClose={() => setSelectedUser(null)} 
                 />

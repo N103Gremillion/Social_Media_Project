@@ -533,7 +533,7 @@ function addGoalCheckpointConnection(checkpointId,goalId,query,req,res) {
 }
 
 router.get('/isFollowing', (req, res) => {
-  const { currentUserId, userIdToFollow } = req.query;  // Use query parameters
+  const { currentUserId, userIdToFollow } = req.query;  
 
   const query = `
     SELECT COUNT(*) AS isFollowing
@@ -549,9 +549,8 @@ router.get('/isFollowing', (req, res) => {
     // If the count is greater than 0, the user is following
     const isFollowing = results[0].isFollowing > 0;
 
-    console.log(isFollowing);  // For debugging
+    console.log(isFollowing); 
 
-    // Return true or false
     return res.json({ isFollowing });
   });
 });
@@ -606,35 +605,39 @@ router.post('/unfollow', async (req, res) => {
 
 
 
-router.get('/user/:userId/followers', async (req, res) => {
-	const { userId } = req.params;
+router.get('/followers', async (req, res) => {
+	const { userId } = req.query;
 
 	try {
-			// Use the promise version of the query
-			const [followers] = await pool.promise().query(
-					`SELECT u.id, u.name, u.profilePicture
+			// Query to count followers
+			console.log('Executing query to count followers...');
+			const [[followerCount]] = await pool.promise().query(
+					`SELECT COUNT(*) AS count
 					 FROM followers f
-					 JOIN users u ON f.follower_id = u.id
 					 WHERE f.user_id = ?`,
 					[userId]
 			);
 
-			// Query for following
-			const [following] = await pool.promise().query(
-					`SELECT u.id, u.name, u.profilePicture
+			// Query to count following
+			console.log('Executing query to count following...');
+			const [[followingCount]] = await pool.promise().query(
+					`SELECT COUNT(*) AS count
 					 FROM followers f
-					 JOIN users u ON f.user_id = u.id
 					 WHERE f.follower_id = ?`,
 					[userId]
 			);
-
-			// Respond with the results
-			res.status(200).json({ followers, following });
+			// Respond with the counts
+			res.status(200).json({
+					followersCount: followerCount.count,
+					followingCount: followingCount.count
+			});
 	} catch (error) {
-			console.error('Database error:', error);
-			res.status(500).json({ error: 'Database error.' });
+			res.status(500).json({ error: error.message || 'Database error.' });
 	}
 });
+
+
+
 
 
 module.exports = router

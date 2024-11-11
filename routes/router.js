@@ -644,9 +644,27 @@ router.get('/followerIds', async (req, res) => {
 	res.status(200).json(followerIds);
 });
 
-router.get('/followingInfo', async (req, res) =>{
+router.get('/followingInfo', async (req, res) => {
 	const { followingIds } = req.query;
-
-	console.log(followingIds)
-});
+  
+	const ids = followingIds.map(follower => follower.user_id);
+	
+	const query = `
+	  SELECT name AS name, profilePicture AS profilePicture
+	  FROM users
+	  WHERE id IN (?);
+	`;
+  
+	try {
+	  const [followingInfo] = await pool.promise().query(query, [ids]); // Use query, not express.query
+	  
+	  res.status(200).json({
+		followingInfo
+	  });
+	} catch (error) {
+	  console.error('Error fetching following info:', error);
+	  res.status(500).json({ error: 'Failed to fetch following information' });
+	}
+  });
+  
 module.exports = router

@@ -3,11 +3,13 @@ import "../components/styles/home.css"
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { response } from "express";
+import { Image } from "react-bootstrap";
+import PersonIcon from "@mui/icons-material/Person";
 
 interface users {
   userId: number,
   name: string,
-  profilePicURL: string
+  profilePicture: string
 }
 
 
@@ -41,7 +43,13 @@ const Home = () => {
       }
      }) 
       .then(response => {
-        
+        console.log(response.data)
+        const formattedFollowers = response.data.followingInfo.map(
+          (follower: users, index: number) => ({
+            name: follower.name,
+            profilePicture: follower.profilePicture
+          }));
+          setFollowersInfo(formattedFollowers);
       })
       .catch(error => console.error('Error fetching followers info:', error));
   }
@@ -62,10 +70,23 @@ const Home = () => {
   return (
     <div className="home-page">
       <div className="followers-scroller">
-        {/* all the users you follow */}
-        {followersInfo.map((user) => (
-          <span> key={user.userId}
-            <p>user.name</p>
+        {followersInfo.map((user, index) => (
+          <span key={index}>
+            {user.profilePicture && user.profilePicture !== './defaultProfile.jpg' ? (
+              <div className="picture-container">
+              <Image
+                src={user.profilePicture}
+                roundedCircle
+                className="me-2"
+                style={{width: 80, height: 80}}
+              />
+              </div>
+            ): (
+              <div className="icon-container">
+              <PersonIcon style={{fontSize: 40, color: 'gray'}}/>
+              </div>
+            )}
+            <p style={{color: "white"}}>{user.name}</p>
           </span>
         ))}
       </div>

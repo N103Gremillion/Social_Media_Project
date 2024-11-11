@@ -12,12 +12,34 @@
 }
 
 .followers-scroller {
-  background-color: white;
-  min-height: 10vh;
+  background-color: lightcoral;
+  height: 25%;
+  min-height: 5vh;
   width: 100%;
   padding-top: 10vh;
   display: flex;
-  justify-content: left;
+  justify-content: flex-start;
   align-items: flex-start;
-  overflow: auto;
+  overflow-x: auto;
+  gap: 10px;
+}
+
+.icon-container {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 120;
+  height: 120;
+  border-radius: 50%;
+  background-color: lightgray;
+  padding-bottom: 20;
+}
+
+.picture-container {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 120;
+  height: 120;
+  border-radius: 50%;
 }

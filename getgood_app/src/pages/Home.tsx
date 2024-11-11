@@ -15,12 +15,11 @@ interface users {
 const Home = () => {
 
   const [followersInfo, setFollowersInfo] = useState<users[]>([]);
-  const [followerIds, setFollowerIds] = useState<number[]>([]);
+  const [followingIds, setFollowingIds] = useState<number[]>([]);
   const BASE_URL: string = 'http://localhost:4000/';
   const id = Number(sessionStorage.getItem('userID'));
 
   const fetchFollowersIds = async () => {
-    console.log("fetching Ids")
     await axios.get(`${BASE_URL}followerIds`, {
       params:
       {
@@ -28,17 +27,37 @@ const Home = () => {
       }
      }) 
       .then(response => {
-        console.log(response.data)
-        setFollowerIds(response.data);
+        setFollowingIds(response.data);
       })
       .catch(error => console.error('Error fetching followers:', error));
+  }
+
+  const fetchFollowingInfo = async () => {
+    console.log(followingIds)
+    await axios.get(`${BASE_URL}followingInfo`, {
+      params:
+      {
+          followingIds: followingIds
+      }
+     }) 
+      .then(response => {
+        
+      })
+      .catch(error => console.error('Error fetching followers info:', error));
+  }
+
+  const fetchFollowersPosts = async () => {
+
   }
 
   useEffect(() => {fetchFollowersIds()}, [])
 
   useEffect(() => {
-    console.log(followerIds);
-  }, [followerIds]);
+    if (followingIds.length > 0) {
+      fetchFollowingInfo();
+      fetchFollowersPosts();
+    }
+  }, [followingIds]);
 
   return (
     <div className="home-page">

@@ -644,4 +644,9 @@ router.get('/followerIds', async (req, res) => {
 	res.status(200).json(followerIds);
 });
 
+router.get('/followingInfo', async (req, res) =>{
+	const { followingIds } = req.query;
+
+	console.log(followingIds)
+});
 module.exports = router

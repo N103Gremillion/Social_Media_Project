@@ -2,6 +2,8 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import { Button } from 'react-bootstrap';
 import SlideOutDiv from './SearchUsersDiv';
 import { useState } from 'react';
+import './styles/toolbar.css';
+import { Link } from 'react-router-dom';
 
 const SearchButton = () => {
 
@@ -24,6 +26,18 @@ const SearchButton = () => {
         </>
     );
 }
-  
-export default SearchButton;
+
+const HomeButton = () => {
+    
+    return (
+        <Link to="home" className='nav-item'>
+            <Button variant="outline-black" className='nav-item-btn'>
+                <i className="bi bi-house-door"></i> Home
+            </Button>
+        </Link>
+    );
+
+}
+
+export {SearchButton, HomeButton};
   

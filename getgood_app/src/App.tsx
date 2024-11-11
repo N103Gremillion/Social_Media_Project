@@ -8,6 +8,7 @@ import AccountManagement from "./pages/AccountManagement";
 import CreateGoalPage from "./pages/CreateGoalPage";
 import EditGoalProgress from "./pages/EditGoalProgress";
 import Explore from "./pages/Explore";
+import Home from "./pages/Home";
 import { createBrowserRouter, RouterProvider, Outlet} from "react-router-dom";
 import "./components/styles/app.css"
 
@@ -29,6 +30,7 @@ const router = createBrowserRouter([
     path: "dashboard",
     element: <Dashboard />,
     children: [
+      { path: "home", element: <Home />},
       { path: "my-goals", element: <MyGoalsPage /> },
       { path: "create-goal", element: <CreateGoalPage /> },
       { path: "account-management", element: <AccountManagement /> },

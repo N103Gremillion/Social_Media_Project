@@ -73,5 +73,14 @@ CREATE TABLE comments (
     FOREIGN KEY (post_id) REFERENCES mainFeedPosts(id) ON DELETE CASCADE
 );
 
--- INSERT INTO users (name, email, password) VALUES ('testuser', 'testuser@something.com', 'password');
+CREATE TABLE followers (
+    follower_id INT,
+    user_id INT,
+    follow_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (follower_id, user_id),
+    FOREIGN KEY (follower_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+INSERT INTO users (name, email, password) VALUES ('testuser', 'testuser@something.com', 'password');
 

@@ -13,15 +13,16 @@
 
 .followers-scroller {
   background-color: lightcoral;
-  height: 25%;
+  height: 18%;
   min-height: 5vh;
   width: 100%;
-  padding-top: 10vh;
+  padding-top: 2vh;
+  padding-left: 1vw; 
   display: flex;
   justify-content: flex-start;
   align-items: flex-start;
   overflow-x: auto;
-  gap: 10px;
+  gap: 15px;
 }
 
 .icon-container {

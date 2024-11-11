@@ -83,7 +83,7 @@ const Home = () => {
               </div>
             ): (
               <div className="icon-container">
-              <PersonIcon style={{fontSize: 40, color: 'gray'}}/>
+                <PersonIcon style={{fontSize: 80, color: 'gray'}}/>
               </div>
             )}
             <p style={{color: "white"}}>{user.name}</p>

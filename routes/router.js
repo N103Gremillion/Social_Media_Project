@@ -603,14 +603,11 @@ router.post('/unfollow', async (req, res) => {
   }
 });
 
-
-
 router.get('/followers', async (req, res) => {
 	const { userId } = req.query;
 
 	try {
 			// Query to count followers
-			console.log('Executing query to count followers...');
 			const [[followerCount]] = await pool.promise().query(
 					`SELECT COUNT(*) AS count
 					 FROM followers f
@@ -619,7 +616,6 @@ router.get('/followers', async (req, res) => {
 			);
 
 			// Query to count following
-			console.log('Executing query to count following...');
 			const [[followingCount]] = await pool.promise().query(
 					`SELECT COUNT(*) AS count
 					 FROM followers f
@@ -636,8 +632,16 @@ router.get('/followers', async (req, res) => {
 	}
 });
 
+router.get('/followerIds', async (req, res) => {
+	const { userId } = req.query;
 
-
-
+	query = `
+		SELECT user_id
+		FROM followers
+		WHERE follower_id = ?
+	`
+	const [followerIds] = await pool.promise().query(query, [userId]);
+	res.status(200).json(followerIds);
+});
 
 module.exports = router

@@ -6,7 +6,7 @@ const mysql = require('mysql2');
 const multer = require('multer');
 const { error } = require('console');
 const baseUrl = 'http://localhost:4000';
-const config = require(path.resolve(__dirname, '../../config.json'));
+const config = require(path.resolve(__dirname, '../config.json'));
 
 const storage = multer.diskStorage({
 
@@ -550,6 +550,68 @@ router.get('/user/:userId/followers', async(req, res) => {
 	} catch (error) {
 		res.status(500).json({ error: "Database error." });
 	}
+});
+
+router.get('/notifications', async (req, res) => {
+	try {
+		const userId = req.user?.id || req.query.userId; 
+
+		if (!userId) {
+			return res.status(400).json({ error: "User ID is required to fetch notifications." });
+		}
+
+		const notifications = await db.query(
+			`SELECT n.id, n.type, n.post_id, n.created_at,
+			s.name AS senderName, s.profilePicture AS senderProfilePicture
+	 		FROM notifications n
+	 		JOIN users s ON n.sender_id = s.id
+	 		WHERE n.receiver_id = ?
+	 		ORDER BY n.created_at DESC`, 
+			[userId]
+		);	
+		res.json({ notifications });
+	} catch (error) {
+		res.status(500).json({ error: "Database error retrieving notifications."});
+	}
+});
+
+router.post('notifications/:notificationId/accept', async (req, res) => {
+	const { notificationId } = req.params;
+
+	try {
+		const [[notification]] = await db.query(
+			`SELECT sender_id, recipient_id FROM notifications WHERE id = ? AND type = 'follow_request'`,
+            [notificationId]	
+		);
+
+		if (!notification) {
+			return res.status(404).json({ error: "Follow request not found."});
+		}
+
+		await db.query(
+			`INSERT INTO followers (follower_id, followed_id) VALUES (?, ?)`,
+            [notification.sender_id, notification.recipient_id]
+		);
+
+		await db.query(`UPDATE notifications SET is_read = TRUE WHERE id = ?`, [notificationId]);
+		res.status(200).json({ message: "Follow request accepted."})
+	} catch (error) {
+		res.status(500).json({ error: "Database error processing follow request."})
+	}
+});
+
+router.post('/notifications/:notificationId/reject', async (req, res) => {
+    const { notificationId } = req.params;
+
+    try {
+        await db.query(
+            `DELETE FROM notifications WHERE id = ? AND type = 'follow_request'`,
+            [notificationId]
+        );
+        res.status(200).json({ message: "Follow request rejected." });
+    } catch (error) {
+        res.status(500).json({ error: "Database error rejecting follow request." });
+    }
 });
 
 module.exports = router

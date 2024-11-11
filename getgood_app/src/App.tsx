@@ -10,6 +10,7 @@ import EditGoalProgress from "./pages/EditGoalProgress";
 import Explore from "./pages/Explore";
 import { createBrowserRouter, RouterProvider, Outlet} from "react-router-dom";
 import "./components/styles/app.css"
+import NotificationsPage from "./pages/NotificationsPage";
 
 const Dashboard  = () => {
   return (
@@ -33,7 +34,8 @@ const router = createBrowserRouter([
       { path: "create-goal", element: <CreateGoalPage /> },
       { path: "account-management", element: <AccountManagement /> },
       { path: "edit-goal-progress", element: <EditGoalProgress />},
-      { path: "explore", element: <Explore />}
+      { path: "explore", element: <Explore />},
+      { path: "notifications", element: <NotificationsPage />}
     ],
   },
   

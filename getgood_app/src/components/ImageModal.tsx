@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Modal, Form, Button } from "react-bootstrap";
 import { Stage, Layer, Rect, Text, Line, Ellipse } from 'react-konva';
+import { useNavigate } from 'react-router-dom';
 import "./styles/imageModal.css"
 import axios from 'axios';
 
@@ -16,6 +17,19 @@ interface Image {
     imagePath: string;
     likes: number;
     visibilityStatus: string;
+}
+
+interface NewGoal {
+    name: String;
+    description: String;
+    start_date: String;
+    end_date: String;
+}
+
+interface Checkpoint {
+    goalId: number;
+    name: string;
+    date: string;
 }
 
 interface ImageModalProps {
@@ -37,6 +51,8 @@ const ImageModal: React.FC<ImageModalProps> = ({image, onClose}) => {
     const [currPost, setCurrPost] = useState<Image>(image);
     const [checkpoints, setCheckpoints] = useState<any[]>([]);
     const [currCheckpoint, setCurrCehckpoint] = useState<any>();
+    const [goal, setGoal] = useState<NewGoal>();
+    const navigate = useNavigate();
     const PORT = 4000;
 
     const handleAddComment = async () => {
@@ -55,10 +71,8 @@ const ImageModal: React.FC<ImageModalProps> = ({image, onClose}) => {
         setNewComment("");
     };
 
-    const renderValues = () => {
+    const renderValues = (yPos: number, leftX: number) => {
         let elements = [];
-        let yPos = 0;
-        let leftX = 100;
         let ovalRadiusX = 90;
         let ovalRadiusY = 50;
         let rectWidth = ovalRadiusX;
@@ -221,6 +235,48 @@ const ImageModal: React.FC<ImageModalProps> = ({image, onClose}) => {
         return { elements, height: yPos};
     }
 
+    const handleCopyGoal = async () => {
+        const newGoal = await axios.get(`http://localhost:${PORT}/api/goal?goalId=${currPost.goalId}`);
+        const goalData = newGoal.data.results[0];
+
+        const goalId = await addGoal(goalData);
+
+        await addCheckpoints(goalId, checkpoints);
+        
+        navigate("/dashboard/goals");
+    };
+
+    const addGoal = async (goalData: NewGoal) => {
+        if (!goalData) {
+            return null;
+        }
+        const newGoal = await axios.post(`http://localhost:${PORT}/addGoal`, {
+            userId: sessionStorage.getItem("userID"),
+            goalName: goalData.name,
+            goalDescription: goalData.description,
+            goalStartDate: goalData.start_date,
+            goalEndDate: goalData.end_date
+        });
+        return newGoal.data.goalId;
+    };
+
+    const addCheckpoints = async (goalId: number, checkpoints: Checkpoint[]) => {
+        if (!checkpoints) {
+            return;
+        }
+        for (const checkpoint of checkpoints) {
+            await addCheckpoint(goalId, checkpoint);
+        }
+    };
+
+    const addCheckpoint = async (goalId: number, checkpoint: Checkpoint) => {
+        await axios.post(`http://localhost:${PORT}/api/checkpoint`, {
+                goalId: goalId,
+                name: checkpoint.name,
+                date: checkpoint.date
+            })
+    };
+
 
     const getComments = async () => {
         await axios.get(`http://localhost:${PORT}/api/comments?postId=${currPost.id}`)
@@ -256,9 +312,6 @@ const ImageModal: React.FC<ImageModalProps> = ({image, onClose}) => {
     }, [currPost]);
 
     useEffect(() => {
-    }, [posts]);
-
-    useEffect(() => {
         getCheckpointPosts();
     }, [currCheckpoint]);
 
@@ -273,7 +326,7 @@ const ImageModal: React.FC<ImageModalProps> = ({image, onClose}) => {
         getCheckpoints();
     }, []);
 
-    const { elements, height } = renderValues();
+    const { elements, height } = renderValues(0, 100);
 
     return (
         <Modal show={true} onHide={onClose} dialogClassName='image-modal'>
@@ -285,6 +338,7 @@ const ImageModal: React.FC<ImageModalProps> = ({image, onClose}) => {
                             {elements}
                         </Layer>
                     </Stage>
+                    <Button className='copy-goal-button' onClick={handleCopyGoal}>Copy Goal</Button>
                 </div>
                 <div className='image-container' >
                     <img src={currPost.imagePath} key={currPost.id} className='img-fluid'/>

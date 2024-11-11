@@ -1,48 +1,43 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
 
-interface AddCheckpointModalProps {
-    isOpen: boolean;
-    close: () => void;
-    addCheckpoint: () => void;
-    checkpointName: string;
-    setCheckpointName: (name: string) => void;
-    checkpointDate: string;
-    setCheckpointDate: (date: string) => void;
-    clearCheckpointFields: () => void;
+interface Checkpoint {
+    name: string;
+    date: string;
 }
 
-const AddCheckpointModal: React.FC<AddCheckpointModalProps> = ({
-    isOpen,
-    close,
-    addCheckpoint,
-    checkpointName,
-    setCheckpointName,
-    checkpointDate,
-    setCheckpointDate,
-    clearCheckpointFields
-  }) => {
+interface AddCheckpointModalProps {
+    handleClose: () => void;
+    addCheckpoint: (checkpoint: Checkpoint) => void;
+}
+
+const AddCheckpointModal: React.FC<AddCheckpointModalProps> = ({handleClose, addCheckpoint }) => {
+    const [checkpointName, setCheckpointName] = useState<string>("");
+    const [completionDate, setCompletionDate] = useState<string>((new Date().toISOString().split('T')[0]));
+
+    const handleAddGoal = (e: React.FormEvent) => {
+        e.preventDefault();
+
+        addCheckpoint({
+            name: checkpointName,
+            date: completionDate,
+        });
+
+        handleClose();
+    };
+
     const style = {
         backgroundColor: 'black',
         color: 'white'
     }
-    const handleAddCheckpoint = (e: React.FormEvent) => {
-        e.preventDefault();
-        addCheckpoint();
-        clearCheckpointFields();
-        close();
-    };
-    const handleClose = () => {
-        clearCheckpointFields();
-        close();
-    }
+
     return (
-        <Modal show={isOpen} onHide={handleClose}>
+        <Modal show={true} onHide={handleClose}>
             <Modal.Header closeButton>
                 <Modal.Title>Add Checkpoint</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                <Form>
+                <Form onSubmit={handleAddGoal}>
                     <Form.Group controlId="checkpointName">
                         <Form.Label>Checkpoint Name</Form.Label>
                         <Form.Control
@@ -51,25 +46,26 @@ const AddCheckpointModal: React.FC<AddCheckpointModalProps> = ({
                             value={checkpointName}
                             onChange={(e: any) => setCheckpointName(e.target.value)}
                             placeholder="Enter checkpoint name"
-                            autoComplete='off'
+                            required
                         />
                     </Form.Group>
-                    <Form.Group controlId="checkpointDate">
-                        <Form.Label>Checkpoint Date</Form.Label>
+                    <Form.Group controlId="completionDate">
+                        <Form.Label>Checkpoint Completion Date</Form.Label>
                         <Form.Control
                             type="date"
                             style={style}
-                            value={checkpointDate}
-                            onChange={(e: any) => setCheckpointDate(e.target.value)}
+                            value={completionDate}
+                            onChange={(e: any) => setCompletionDate(e.target.value)}
+                            required
                         />
+                    </Form.Group>
+                    <Form.Group controlId='submitButton'>
+                        <Button variant="primary" type='submit'>Add Checkpoint</Button>
                     </Form.Group>
                 </Form>
             </Modal.Body>
-            <Modal.Footer>
-                <Button variant="primary" onClick={handleAddCheckpoint}>Add Checkpoint</Button>
-            </Modal.Footer>
         </Modal>
-    )
-  };
+    );
+}
 
 export default AddCheckpointModal;

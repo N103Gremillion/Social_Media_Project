@@ -160,7 +160,7 @@ router.post('/getPassword', (req, res) => {
 router.get('/getUserGoals', (req,res) => {
 	const  userId  = req.query.userId;
 
-	const getUserGoalsQuery = 'select id, goals.name, goals.description, goals.start_date, goals.end_date, goals.current_progress from goals join user_goals on goals.id = user_goals.goal_id where user_goals.user_id = ?';
+	const getUserGoalsQuery = 'select id, goals.name, goals.description, date_format(goals.start_date, "%Y-%m-%d") as startDate, date_format(goals.end_date, "%Y-%m-%d") as endDate, goals.current_progress from goals join user_goals on goals.id = user_goals.goal_id where user_goals.user_id = ?';
 
 	pool.query(getUserGoalsQuery, [userId], (error,results) => {
 		if (error) {
@@ -259,6 +259,19 @@ router.post('/addGoal', (req,res) => {
 	});
 });
 
+router.put('/editGoal', (req,res) => {
+	const { userId, goalId, goalName, goalDescription, goalStartDate, goalEndDate } = req.body;
+
+	const editGoalQuery = "update goals set name = ?, description = ?, start_date = ?, end_date = ? where id = ? and id in (select goal_id from user_goals where user_id = ?)";
+
+	pool.query(editGoalQuery, [goalName, goalDescription, goalStartDate, goalEndDate, goalId, userId], (error, results) => {
+		if (error) {
+			return res.status(500).json({error});
+		}
+		res.status(200).json(results);
+	});
+})
+
 router.post('/deleteGoal', (req,res) => {
 	const { userId, goalId } = req.body;
 
@@ -280,12 +293,12 @@ router.post('/deleteGoal', (req,res) => {
 	});
 });
 
-router.post('/addCheckpoint', (req,res) => {
-	const { goalId, name, date, completed} = req.body;
-	const addQuery = "insert into checkpoints (name, date, completed) values (?,?,?)";
+router.post('/api/checkpoint', (req,res) => {
+	const { goalId, name, date} = req.body;
+	const addQuery = "insert into checkpoints (name, date) values (?,?)";
 	const addConnectionQuery = "insert into goal_checkpoints (goal_id, checkpoint_id) values (?,?)";
 
-	pool.query(addQuery, [name, date, completed],(error, results) => {
+	pool.query(addQuery, [name, date],(error, results) => {
                 if (error) {
 					console.log(error.message);
                     return res.status(500).json({ error: error.cause });
@@ -293,6 +306,20 @@ router.post('/addCheckpoint', (req,res) => {
 		addGoalCheckpointConnection(results.insertId,goalId,addConnectionQuery,req,res);
         });
 });
+
+router.put('/api/checkpoint', (req, res) => {
+	const { id, name, date} = req.body;
+
+	const editCheckpointQuery = "update checkpoints set name = ?, `date` = ? where id = ?"
+
+	pool.query(editCheckpointQuery, [name, date, id], (error, results) => {
+		if (error) {
+			console.log(error.message);
+			return res.status(500).json({error});
+		}
+		res.status(200).json({results});
+	})
+})
 
 router.delete('/deleteCheckpoints', (req,res) => {
 	const { goalId } = req.body;
@@ -332,7 +359,7 @@ router.post('/decrementLikes', (req,res) => {
 router.post('/getCheckpoints', (req,res) => {
 	const { userId, goalId } = req.body;
 
-	const query = "select * from checkpoints where (id in (select checkpoint_id from goal_checkpoints where goal_id = ?) and ? in (select goal_id from user_goals where user_id = ?))";
+	const query = "select id, name, date_format(date, '%Y-%m-%d') as date from checkpoints where (id in (select checkpoint_id from goal_checkpoints where goal_id = ?) and ? in (select goal_id from user_goals where user_id = ?))";
 
 	pool.query(query, [goalId,goalId,userId], (error, results) => {
 		if (error){
@@ -345,8 +372,7 @@ router.post('/getCheckpoints', (req,res) => {
 router.get('/api/checkpoints', (req,res) => {
 	const userId = req.query.userId;
 	const goalId = req.query.goalId;
-	console.log(userId, goalId);
-	const query = "select * from checkpoints where (id in (select checkpoint_id from goal_checkpoints where goal_id = ?) and ? in (select goal_id from user_goals where user_id = ?))";
+	const query = "select id, name, date_format(date, '%Y-%m-%d') as date from checkpoints where (id in (select checkpoint_id from goal_checkpoints where goal_id = ?) and ? in (select goal_id from user_goals where user_id = ?)) order by date asc";
 
 	pool.query(query, [goalId,goalId,userId], (error, results) => {
 		if (error){
@@ -398,7 +424,6 @@ router.get('/api/posts', (req, res) => {
 			imagePath: post.imagePath,
 			likes: post.likes,
 		}));
-		
 		res.status(200).json(formattedPosts);
 	});
 });
@@ -422,6 +447,27 @@ router.post('/api/posts', upload.single('image'), (req, res) => {
 		newPost.id = results.insertId;
 		posts.push(newPost);
 		res.status(201).json(newPost);
+  
+	  });
+  
+});
+
+router.put('/api/posts/:id', upload.single('image'), (req, res) => {
+	const postId = req.params.id;
+	const { goal_id, checkpoint_id, owner_id, title, content, author, date } = req.body;
+	const imagePath = req.file ? `${baseUrl}/mainFeedImages/${req.file.filename}` : null;
+  
+	// add post to the sql database
+	const query = 'update mainFeedPosts set title=?, content=?, author=?, date=?, imagePath=coalesce(?,imagePath), goal_id=?, checkpoint_id=?, owner_id=? where id=?';
+	  
+	  pool.query(query, [title, content, author, date, imagePath, goal_id, checkpoint_id, owner_id, postId], (error, results) => {
+		
+		if (error){
+			console.error("error when trying to send the post to database:", error);
+			return res.status(500).json({ message: 'Error saving post to database' });
+		}
+
+		res.status(200).json(results);
   
 	  });
   
@@ -458,7 +504,7 @@ router.get('/api/comments', (req,res) => {
 router.get('/api/postsFromCheckpoint', (req, res) => {
 	const checkpointId = req.query.checkpointId;
 
-	const query = "select id, owner_id, goal_id, checkpoint_id, title, content, author, date, imagePath, likes from mainFeedPosts where checkpoint_id = ?";
+	const query = "select id, owner_id, goal_id, checkpoint_id, title, content, author, DATE_FORMAT(date, '%Y-%m-%d') AS date, imagePath, likes from mainFeedPosts where checkpoint_id = ?";
 
 	pool.query(query, [checkpointId], (error, results) => {
 		if (error) {
@@ -469,12 +515,24 @@ router.get('/api/postsFromCheckpoint', (req, res) => {
 	})
 });
 
+router.get('/api/goal', (req,res) => {
+	const goalId = req.query.goalId;
+	const query = "select name, description, date_format(start_date, '%Y-%m-%d') as start_date, date_format(end_date, '%Y-%m-%d') as end_date from goals where id = ?";
+
+	pool.query(query, [goalId], (error, results) => {
+		if (error) {
+			return res.status(500).json({error: error});
+		}
+		res.status(200).json({results});
+	})
+})
+
 function addGoalUserConnection(userId,goalId,query,req,res) {
 	pool.query(query, [userId, goalId], (error, results) => {
                 if (error) {
                         return res.status(500).json({error: error.message});
                 }
-                res.status(201).json({ id: goalId});
+                res.status(201).json({ goalId: goalId});
         });
 }
 

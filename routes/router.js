@@ -6,7 +6,7 @@ const mysql = require('mysql2');
 const multer = require('multer');
 const { error } = require('console');
 const baseUrl = 'http://localhost:4000';
-const config = require(path.resolve(__dirname, '../../config.json'));
+const config = require(path.resolve(__dirname, '../config.json'));
 
 const storage = multer.diskStorage({
 
@@ -571,30 +571,35 @@ router.post('/unfollow', async(req, res) => {
 	}
 });
 
-router.get('/user/:userId/followers', async(req, res) => {
-	const { userID } = req.params; 
+router.get('/user/:userId/followers', async (req, res) => {
+	const { userId } = req.params;
 
 	try {
-		cosnt [followers] = await db.query(
-			`SELECT u.id, u.name, u.profilePicture
-			 FROM followers f
-			 JOIN users u ON f.follower_id = u.id
-			 WHERE f.user_id = ?`,
-			[userId]
-		);
+			// Use the promise version of the query
+			const [followers] = await pool.promise().query(
+					`SELECT u.id, u.name, u.profilePicture
+					 FROM followers f
+					 JOIN users u ON f.follower_id = u.id
+					 WHERE f.user_id = ?`,
+					[userId]
+			);
 
-		const [following] = await db.query(
-			`SELECT u.id, u.name, u.profilePicture
-			 FROM followers f
-			 JOIN users u ON f.user_id = u.id
-			 WHERE f.follower_id = ?`,
-			[userId]
-		);
+			// Query for following
+			const [following] = await pool.promise().query(
+					`SELECT u.id, u.name, u.profilePicture
+					 FROM followers f
+					 JOIN users u ON f.user_id = u.id
+					 WHERE f.follower_id = ?`,
+					[userId]
+			);
 
-		res.status(200).json({ followers, following });
+			// Respond with the results
+			res.status(200).json({ followers, following });
 	} catch (error) {
-		res.status(500).json({ error: "Database error." });
+			console.error('Database error:', error);
+			res.status(500).json({ error: 'Database error.' });
 	}
 });
+
 
 module.exports = router

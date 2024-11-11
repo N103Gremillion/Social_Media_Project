@@ -4,6 +4,8 @@ import ImageModal from '../components/ImageModal';
 import { useState, useEffect } from 'react';
 import { Modal, Button, Image } from 'react-bootstrap';
 import axios from 'axios';
+import PersonIcon from "@mui/icons-material/Person"
+import { FollowButton, MessageButton} from '../components/overviewButtons';
 
 interface UserInfo {
     name: string;
@@ -13,6 +15,8 @@ interface UserInfo {
 
 interface AccountOverviewProps {
     userInfo: UserInfo; 
+    userFollowerCount: number;
+    userFollowingCount: number;
     show: boolean; 
     handleClose: () => void; 
 }
@@ -28,7 +32,7 @@ interface ImageData {
     visibilityStatus: string;
 }
 
-const AccountOverview = ({ userInfo, show, handleClose }: AccountOverviewProps) => {
+const AccountOverview = ({ userInfo, userFollowerCount, userFollowingCount, show, handleClose }: AccountOverviewProps) => {
 
     const [posts, setPosts] = useState<ImageData[]>([]);
     const [selectedImage, setSelectedImage] = useState<ImageData | null>(null)
@@ -57,24 +61,36 @@ const AccountOverview = ({ userInfo, show, handleClose }: AccountOverviewProps) 
 
     return (
         <Modal show={show} onHide={handleClose} dialogClassName="modal-lg">
-            <Modal.Header style={{backgroundColor:'#2e2e2e', color: 'white'}}closeButton>
-                <Modal.Title>
-                <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <div>
-                    <Image 
-                        src={userInfo.profilePictureUrl} 
-                        roundedCircle 
-                        className="me-2" 
-                        style={{ width: 60, height: 60 }} 
-                    />
-                    <p>{userInfo.name}</p>
+           <Modal.Header style={{backgroundColor:'#2e2e2e', color: 'white'}} closeButton>
+            <Modal.Title>
+                <div style={{ display: 'flex', alignItems: 'center', flexDirection: 'row', textAlign: 'center' }}>
+                    {/* User Image and Name */}
+                    <div style={{ marginBottom: '10px', marginRight: '20px'}}>
+                        <span>
+                        {userInfo.profilePictureUrl && userInfo.profilePictureUrl !== './defaultProfile.jpg' ? (
+                            <Image 
+                            src={userInfo.profilePictureUrl} 
+                            roundedCircle 
+                            className="me-2" 
+                            style={{ width: 60, height: 60 }} 
+                            />
+                        ) : (
+                            <PersonIcon style={{ fontSize: 40, color: 'blue' }} />
+                        )}
+                        </span>
+                        <p>{userInfo.name}</p>
                     </div>
-                    <div style={{ marginLeft: '40px', display: 'flex', flexDirection: 'column'}}>
-                        <span style={{ fontSize: '16px' }}><strong>Follows:</strong> </span>
-                        <span style={{ fontSize: '16px' }}><strong>Following:</strong></span>
+                    
+                    <div style={{ display: 'flex', flexDirection: 'column', marginBottom: '10px'}}>
+                        <span style={{ fontSize: '16px' }}><strong>Follows:</strong>{userFollowerCount}</span>
+                        <span style={{ fontSize: '16px' }}><strong>Following:</strong>{userFollowingCount}</span>
                     </div>
                 </div>
-                </Modal.Title>
+                <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
+                    <FollowButton />
+                    <MessageButton />
+                </div>
+            </Modal.Title>
             </Modal.Header>
             <Modal.Body className="overview-body">
                 <div className={"overviewImages-display"}>

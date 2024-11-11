@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Offcanvas, Form, ListGroup, Image } from 'react-bootstrap';
 import axios from "axios";
 import AccountOverview from '../pages/AccountOverview';
-import PersonIcon from "@mui/icons-material/Person"
+import PersonIcon from "@mui/icons-material/Person";
 
 interface SlideOutDivProps {
     show: boolean;       
@@ -15,9 +15,15 @@ interface User {
     id: number;
 }
 
+interface UserFollowers {
+    followers: User[];  
+    following: User[];  
+}
+
 const SlideOutDiv: React.FC<SlideOutDivProps> = ({ show, handleClose }) => {
     const [users, setUsers] = useState<User[]>([]);
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
+    const [selectedUserFollowers, setSelectedUserFollowers] = useState<UserFollowers | null>(null);
     const [hoveredUserId, setHoveredUserId] = useState<number | null>(null); 
     const BASE_URL: string = 'http://localhost:4000/';
 
@@ -30,6 +36,22 @@ const SlideOutDiv: React.FC<SlideOutDivProps> = ({ show, handleClose }) => {
             .catch(error => console.error('Error fetching users:', error));
     }
 
+    const fetchUserFollowers = async (userId: number) => {
+        await axios.get(`${BASE_URL}user/:userId/followers`, {
+            params: {
+                userId: userId,
+            }
+        })
+        .then(response => {
+            console.log(response.data);
+            setSelectedUserFollowers({
+                followers: response.data.followers,  
+                following: response.data.following   
+            });
+        })
+        .catch(error => console.error('Error fetching followers:', error));
+    }
+
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const curTextInput = event.target.value;
         fetchUsersWithSubstring(curTextInput);
@@ -37,6 +59,7 @@ const SlideOutDiv: React.FC<SlideOutDivProps> = ({ show, handleClose }) => {
 
     const handleNamePressed = (user: User) => {
         setSelectedUser(user); 
+        fetchUserFollowers(user.id);
         handleClose(); 
     }
 
@@ -77,15 +100,17 @@ const SlideOutDiv: React.FC<SlideOutDivProps> = ({ show, handleClose }) => {
                                     )}
                                     {user.name}
                                 </div>
-                                
                             </ListGroup.Item>
                         ))}
                     </ListGroup>
                 </Offcanvas.Body>
             </Offcanvas>
+
             {selectedUser && (
                 <AccountOverview 
                     userInfo={selectedUser} 
+                    userFollowerCount={selectedUserFollowers ? selectedUserFollowers.followers.length : 0}
+                    userFollowingCount={selectedUserFollowers ? selectedUserFollowers.following.length : 0}
                     show={!!selectedUser} 
                     handleClose={() => setSelectedUser(null)} 
                 />

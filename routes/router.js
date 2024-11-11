@@ -532,44 +532,79 @@ function addGoalCheckpointConnection(checkpointId,goalId,query,req,res) {
         });
 }
 
+router.get('/isFollowing', (req, res) => {
+  const { currentUserId, userIdToFollow } = req.query;  // Use query parameters
+
+  const query = `
+    SELECT COUNT(*) AS isFollowing
+    FROM followers
+    WHERE follower_id = ? AND user_id = ?;
+  `;
+
+  pool.query(query, [currentUserId, userIdToFollow], (error, results) => {
+    if (error) {
+      return res.status(500).json({ error: error });
+    }
+
+    // If the count is greater than 0, the user is following
+    const isFollowing = results[0].isFollowing > 0;
+
+    console.log(isFollowing);  // For debugging
+
+    // Return true or false
+    return res.json({ isFollowing });
+  });
+});
+
+
 router.post('/follow', async (req, res) => {
-	const {followerId, userId} = req.body;
-	if (followerId == userId) {
-		return res.status(400).json({ error: "User cannot follow themselves." })
-	}
+  
+  const { followerId, userId } = req.body;
 
-	try {
-		await db.query(
-			`INSERT INTO followers (follower_id, user_id) VALUES (?, ?)`,
-			[followerId, userId]
-		);
-		res.status(201).json({ message: "User followed successfully." });
-	} catch (error) {
-		if (error.code === `ER_DUP_ENTRY`) {
-			res.status(409).json({ error: "Already following this user." })
-		} else {
-			res.status(500).json({ error: "Database error." });
-		}
-	}
+  // Check if follower is trying to follow themselves
+  if (followerId == userId) {
+    return res.status(400).json({ error: "User cannot follow themselves." });
+  }
+
+  try {
+    const result = await pool.promise().query(
+      `INSERT INTO followers (follower_id, user_id) VALUES (?, ?)`,
+      [followerId, userId]
+    );
+		return res.status(201).json({ success: true});
+  } catch (error) {
+    if (error.code === `ER_DUP_ENTRY`) {
+      res.status(409).json({ error: "Already following this user." });
+    } else {
+      res.status(500).json({ error: "Database error." });
+    }
+  }
 });
 
-router.post('/unfollow', async(req, res) => {
-	const { followerId, userId } = req.body;
+router.post('/unfollow', async (req, res) => {
+  const { followerId, userId } = req.body;
 
-	try {
-		const [result] = await db.query(
-			`DELETE FROM followers WHERE follower_id = ? AND user_id = ?`,
-			[followerId, userId]
-		);
-		if (result.affectedRows > 0) {
-			res.status(200).json({ message: "User unfollowed successfully." });
-		} else {
-			res.status(404).json({ error: "Follow relationship not found." });
-		}
-	} catch (error) {
-		res.status(500).json({ error: "Database error." });
-	}
+  // Check if both followerId and userId are provided
+  if (!followerId || !userId) {
+    return res.status(400).json({ error: "Missing followerId or userId." });
+  }
+
+  try {
+    const query = `DELETE FROM followers WHERE follower_id = ? AND user_id = ?;`;
+    const [result] = await pool.promise().query(query, [followerId, userId]);
+
+    if (result.affectedRows > 0) {
+      console.log("Unfollow successful. Rows affected:", result.affectedRows);
+      return res.status(201).json({ success: true});
+    } else {
+      return res.status(404).json({ error: "Follow relationship not found." });
+    }
+  } catch (error) {
+    return res.status(500).json({ error: "Database error." });
+  }
 });
+
+
 
 router.get('/user/:userId/followers', async (req, res) => {
 	const { userId } = req.params;

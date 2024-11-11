@@ -37,6 +37,7 @@ const AccountOverview = ({ userInfo, userFollowerCount, userFollowingCount, show
     const [posts, setPosts] = useState<ImageData[]>([]);
     const [selectedImage, setSelectedImage] = useState<ImageData | null>(null)
     const BASE_URL: string = 'http://localhost:4000/';
+    const id = sessionStorage.getItem('userID');
 
     const fetchUsersPosts = async () => { 
         // fetch all of the current users posts
@@ -87,7 +88,7 @@ const AccountOverview = ({ userInfo, userFollowerCount, userFollowingCount, show
                     </div>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
-                    <FollowButton />
+                    <FollowButton userIdToFollow={userInfo.id} currentUserId={Number(id)}/>
                     <MessageButton />
                 </div>
             </Modal.Title>

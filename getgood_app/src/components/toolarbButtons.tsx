@@ -29,16 +29,14 @@ const SearchButton = () => {
 }
 
 const HomeButton = () => {
-    
     return (
-        <Link to="home" className='nav-item'>
-            <Button variant="outline-black">
-                <i className="bi bi-house-door"/>Home
+        <Link to="home" style={{ display: 'block', width: '80%', height: '80%' }}>
+            <Button variant="outline-black" className="nav-item" style={{ width: '100%', height: '100%' }}>
+                <i className="bi bi-house-door" /> Home
             </Button>
         </Link>
     );
-
-}
+};
 
 export {SearchButton, HomeButton};
   

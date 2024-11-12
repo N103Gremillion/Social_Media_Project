@@ -94,7 +94,7 @@ const AccountOverview = ({ userInfo, userFollowerCount, userFollowingCount, show
                 </div>
             </Modal.Title>
             </Modal.Header>
-            <Modal.Body className="overview-body">
+            <Modal.Body>
                 <div className={"overviewImages-display"}>
                     {posts.map((post) => (
                         <img

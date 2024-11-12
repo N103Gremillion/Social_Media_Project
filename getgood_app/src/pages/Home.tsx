@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Image } from "react-bootstrap";
 import PersonIcon from "@mui/icons-material/Person";
+import ImageModal from "../components/ImageModal";
 import AccountOverview from "./AccountOverview";
 import "../components/styles/home.css";
 
@@ -16,11 +17,24 @@ interface UserFollowers {
   following: number;
 }
 
+interface ImageData {
+  id: number;
+  title: string;
+  content: string;
+  author: string;
+  date: string;
+  imagePath: string;
+  likes: number;
+  visibilityStatus: string;
+}
+
 const Home = () => {
   const [followersInfo, setFollowersInfo] = useState<users[]>([]);
   const [followingIds, setFollowingIds] = useState<number[]>([]);
+  const [posts, setPosts] = useState<ImageData[]>([]);
   const [selectedUser, setSelectedUser] = useState<users | null>(null);
   const [selectedUserFollower, setSelectedUserFollower] = useState<UserFollowers | null>(null);
+  const [selectedImage, setSelectedImage] = useState<ImageData | null>(null)
   const BASE_URL: string = "http://localhost:4000/";
   const id = Number(sessionStorage.getItem("userID"));
 
@@ -46,7 +60,6 @@ const Home = () => {
           })
         );
         setFollowersInfo(formattedFollowers);
-        console.log("Formatted Followers:", formattedFollowers); // Log the structure
       } catch (error) {
         console.error("Error fetching followers info:", error);
       }
@@ -66,6 +79,32 @@ const Home = () => {
     }
   };
 
+  const fetchFollowingPosts = async (followIds: number[]) => {
+    console.log(followIds);
+    const idsParam = followIds.join(',');
+    try {
+      const response = await axios.get(`${BASE_URL}api/postsOfFollowing?ids=${idsParam}`);
+      
+      const formattedPosts = response.data.map((post: any) => ({
+        id: post.id,
+        ownerId: post.ownerId,
+        goalId: post.goalId,
+        checkpointId: post.checkpointId,
+        title: post.title,
+        content: post.content,
+        author: post.author,
+        date: post.date, 
+        imagePath: post.imagePath,
+        likes: post.likes,
+      }));
+
+      setPosts(formattedPosts);
+    } catch (error) {
+      console.error('Error fetching posts: ', error);
+    }
+  };
+  
+
   useEffect(() => {
     fetchFollowersIds();
   }, []);
@@ -73,6 +112,7 @@ const Home = () => {
   useEffect(() => {
     if (followingIds.length > 0) {
       fetchFollowingInfo();
+      fetchFollowingPosts(followingIds);
     }
   }, [followingIds]);
 
@@ -80,6 +120,14 @@ const Home = () => {
     setSelectedUser(user);
     fetchUserFollowers(user.id);
   };
+
+  const openModal = (image: ImageData) => {
+    setSelectedImage(image);
+};
+
+const closeModal = () => {
+    setSelectedImage(null);
+};
 
   return (
     <>
@@ -102,10 +150,24 @@ const Home = () => {
                 </div>
               )}
               <p style={{ color: "white", textAlign: "center" }}>{user.name}</p>
-              <p style={{ color: "white", textAlign: "center" }}>{user.id}</p>
             </span>
           ))}
         </div>
+        <div className={"overviewImages-display"}>
+            {posts.map((post) => (
+                <img
+                    key={post.id}
+                    src={post.imagePath}
+                    onClick={() => openModal(post)}
+                    className="overviewImage"
+                />
+            ))}
+            {selectedImage && (
+            <div className="image-modal">
+                <ImageModal image={selectedImage} onClose={closeModal} />
+            </div>
+        )}
+      </div>
       </div>
       {selectedUser && (
         <AccountOverview

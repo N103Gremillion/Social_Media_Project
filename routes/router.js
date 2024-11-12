@@ -663,6 +663,53 @@ router.get('/followingInfo', async (req, res) => {
 	  console.error('Error fetching following info:', error);
 	  res.status(500).json({ error: 'Failed to fetch following information' });
 	}
-  });
+});
+
+router.get ('/api/postsOfFollowing', async (req, res) => {
+	// expects a comma separated value string in the querery 
+	const followingIds = req.query.ids ? req.query.ids.split(',').map(id => parseInt(id)) : [];
+	
+	query = `
+		SELECT
+			id,
+			owner_id,
+			goal_id,
+			checkpoint_id,
+			title,
+			content,
+			author,
+			DATE_FORMAT(date, '%d-%m-%Y') AS formatted_date,
+			imagePath,
+			likes
+		FROM
+			mainFeedPosts
+		WHERE
+			owner_id IN (?);
+	`
+
+	pool.query(query, [followingIds], (error, results) => {
+		if (error){
+			console.error("error fetching the posts form database", error);
+			return res.status(500).json();
+		}
+		
+		// add all elements in the table to the posts[]
+		const formattedPosts = results.map(post => ({
+			id: post.id,
+			ownerId: post.owner_id,
+			goalId: post.goal_id,
+			checkpointId: post.checkpoint_id,
+			title: post.title,
+			content: post.content,
+			author: post.author,
+			date: post.formatted_date,
+			imagePath: post.imagePath,
+			likes: post.likes,
+		}));
+		
+		console.log(formattedPosts);
+		res.status(200).json(formattedPosts);
+	});
+})
   
 module.exports = router

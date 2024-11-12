@@ -417,6 +417,9 @@ const Goals: React.FC = () => {
                 <button className='add-checkpoint-button' onClick={() => setShowAddCheckpointModal(true)}>Add Checkpoint</button>
             </div>
             <div className='post-display'>
+                <div className='post-title'>
+                    {currPost?.title}
+                </div>
                 <div className='post-description'>
                     <span>{currPost?.content}</span>
                 </div>

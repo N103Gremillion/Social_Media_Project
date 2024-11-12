@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Offcanvas, Form, ListGroup, Image } from 'react-bootstrap';
 import axios from "axios";
 import AccountOverview from '../pages/AccountOverview';
-import PersonIcon from "@mui/icons-material/Person"
+import PersonIcon from "@mui/icons-material/Person";
 
 interface SlideOutDivProps {
     show: boolean;       
@@ -15,12 +15,19 @@ interface User {
     id: number;
 }
 
+interface UserFollowers {
+    followers: number;  
+    following: number;  
+}
+
 const SlideOutDiv: React.FC<SlideOutDivProps> = ({ show, handleClose }) => {
     const [users, setUsers] = useState<User[]>([]);
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
+    const [selectedUserFollowers, setSelectedUserFollowers] = useState<UserFollowers | null>(null);
     const [hoveredUserId, setHoveredUserId] = useState<number | null>(null); 
     const BASE_URL: string = 'http://localhost:4000/';
 
+    // Fetch users based on the search input
     const fetchUsersWithSubstring = async (curTextInput: string) => { 
         await axios.get(`${BASE_URL}usersWithSub?query=${curTextInput}`)
             .then(response => {
@@ -30,13 +37,32 @@ const SlideOutDiv: React.FC<SlideOutDivProps> = ({ show, handleClose }) => {
             .catch(error => console.error('Error fetching users:', error));
     }
 
+    const fetchUserFollowers = async (userId: number) => {
+        await axios.get(`${BASE_URL}followers`, {
+            params:
+            {
+                userId: userId
+            }
+        }) 
+            .then(response => {
+                setSelectedUserFollowers({
+                    followers: response.data.followersCount,  
+                    following: response.data.followingCount   
+                });
+            })
+            .catch(error => console.error('Error fetching followers:', error));
+    }
+
+    // Handle the input change event and fetch users with the substring
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const curTextInput = event.target.value;
         fetchUsersWithSubstring(curTextInput);
     }
 
+    // Handle user name click to select a user and fetch their followers
     const handleNamePressed = (user: User) => {
         setSelectedUser(user); 
+        fetchUserFollowers(user.id);
         handleClose(); 
     }
 
@@ -77,15 +103,17 @@ const SlideOutDiv: React.FC<SlideOutDivProps> = ({ show, handleClose }) => {
                                     )}
                                     {user.name}
                                 </div>
-                                
                             </ListGroup.Item>
                         ))}
                     </ListGroup>
                 </Offcanvas.Body>
             </Offcanvas>
+
             {selectedUser && (
                 <AccountOverview 
                     userInfo={selectedUser} 
+                    userFollowerCount={selectedUserFollowers ? selectedUserFollowers.followers : 0} 
+                    userFollowingCount={selectedUserFollowers ? selectedUserFollowers.following : 0} 
                     show={!!selectedUser} 
                     handleClose={() => setSelectedUser(null)} 
                 />

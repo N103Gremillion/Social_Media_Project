@@ -1,0 +1,55 @@
+.home-page {
+  display: flex;
+  background-color: black;
+  flex-direction: column;
+  padding: 20px;
+}
+
+.followers-scroller {
+  background-color: lightcoral;
+  display: flex;
+  overflow-x: auto;
+  gap: 15px;
+  padding-bottom: 10px;
+  padding-top: 10px;
+}
+
+.picture-container,
+.icon-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.overviewImages-display {
+  position: relative; 
+  overflow-y: auto; 
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+  background-color: black;
+}
+
+.overviewImage {
+  width: 100%;
+  height: auto;
+  cursor: pointer;
+  object-fit: cover;
+}
+
+.image-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+.image-modal img {
+  max-width: 80%;
+  max-height: 80%;
+}

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import '../components/styles/explore.css';
+import '../components/styles/accountOverviewModal.css';
 import ImageModal from '../components/ImageModal.tsx';
 import Loader from "../components/Loader.tsx";
 import InfiniteScroll from 'react-infinite-scroll-component';
@@ -45,7 +45,14 @@ const Explore = () => {
 
         await axios.get(`${BASE_URL}api/posts?offset=${postIndex * 12}&limit12`)
         .then( response => {
-            setPosts(posts => [...posts, ...response.data]);
+            const newPosts = response.data;
+
+            setPosts((posts) => {
+                return [
+                  ...posts, 
+                  ...newPosts.filter((post : ImageData) => !posts.some(existingPost => existingPost.id === post.id))
+                ];
+            });
 
             response.data.length > 0 ? setHasMorePosts(true) : setHasMorePosts(false);
         })

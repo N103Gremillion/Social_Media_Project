@@ -52,6 +52,9 @@ const ImageModal: React.FC<ImageModalProps> = ({image, onClose}) => {
     const [checkpoints, setCheckpoints] = useState<any[]>([]);
     const [currCheckpoint, setCurrCehckpoint] = useState<any>();
     const [goal, setGoal] = useState<NewGoal>();
+    const [authorName, setAuthorName] = useState<String>("");
+    const [authorImage, setAuthorImage] = useState<String>("");
+    const [currUserName, setCurrUserName] = useState<String>("");
     const navigate = useNavigate();
     const PORT = 4000;
 
@@ -60,7 +63,8 @@ const ImageModal: React.FC<ImageModalProps> = ({image, onClose}) => {
 
         await axios.post(`http://localhost:${PORT}/api/comments`, {
             postId: currPost.id,
-            content: newComment
+            content: newComment,
+            author: currUserName
         })
 
         await axios.get(`http://localhost:${PORT}/api/comments?postId=${currPost.id}`)
@@ -307,6 +311,32 @@ const ImageModal: React.FC<ImageModalProps> = ({image, onClose}) => {
         });
     };
 
+    const getAuthorInfo = async () => {
+        if (!currPost) {
+            return;
+        }
+        await axios.get(`http://localhost:${PORT}/authorInfo`, {
+            params: {
+                authorId: image.ownerId
+            }
+        })
+        .then((response) => {
+            setAuthorName(response.data.info[0].name);
+            setAuthorImage(response.data.info[0].profilePicture);
+        });
+    }
+
+    const getUserInfo = async () => {
+        await axios.get(`http://localhost:${PORT}/name`, {
+            params: {
+                id: sessionStorage.getItem("userID")
+            }
+        })
+        .then((response) => {
+            setCurrUserName(response.data.userName[0].name);
+        });
+    }
+
     useEffect(() => {
         getComments();
     }, [currPost]);
@@ -322,8 +352,11 @@ const ImageModal: React.FC<ImageModalProps> = ({image, onClose}) => {
     }, [checkpoints]);
 
     useEffect(() => { 
+        getUserInfo();
+        getAuthorInfo();
         getComments();
         getCheckpoints();
+        
     }, []);
 
     const { elements, height } = renderValues(0, 100);
@@ -346,10 +379,14 @@ const ImageModal: React.FC<ImageModalProps> = ({image, onClose}) => {
 
                 <div className='comment-section'>
                     <div className='post-information'>
+                        <div className='author-name'>
+                            By {authorName}
+                        </div>
+                        <br/>
                         <div className='image-title'>
                             <strong>{currPost.title}</strong>
                         </div>
-                        <strong>Description</strong>
+                        <br/>
                         <p>{currPost.content}</p>
                     </div>
                     

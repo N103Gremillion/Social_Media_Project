@@ -131,8 +131,8 @@ router.get('/usersWithSub', (req, res) => {
 });
 
 
-router.post('/getUsername', (req, res) => {
-	const userId = req.body.id;
+router.get('/name', (req, res) => {
+	const userId = req.query.id;
 	
 	const getUsername = 'select name from users where id = ?';
 	
@@ -140,7 +140,7 @@ router.post('/getUsername', (req, res) => {
 		if(error) {
 			return res.status(500).json({ error: error.message});
 		}
-		res.json(results);
+		res.status(200).json({ userName: results });
 	})
 })
 
@@ -546,11 +546,11 @@ router.delete('/api/posts', (req,res) => {
 });
 
 router.post('/api/comments', (req,res) => {
-	const { postId, content } = req.body;
+	const { postId, content, author } = req.body;
 
-	const query = 'insert into comments (post_id, content) values (?, ?)';
+	const query = 'insert into comments (post_id, content, author) values (?, ?, ?)';
 
-	pool.query(query, [postId, content], (error, results) => {
+	pool.query(query, [postId, content, author], (error, results) => {
 		if (error) {
 			return res.status(500).json({error: error});
 		}
@@ -597,7 +597,7 @@ router.get('/api/goal', (req,res) => {
 		}
 		res.status(200).json({results});
 	})
-})
+});
 
 function addGoalUserConnection(userId,goalId,query,req,res) {
 	pool.query(query, [userId, goalId], (error, results) => {
@@ -606,16 +606,30 @@ function addGoalUserConnection(userId,goalId,query,req,res) {
                 }
                 res.status(201).json({ goalId: goalId});
         });
-}
+};
 
 function addGoalCheckpointConnection(checkpointId,goalId,query,req,res) {
         pool.query(query, [goalId, checkpointId], (error, results) => {
                 if (error) {
                         return res.status(500).json({error: error.message});
                 }
-                res.status(201).json({ id: results.insertId});
+                res.status(200).json({ id: results.insertId});
         });
-}
+};
+
+router.get('/authorInfo', (req,res) => {
+	const authorId = req.query.authorId;
+
+	const query = "select name, profilePicture from users where id = ?";
+
+	pool.query(query, [authorId], (error, results) => {
+		if (error) {
+				return res.status(500).json({error: error.message});
+		}
+		res.status(200).json({ info: results });
+	});
+
+});
 
 router.get('/isFollowing', (req, res) => {
   const { currentUserId, userIdToFollow } = req.query;  

@@ -70,6 +70,7 @@ CREATE TABLE comments (
     id INT AUTO_INCREMENT PRIMARY KEY,
     content TEXT,
     post_id INT,
+    author VARCHAR(100),
     FOREIGN KEY (post_id) REFERENCES mainFeedPosts(id) ON DELETE CASCADE
 );
 

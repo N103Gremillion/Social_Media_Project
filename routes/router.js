@@ -6,7 +6,7 @@ const mysql = require('mysql2');
 const multer = require('multer');
 const { error } = require('console');
 const baseUrl = 'http://localhost:4000';
-const config = require(path.resolve(__dirname, '../config.json'));
+const config = require(path.resolve(__dirname, '../../config.json'));
 
 const storage = multer.diskStorage({
 

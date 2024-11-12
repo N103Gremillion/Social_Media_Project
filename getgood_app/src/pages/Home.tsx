@@ -167,7 +167,7 @@ const closeModal = () => {
                 <ImageModal image={selectedImage} onClose={closeModal} />
             </div>
         )}
-      </div>
+        </div>
       </div>
       {selectedUser && (
         <AccountOverview

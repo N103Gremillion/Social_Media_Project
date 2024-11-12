@@ -129,8 +129,29 @@ const closeModal = () => {
     setSelectedImage(null);
 };
 
-  return (
-    <>
+return (
+  <>
+    {followersInfo.length === 0 ? (
+      <div
+        className="empty-followers-message"
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          position: "fixed", // Ensures it spans the full viewport
+          top: 0,
+          left: "15%",
+          width: "100%",
+          height: "100%",
+          backgroundColor: "black",
+          zIndex: 1,
+        }}
+      >
+        <h2 style={{ color: "white", textAlign: "center" }}>
+          You are following no one
+        </h2>
+      </div>
+    ) : (
       <div className="home-page">
         <div className="followers-scroller">
           {followersInfo.map((user, index) => (
@@ -153,33 +174,34 @@ const closeModal = () => {
             </span>
           ))}
         </div>
-        <div className={"overviewImages-display"}>
-            {posts.map((post) => (
-                <img
-                    key={post.id}
-                    src={post.imagePath}
-                    onClick={() => openModal(post)}
-                    className="overviewImage"
-                />
-            ))}
-            {selectedImage && (
+        <div className="overviewImages-display">
+          {posts.map((post) => (
+            <img
+              key={post.id}
+              src={post.imagePath}
+              onClick={() => openModal(post)}
+              className="overviewImage"
+            />
+          ))}
+          {selectedImage && (
             <div className="image-modal">
-                <ImageModal image={selectedImage} onClose={closeModal} />
+              <ImageModal image={selectedImage} onClose={closeModal} />
             </div>
-        )}
+          )}
         </div>
       </div>
-      {selectedUser && (
-        <AccountOverview
-          userInfo={selectedUser}
-          userFollowerCount={selectedUserFollower?.followers || 0}
-          userFollowingCount={selectedUserFollower?.following || 0}
-          show={!!selectedUser}
-          handleClose={() => setSelectedUser(null)}
-        />
-      )}
-    </>
-  );
-};
+    )}
+    {selectedUser && (
+      <AccountOverview
+        userInfo={selectedUser}
+        userFollowerCount={selectedUserFollower?.followers || 0}
+        userFollowingCount={selectedUserFollower?.following || 0}
+        show={!!selectedUser}
+        handleClose={() => setSelectedUser(null)}
+      />
+    )}
+  </>
+);
+}
 
 export default Home;

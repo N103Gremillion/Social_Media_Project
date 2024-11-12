@@ -15,6 +15,8 @@ const FollowButton = ({ userIdToFollow, currentUserId }: FollowButtonProps) => {
   const BASE_URL = 'http://localhost:4000/';
 
   const checkIfFollowing = async () => {
+    console.log("trying to check if following")
+    console.log(userIdToFollow)
     try {
       const response = await axios.get(`${BASE_URL}isFollowing`, {
         params: { currentUserId, userIdToFollow },

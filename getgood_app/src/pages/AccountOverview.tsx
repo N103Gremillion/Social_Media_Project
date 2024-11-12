@@ -40,6 +40,7 @@ const AccountOverview = ({ userInfo, userFollowerCount, userFollowingCount, show
     const id = sessionStorage.getItem('userID');
 
     const fetchUsersPosts = async () => { 
+        console.log(userInfo.id)
         // fetch all of the current users posts
         await axios.get(`${BASE_URL}api/postsOfUser?userId=${userInfo.id}`)
         .then( response => {

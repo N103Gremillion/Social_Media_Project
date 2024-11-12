@@ -44,7 +44,7 @@ const SlideOutDiv: React.FC<SlideOutDivProps> = ({ show, handleClose }) => {
                 userId: userId
             }
         }) 
-            .then(response => {;
+            .then(response => {
                 setSelectedUserFollowers({
                     followers: response.data.followersCount,  
                     following: response.data.followingCount   

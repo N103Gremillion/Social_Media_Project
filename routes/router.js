@@ -646,8 +646,6 @@ router.get('/followerIds', async (req, res) => {
 
 router.get('/followingInfo', async (req, res) => {
 	const { followingIds } = req.query;
-  
-	const ids = followingIds.map(follower => follower.user_id);
 	
 	const query = `
 	  SELECT name AS name, profilePicture AS profilePicture
@@ -656,7 +654,7 @@ router.get('/followingInfo', async (req, res) => {
 	`;
   
 	try {
-	  const [followingInfo] = await pool.promise().query(query, [ids]); // Use query, not express.query
+	  const [followingInfo] = await pool.promise().query(query, [followingIds]); // Use query, not express.query
 	  
 	  res.status(200).json({
 		followingInfo

@@ -10,10 +10,11 @@ interface Checkpoint {
 interface EditCheckpointModalProps {
     handleClose: () => void;
     editCheckpoint: (checkpoint: Checkpoint) => void;
+    deleteCheckpoint: (Checkpoint: Checkpoint) => void;
     checkpoint: Checkpoint;
 }
 
-const EditCheckpointModal: React.FC<EditCheckpointModalProps> = ({handleClose, editCheckpoint, checkpoint }) => {
+const EditCheckpointModal: React.FC<EditCheckpointModalProps> = ({handleClose, editCheckpoint, checkpoint, deleteCheckpoint }) => {
     const [checkpointName, setCheckpointName] = useState<string>(checkpoint.name);
     const [completionDate, setCompletionDate] = useState<string>(checkpoint.date);
     console.log(checkpoint, completionDate);
@@ -28,6 +29,11 @@ const EditCheckpointModal: React.FC<EditCheckpointModalProps> = ({handleClose, e
 
         handleClose();
     };
+
+    const handleDeleteCheckpoint = () => {
+        deleteCheckpoint(checkpoint);
+        handleClose();
+    }
 
     const style = {
         backgroundColor: 'black',
@@ -64,6 +70,9 @@ const EditCheckpointModal: React.FC<EditCheckpointModalProps> = ({handleClose, e
                     </Form.Group>
                     <Form.Group controlId='submitButton'>
                         <Button variant="primary" type='submit'>Save Changes</Button>
+                    </Form.Group>
+                    <Form.Group controlId='submitButton'>
+                        <Button variant="danger" onClick={handleDeleteCheckpoint}>Delete</Button>
                     </Form.Group>
                 </Form>
             </Modal.Body>

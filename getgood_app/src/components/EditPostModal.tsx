@@ -5,6 +5,7 @@ import axios from 'axios';
 interface EditPostModalProps {
     onClose: () => void;
     post: Post;
+    deletePost: (post: Post) => void;
 }
 
 interface Post {
@@ -31,7 +32,7 @@ interface Checkpoint {
     goalId: number;
 }
 
-const EditPostModal: React.FC<EditPostModalProps> = ({onClose, post}) => {
+const EditPostModal: React.FC<EditPostModalProps> = ({onClose, post, deletePost}) => {
     const [title, setTitle] = useState<string>(post.title);
     const [image, setImage] = useState<File | null>(null);
     const [author, setAuthor] = useState<string>(post.author);
@@ -57,6 +58,11 @@ const EditPostModal: React.FC<EditPostModalProps> = ({onClose, post}) => {
                 setImage(e.target.files[0]);
             }
         } 
+    }
+
+    const handleDeletePost = () => {
+        deletePost(post);
+        onClose();
     }
 
     const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -181,6 +187,9 @@ const EditPostModal: React.FC<EditPostModalProps> = ({onClose, post}) => {
                             : ("Save Changes")
                         }
                     </Button>
+                    <Form.Group controlId='submitButton'>
+                        <Button variant="danger" onClick={handleDeletePost}>Delete</Button>
+                    </Form.Group>
                 </Form>
             </Modal.Body>
         </Modal>

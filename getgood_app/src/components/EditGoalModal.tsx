@@ -12,10 +12,11 @@ interface Goal {
 interface EditGoalModalProps {
     handleClose: () => void;
     editGoal: (goal: Goal) => void;
+    deleteGoal: (goal: Goal) => void;
     goal: Goal;
 }
 
-const EditGoalModal: React.FC<EditGoalModalProps> = ({handleClose, editGoal, goal }) => {
+const EditGoalModal: React.FC<EditGoalModalProps> = ({handleClose, editGoal, goal, deleteGoal }) => {
     const [goalName, setGoalName] = useState<string>(goal.name);
     const [goalDescription, setGoalDescription] = useState<string>(goal.description);
     const [goalStartDate, setGoalStartDate] = useState<string>(goal.startDate);
@@ -23,6 +24,14 @@ const EditGoalModal: React.FC<EditGoalModalProps> = ({handleClose, editGoal, goa
 
     const handleEditGoal = (e: React.FormEvent) => {
         e.preventDefault();
+
+        const startDate = new Date(goalStartDate);
+        const endDate = new Date(goalEndDate);
+
+        if (startDate > endDate) {
+            alert("Start date must be after end date");
+            return;
+        }
 
         editGoal({
             id: goal.id,
@@ -34,6 +43,11 @@ const EditGoalModal: React.FC<EditGoalModalProps> = ({handleClose, editGoal, goa
 
         handleClose();
     };
+
+    const handleDeleteGoal = () => {
+        deleteGoal(goal);
+        handleClose();
+    }
 
     const style = {
         backgroundColor: 'black',
@@ -91,6 +105,9 @@ const EditGoalModal: React.FC<EditGoalModalProps> = ({handleClose, editGoal, goa
                     </Form.Group>
                     <Form.Group controlId='submitButton'>
                         <Button variant="primary" type='submit'>Save Changes</Button>
+                    </Form.Group>
+                    <Form.Group controlId='submitButton'>
+                        <Button variant="danger" onClick={handleDeleteGoal}>Delete</Button>
                     </Form.Group>
                 </Form>
             </Modal.Body>

@@ -272,7 +272,7 @@ router.put('/editGoal', (req,res) => {
 	});
 })
 
-router.post('/deleteGoal', (req,res) => {
+router.delete('/deleteGoal', (req,res) => {
 	const { userId, goalId } = req.body;
 
 	const deleteQuery = "delete from goals where id=?";
@@ -329,6 +329,19 @@ router.delete('/deleteCheckpoints', (req,res) => {
 		if (error) {
 			return res.status(500).json({ error: error.message });
 		}
+		res.status(200).json({results});
+	});
+});
+
+router.delete('/deleteCheckpoint', (req,res) => {
+	const { checkpointId } = req.body;
+	const deleteQuery = "delete from checkpoints where id = ?";
+
+	pool.query(deleteQuery, [checkpointId], (error, results) => {
+		if (error) {
+			return res.status(500).json({ error: error.message });
+		}
+		res.status(200).json({results});
 	});
 });
 
@@ -471,6 +484,18 @@ router.put('/api/posts/:id', upload.single('image'), (req, res) => {
   
 	  });
   
+});
+
+router.delete('/api/posts', (req,res) => {
+	const { postId } = req.body;
+	const deleteQuery = "delete from mainfeedposts where id = ?";
+
+	pool.query(deleteQuery, [postId], (error, results) => {
+		if (error) {
+			return res.status(500).json({ error: error.message });
+		}
+		res.status(200).json({results});
+	});
 });
 
 router.post('/api/comments', (req,res) => {

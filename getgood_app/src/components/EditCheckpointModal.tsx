@@ -1,83 +1,74 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
 
-interface AddCheckpointModalProps {
-    isOpen: boolean;
-    close: () => void;
-    saveChanges: () => void;
-    deleteCheckpoint: () => void;
-    checkpointName: string;
-    setCheckpointName: (name: string) => void;
-    checkpointDate: string;
-    setCheckpointDate: (date: string) => void;
-    clearCheckpointFields: () => void;
+interface Checkpoint {
+    id: number;
+    name: string;
+    date: string;
 }
 
-const AddCheckpointModal: React.FC<AddCheckpointModalProps> = ({
-    isOpen,
-    close,
-    saveChanges,
-    deleteCheckpoint,
-    checkpointName,
-    setCheckpointName,
-    checkpointDate,
-    setCheckpointDate,
-    clearCheckpointFields
-  }) => {
+interface EditCheckpointModalProps {
+    handleClose: () => void;
+    editCheckpoint: (checkpoint: Checkpoint) => void;
+    checkpoint: Checkpoint;
+}
+
+const EditCheckpointModal: React.FC<EditCheckpointModalProps> = ({handleClose, editCheckpoint, checkpoint }) => {
+    const [checkpointName, setCheckpointName] = useState<string>(checkpoint.name);
+    const [completionDate, setCompletionDate] = useState<string>(checkpoint.date);
+    console.log(checkpoint, completionDate);
+    const handleEditGoal = (e: React.FormEvent) => {
+        e.preventDefault();
+
+        editCheckpoint({
+            id: checkpoint.id,
+            name: checkpointName,
+            date: completionDate,
+        });
+
+        handleClose();
+    };
+
     const style = {
         backgroundColor: 'black',
         color: 'white'
     }
-    const handleSaveChanges = (e: React.FormEvent) => {
-        e.preventDefault();
-        saveChanges();
-        close();
-    };
-    const handeDeleteCheckpoint = (e: React.FormEvent) => {
-        e.preventDefault();
-        deleteCheckpoint();
-        close();
-        
-    };
-    const handleClose = () => {
-        clearCheckpointFields();
-        close();
-    }
+
     return (
-        <Modal show={isOpen} onHide={handleClose}>
+        <Modal show={true} onHide={handleClose}>
             <Modal.Header closeButton>
                 <Modal.Title>Edit Checkpoint</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                <Form>
+                <Form onSubmit={handleEditGoal}>
                     <Form.Group controlId="checkpointName">
                         <Form.Label>Checkpoint Name</Form.Label>
                         <Form.Control
                             type="text"
-                            value={checkpointName}
                             style={style}
+                            value={checkpointName}
                             onChange={(e: any) => setCheckpointName(e.target.value)}
                             placeholder="Enter checkpoint name"
-                            autoComplete='off'
+                            required
                         />
                     </Form.Group>
-                    <Form.Group controlId="checkpointDate">
-                        <Form.Label>Checkpoint Date</Form.Label>
+                    <Form.Group controlId="completionDate">
+                        <Form.Label>Checkpoint Completion Date</Form.Label>
                         <Form.Control
                             type="date"
                             style={style}
-                            value={checkpointDate}
-                            onChange={(e: any) => setCheckpointDate(e.target.value)}
+                            value={completionDate}
+                            onChange={(e: any) => setCompletionDate(e.target.value)}
+                            required
                         />
+                    </Form.Group>
+                    <Form.Group controlId='submitButton'>
+                        <Button variant="primary" type='submit'>Save Changes</Button>
                     </Form.Group>
                 </Form>
             </Modal.Body>
-            <Modal.Footer>
-                <Button variant="primary" onClick={handleSaveChanges}>Save Changes</Button>
-                <Button variant="danger" onClick={handeDeleteCheckpoint}>Delete</Button>
-            </Modal.Footer>
         </Modal>
-    )
-  };
+    );
+}
 
-export default AddCheckpointModal;
+export default EditCheckpointModal;

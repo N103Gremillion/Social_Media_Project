@@ -25,14 +25,15 @@ const SearchButton = () => {
             <SlideOutDiv show={show} handleClose={handleClose} />
         </>
     );
+    
 }
 
 const HomeButton = () => {
     
     return (
         <Link to="home" className='nav-item'>
-            <Button variant="outline-black" className='nav-item-btn'>
-                <i className="bi bi-house-door"></i> Home
+            <Button variant="outline-black">
+                <i className="bi bi-house-door"/>Home
             </Button>
         </Link>
     );

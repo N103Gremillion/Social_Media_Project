@@ -9,6 +9,7 @@ import CreateGoalPage from "./pages/CreateGoalPage";
 import EditGoalProgress from "./pages/EditGoalProgress";
 import Explore from "./pages/Explore";
 import Forgot from "./pages/ForgotPassword"
+import Reset from "./pages/ResetPassword"
 import { createBrowserRouter, RouterProvider, Outlet} from "react-router-dom";
 import "./components/styles/app.css"
 
@@ -27,6 +28,7 @@ const router = createBrowserRouter([
   { path: "/", element: <Login />, errorElement: <ErrorPage /> },
   { path: "signup", element: <SignUp /> },
   {path: "forgot", element: <Forgot />},
+  {path: "reset-password", element: <Reset />},
   {
     path: "dashboard",
     element: <Dashboard />,

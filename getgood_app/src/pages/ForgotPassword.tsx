@@ -3,16 +3,34 @@ import {
     Typography,
     TextField,
     Button,
-    Divider,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle
 } from "@mui/material";
 import {useState} from "react";
-import {Link} from "react-router-dom"
+import {Link, useNavigate} from "react-router-dom"
 
 const Forgot = () => {
+
+    const navigate = useNavigate()
 
     const [email, setEmail] = useState("");
     const [emailError, setEmailError] = useState(false)
     const [emailErrorType, setEmailErrorType] = useState("")
+    const [id, setId] = useState("")
+
+    const [open, setOpen] = useState(false)
+    const [verification, setVerification] = useState(0)
+
+    const handleOpen = () => {
+        setOpen(true)
+    }
+
+    const handleClose = () => {
+        setOpen(false)
+    }
 
     const handleRequest = async () => {
         
@@ -28,21 +46,61 @@ const Forgot = () => {
             setEmailError(false)
         }
 
-        const checkForUser = await fetch('http://localhost:4000/checkForUser', {
-            method: 'POST',
-            headers: {
-                'Content-type': "application/json"
-            },
-            body: JSON.stringify({email, })
-        })
+        var errortype = 0
 
-        if(checkForUser.status > 499) {
+        try {
+            const checkForUser = await fetch('http://localhost:4000/checkForUser', {
+                method: 'POST',
+                headers: {
+                    'Content-type': "application/json"
+                },
+                body: JSON.stringify({email, })
+            })
+    
+            if(checkForUser.status > 499) {
+                errortype = 1
+                throw new Error("Account not found")
+            }
+
+            const check = await checkForUser.json()
+            setId(check[0].id)
+
+            const verify = Math.floor(Math.random() * 999999) + 100000
+            setVerification(verify)
+
+            const subject = `${email}, reset your password for GetGoals`
+            const text = `Hi ${email}, someone is trying to reset your password. If it was you, enter this confirmation code in the app: ${verify}`
+
+            const sendEmail = await fetch('http://localhost:4000/sendEmail', {
+                method: "POST",
+                headers: {
+                    'Content-type': "application/json"
+                },
+                body: JSON.stringify({email, subject, text})
+            })
+
+            if(sendEmail.status > 499) {
+                errortype = 2
+                throw new Error("Send email error")
+            }
+
+            handleOpen()
+
+        } catch(error) {
+            console.error(error)
             setEmail("")
             setEmailError(true)
-            setEmailErrorType("Account not found")
-        } else {
-            console.log(checkForUser.status)
+            if(errortype == 1) {
+                setEmailErrorType("Account not found")
+            }
+            else if(errortype == 2) {
+                setEmailErrorType("The email to change your password could not be sent to your email")
+            }
+            else {
+                setEmailErrorType("An unknown error has occured, retry again later")
+            }
         }
+
     }
 
     return (
@@ -74,7 +132,7 @@ const Forgot = () => {
                 <TextField sx={{
                     mt: 2,
                     width: "20vw",
-                    backgroundColor: "gray",
+                    backgroundColor: "#121212",
                     borderRadius: 1
                 }}
                     margin="normal"
@@ -96,17 +154,6 @@ const Forgot = () => {
                     >Send login link
                     </Button>
 
-                    <Divider sx={{
-                        paddingLeft: "10%",
-                        paddingRight: "10%",
-                        alignSelf: "stretch",
-                        color: "white",
-                        "&::before, &::after": {
-                        borderColor: "gray",
-                        },
-                    }}
-                    >OR</Divider>
-
                     <Link to="/signup">Create new account</Link>
 
                     <Link to="/">
@@ -114,8 +161,51 @@ const Forgot = () => {
                             border: "1px solid gray",
                         }}>Back to login</Button>
                     </Link>
-
                 </Box>
+
+                <Dialog
+                    sx={{backgroundColor: "black"}}
+                    open={open}
+                    onClose={handleClose}
+                    PaperProps={{
+                        component: 'form',
+                        onSubmit: (event: React.FormEvent<HTMLFormElement>) => {
+                            event.preventDefault()
+                            const formData = new FormData(event.currentTarget)
+                            const formJson = Object.fromEntries((formData as any).entries())
+                            const verify = formJson.verify
+                            if(verify == verification) {
+                                sessionStorage.setItem('userEmail', id)
+                                navigate("/reset-password")
+                            }
+                            else {
+                                alert("That code is not valid")
+                            }
+                            handleClose()
+                        }
+                    }}
+                    >
+                        <DialogTitle>Verify</DialogTitle>
+                        <DialogContent>
+                            <DialogContentText>
+                                An email has been sent with a verification code. Please submit it to change your password.
+                            </DialogContentText>
+                            <TextField
+                                autoFocus
+                                required
+                                margin="dense"
+                                id="verify"
+                                name="verify"
+                                label="Verification"
+                                fullWidth
+                                variant="standard"
+                                />
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={handleClose}>Cancel</Button>
+                            <Button type="submit">Confirm</Button>
+                        </DialogActions>
+                    </Dialog>
             </div>
     )
 }

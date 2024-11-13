@@ -107,7 +107,7 @@ const SignUp = () => {
 
             handleOpen()
 
-        } catch (error) {
+        } catch(error) {
             console.error(error)
             setEmailError(true)
             if(errortype == 1) {

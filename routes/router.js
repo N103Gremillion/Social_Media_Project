@@ -613,63 +613,87 @@ router.get('/user/:userId/followers', async(req, res) => {
 router.get('/notifications', async (req, res) => {
 	try {
 		const userId = req.user?.id || req.query.userId; 
-
+		const query = `SELECT n.id, n.reciever_id, n.sender_id, n.type, n.post_id, n.created_at, s.name AS senderName, s.profilePicture AS senderProfilePicture FROM notifications n JOIN users s ON n.sender_id = s.id WHERE n.reciever_id = ? ORDER BY n.created_at DESC`
+		
+		console.log("Recieved userId: ", userId);
 		if (!userId) {
 			return res.status(400).json({ error: "User ID is required to fetch notifications." });
 		}
 
-		const notifications = await db.query(
-			`SELECT n.id, n.type, n.post_id, n.created_at,
-			s.name AS senderName, s.profilePicture AS senderProfilePicture
-	 		FROM notifications n
-	 		JOIN users s ON n.sender_id = s.id
-	 		WHERE n.receiver_id = ?
-	 		ORDER BY n.created_at DESC`, 
-			[userId]
-		);	
-		res.json({ notifications });
+		console.log("Querying");
+	    
+		pool.query(query, [userId], (error,results) => {
+			if (error) {
+				console.error("Database error retrieving notifications:", error);
+				return res.status(500).json({ error: "Database error retrieving notifications." });
+			}
+			console.log("Query successful, notifications:", results);
+			res.json({ notifications: results })
+		});
+			
 	} catch (error) {
-		res.status(500).json({ error: "Database error retrieving notifications."});
+		console.error("Unexpected error:", error); 
+		res.status(500).json({ error: "Unexpected error retrieving notifications." });
 	}
 });
 
-router.post('notifications/:notificationId/accept', async (req, res) => {
-	const { notificationId } = req.params;
-
+router.post('/notifications/:notificationId/accept', async (req, res) => {
 	try {
-		const [[notification]] = await db.query(
-			`SELECT sender_id, recipient_id FROM notifications WHERE id = ? AND type = 'follow_request'`,
-            [notificationId]	
-		);
-
-		if (!notification) {
-			return res.status(404).json({ error: "Follow request not found."});
-		}
-
-		await db.query(
-			`INSERT INTO followers (follower_id, followed_id) VALUES (?, ?)`,
-            [notification.sender_id, notification.recipient_id]
-		);
-
-		await db.query(`UPDATE notifications SET is_read = TRUE WHERE id = ?`, [notificationId]);
-		res.status(200).json({ message: "Follow request accepted."})
+		const { notificationId } = req.params;  
+		const notification_query = `SELECT sender_id, reciever_id FROM notifications WHERE id = ? AND type = 'follow_request'`; 
+		const follower_query = `INSERT INTO followers (follower_id, followed_id) VALUES (?, ?)`; 
+		
+		console.log("NotificationId:", notificationId);
+		pool.query(notification_query, [notificationId], (error,results) => {
+			if (error) {
+				console.error("Database error retreiving sender and recipiant id", error)
+				return res.status(500).json({ error: "Database error retrieving notification data." });
+			}
+			console.log("Notification query:", results);
+			if (results.length === 0) {
+				return res.status(404).json({ error: "Notification not found or not a follow request"})
+			}
+			const { sender_id, reciever_id } = results[0]; 
+			
+			pool.query(follower_query,[sender_id, reciever_id], (error,results) => {
+				if (error) {
+					console.error("Database error adding follower", error)
+					return res.status(500).json({ error: "Database error adding follower." });
+				}
+				const delete_query = `DELETE FROM notifications WHERE id = ?`; 
+				pool.query(delete_query, [notificationId], (error,results) => {
+					if (error) {
+						console.error("Database error deleting notification", error);
+						return res.status(500).json({error: "Database error deleting notification." });
+					}
+					res.status(200).json({ message: "Follow requset accepted and notification deleted." });
+				});
+			});
+		});
 	} catch (error) {
-		res.status(500).json({ error: "Database error processing follow request."})
+		console.error("Unexpected error processing follow request:", error); 
+		res.status(500).json({ error: "Unexpected error processing follow request." });
 	}
 });
 
-router.post('/notifications/:notificationId/reject', async (req, res) => {
-    const { notificationId } = req.params;
-
-    try {
-        await db.query(
-            `DELETE FROM notifications WHERE id = ? AND type = 'follow_request'`,
-            [notificationId]
-        );
-        res.status(200).json({ message: "Follow request rejected." });
-    } catch (error) {
-        res.status(500).json({ error: "Database error rejecting follow request." });
-    }
+router.post('/notifications/:notificationId/reject', async (req, res) => { 
+	try { 
+		const { notificationId } = req.params; 
+		const delete_query = `DELETE FROM notifications WHERE id = ? AND type = 'follow_request'`;
+		pool.query( delete_query, [notificationId], (error, results) => { 
+			if (error) { console.error("Database error rejecting follow request", error); 
+				return res.status(500).json({ error: "Database error rejecting follow request." }); 
+			} 
+			
+			if (results.affectedRows === 0) { 
+				return res.status(404).json({ error: "Notification not found or not a follow request." }); 
+			} 
+			res.status(200).json({ message: "Follow request rejected." }); 
+		}); 
+	} catch (error) { 
+		console.error("Unexpected error rejecting follow request:", error); 
+		res.status(500).json({ error: "Unexpected error rejecting follow request." }); 
+	} 
 });
 
 module.exports = router

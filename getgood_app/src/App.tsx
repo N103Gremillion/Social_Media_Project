@@ -10,11 +10,13 @@ import Goals from "./pages/Goals";
 import { createBrowserRouter, RouterProvider, Outlet} from "react-router-dom";
 import "./components/styles/app.css"
 import NotificationsPage from "./pages/NotificationsPage";
+import NotificationButton from "./components/NotificationButton";
 
 const Dashboard  = () => {
   return (
     <div className="content">   
       <Toolbar />
+      <NotificationButton />
       <div className="dashboard">
         <Outlet />
       </div>

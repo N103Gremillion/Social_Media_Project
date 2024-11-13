@@ -82,5 +82,17 @@ CREATE TABLE followers (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
+CREATE TABLE notifications (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    reciever_id INT NOT NULL, 
+    sender_id INT, 
+    type ENUM('like', 'follow_request') NOT NULL,
+    post_id INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (reciever_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE, 
+    FOREIGN KEY (post_id) REFERENCES mainFeedPosts(id) ON DELETE CASCADE
+);
+
 INSERT INTO users (name, email, password) VALUES ('testuser', 'testuser@something.com', 'password');
 

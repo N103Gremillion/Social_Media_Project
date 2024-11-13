@@ -90,7 +90,6 @@ const AccountOverview = ({ userInfo, userFollowerCount, userFollowingCount, show
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
                     <FollowButton userIdToFollow={userInfo.id} currentUserId={Number(id)}/>
-                    <MessageButton />
                 </div>
             </Modal.Title>
             </Modal.Header>

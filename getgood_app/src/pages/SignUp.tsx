@@ -171,6 +171,7 @@ const SignUp = () => {
                 <TextField sx={{
                     mt: 2,
                     width: "20vw",
+                    input: { color: 'white' },
                     backgroundColor: "#121212",
                     borderRadius: 1
                 }}
@@ -189,6 +190,7 @@ const SignUp = () => {
                 <TextField sx={{
                     mt: 0.5,
                     width: "20vw",
+                    input: { color: 'white' },
                     backgroundColor: "#121212",
                     borderRadius: 1
                 }}
@@ -207,6 +209,7 @@ const SignUp = () => {
                 <TextField sx={{
                     mt: 0.5,
                     width: "20vw",
+                    input: { color: 'white' },
                     backgroundColor: "#121212",
                     borderRadius: 1
                 }}

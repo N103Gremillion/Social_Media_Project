@@ -188,7 +188,7 @@ const AccountManagement = () => {
     return (
         <div
             style={{
-            backgroundColor: 'white',
+            backgroundColor: 'black',
             width: '95%',
             height: '100vh',
             // padding: '20px',

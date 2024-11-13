@@ -60,6 +60,7 @@ const Reset = () => {
                     mt: 2,
                     width: "20vw",
                     backgroundColor: "#121212",
+                    input: { color: 'white' },
                     borderRadius: 1
                 }}
                     margin="normal"
@@ -77,6 +78,7 @@ const Reset = () => {
                     mt: 2,
                     width: "20vw",
                     backgroundColor: "#121212",
+                    input: { color: 'white' },
                     borderRadius: 1
                 }}
                     margin="normal"

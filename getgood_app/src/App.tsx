@@ -12,12 +12,15 @@ import Forgot from "./pages/ForgotPassword"
 import Reset from "./pages/ResetPassword"
 import { createBrowserRouter, RouterProvider, Outlet} from "react-router-dom";
 import "./components/styles/app.css"
+import NotificationsPage from "./pages/NotificationsPage";
+import NotificationButton from "./components/NotificationButton";
 
 const Dashboard  = () => {
   return (
     <div className="content">   
       <Toolbar />
-      <div className="dashboard">
+      <NotificationButton />
+      <div className="dashboard" style={{ backgroundColor:'#000'}}>
         <Outlet />
       </div>
     </div>
@@ -37,6 +40,7 @@ const router = createBrowserRouter([
       { path: "account-management", element: <AccountManagement /> },
       { path: "edit-goal-progress", element: <EditGoalProgress />},
       { path: "explore", element: <Explore />},
+      { path: "notifications", element: <NotificationsPage />},
       { path: "goals", element: <Goals />}
     ],
   },

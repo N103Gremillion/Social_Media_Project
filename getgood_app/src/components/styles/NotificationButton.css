@@ -1,0 +1,16 @@
+.notification-button {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 1.5em;
+    color: #333; /* Customize the color to match your theme */
+    outline: none; 
+}
+
+.notification-button:hover {
+    color: #007bff; /* Optional: Change color on hover */
+    transform: scale(1.1);
+}

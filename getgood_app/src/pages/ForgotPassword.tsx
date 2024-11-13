@@ -6,7 +6,7 @@ import {
     Divider,
 } from "@mui/material";
 import {useState} from "react";
-import {Link, useNavigate} from "react-router-dom"
+import {Link} from "react-router-dom"
 
 const Forgot = () => {
 
@@ -18,12 +18,12 @@ const Forgot = () => {
         
         const emailFormat = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i
 
-        var err = false
+        // var err = false
 
         if(email === "" || emailFormat.test(email) === false){
             setEmailError(true)
             setEmailErrorType("Please enter a valid Email")
-            err = true
+            // err = true
         } else {
             setEmailError(false)
         }
@@ -55,7 +55,8 @@ const Forgot = () => {
             justifyContent: "center",
             alignItems: "center",
             paddingBottom: "10%",
-            paddingTop: "2%"
+            paddingTop: "2%",
+            backgroundColor: "black"
         }}
         >
             <Box sx={{
@@ -64,16 +65,16 @@ const Forgot = () => {
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
-                backgroundColor: "lightgray",
-                border: "2px solid gray"
+                backgroundColor: "black",
+                border: "1px solid gray"
             }}
             >
-                <Typography sx={{mt: 5}}
+                <Typography sx={{mt: 4, color: "white"}}
                 variant="h4">Trouble logging in?</Typography>
                 <TextField sx={{
                     mt: 2,
                     width: "20vw",
-                    backgroundColor: "white",
+                    backgroundColor: "gray",
                     borderRadius: 1
                 }}
                     margin="normal"
@@ -98,12 +99,21 @@ const Forgot = () => {
                     <Divider sx={{
                         paddingLeft: "10%",
                         paddingRight: "10%",
-                        alignSelf: "stretch"}}
+                        alignSelf: "stretch",
+                        color: "white",
+                        "&::before, &::after": {
+                        borderColor: "gray",
+                        },
+                    }}
                     >OR</Divider>
 
                     <Link to="/signup">Create new account</Link>
 
-                    <Link to="/">Back to login</Link>
+                    <Link to="/">
+                        <Button sx={{
+                            border: "1px solid gray",
+                        }}>Back to login</Button>
+                    </Link>
 
                 </Box>
             </div>

@@ -26,7 +26,7 @@ const Dashboard  = () => {
 const router = createBrowserRouter([
   { path: "/", element: <Login />, errorElement: <ErrorPage /> },
   { path: "signup", element: <SignUp /> },
-  {path: "forgot-password", element: <Forgot />},
+  {path: "forgot", element: <Forgot />},
   {
     path: "dashboard",
     element: <Dashboard />,
@@ -51,13 +51,3 @@ function App() {
 };
 
 export default App;
-
-
-
-
-
-
-
-
-
-

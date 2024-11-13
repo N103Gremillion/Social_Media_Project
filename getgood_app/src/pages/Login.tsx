@@ -83,7 +83,8 @@ const Login = () => {
             justifyContent: "center",
             alignItems: "center",
             paddingBottom: "10%",
-            paddingTop: "2%"
+            paddingTop: "2%",
+            backgroundColor: "black"
         }}
         >
             <Box sx={{
@@ -92,16 +93,16 @@ const Login = () => {
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
-                backgroundColor: "lightgray",
-                border: "2px solid gray"
+                backgroundColor: "black",
+                border: "1px solid gray"
             }}
             >
-                <Typography sx={{mt: 5}}
+                <Typography sx={{mt: 4, color: "white"}}
                 variant="h4">Login</Typography>
                 <TextField sx={{
                     mt: 2,
                     width: "20vw",
-                    backgroundColor: "white",
+                    backgroundColor: "gray",
                     borderRadius: 1
                 }}
                     margin="normal"
@@ -119,7 +120,7 @@ const Login = () => {
                     <TextField sx={{
                         mt: 0.5,
                         width: "20vw",
-                        backgroundColor: "white",
+                        backgroundColor: "gray",
                         borderRadius: 1
                     }}
                         margin="normal"
@@ -142,17 +143,21 @@ const Login = () => {
                         variant="contained"
                         sx={{mt: 0.5, mb: 2, width: "20vw"}}
                         onClick={handleLogin}
-                    >Login
+                    >Log in
                     </Button>
 
                     <Divider sx={{
                         paddingLeft: "10%",
                         paddingRight: "10%",
-                        alignSelf: "stretch"}}
+                        alignSelf: "stretch",
+                        color: "white",
+                        "&::before, &::after": {
+                        borderColor: "gray",
+                        },
+                    }}
                     >OR</Divider>
 
-                    {/* <Typography sx={{mt: 2, mb: 5}}>Forgot Password?</Typography> */}
-                    <Link to="forgot-password">Forgot Password?</Link>
+                    <Link to="forgot" style={{color: "white", paddingBottom: "5%"}}>Forgot Password?</Link>
 
                 </Box>
                 <Box sx={{
@@ -163,10 +168,10 @@ const Login = () => {
                     flexDirection: "column",
                     alignItems: "center",
                     justifyContent: "center",
-                    backgroundColor: "lightgray",
+                    backgroundColor: "black",
                     border: "2px solid gray"
                 }}>
-                    <Typography>Don't have an account?
+                    <Typography sx={{color: "white"}}>Don't have an account?
                         <> </>
                     <Link to="SignUp">Sign Up</Link>
                     </Typography>

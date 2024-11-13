@@ -1,10 +1,15 @@
 import {
     Box,
     Button,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
     TextField,
     Typography,
 } from "@mui/material";
-import {useState} from "react";
+import React, {useState} from "react";
 import {Link, useNavigate} from "react-router-dom"
 
 const SignUp = () => {
@@ -22,6 +27,18 @@ const SignUp = () => {
     const [passwordError, setPasswordError] = useState(false)
 
     const [emailErrorType, setErrorType] = useState("")
+
+    const [open, setOpen] = useState(false)
+    const [verification, setVerification] = useState(0)
+
+    const handleOpen = () => {
+        setOpen(true)
+        console.log("In open")
+    }
+
+    const handleClose = () => {
+        setOpen(false)
+    }
 
     const handleSignUp = async () => {
 
@@ -53,7 +70,10 @@ const SignUp = () => {
             return
         }
 
+        var errorType = 0
+
         try {
+
             const existingUsers = await fetch ('http://localhost:4000/existingUsers', {
                 method: 'POST',
                 headers: {
@@ -64,31 +84,63 @@ const SignUp = () => {
 
             if(existingUsers.status > 499) {
                 throw new Error("User already exists")
+                errorType = 1
             }
 
-            const signupInfo = await fetch('http://localhost:4000/addUser', {
+            const verify = Math.floor(Math.random() * 999999) + 100000
+            setVerification(verify)
+
+            const subject = `${verify} is your GetGoals code`
+            const text = `Hi, Someone tried to sign up for an GetGoals account with ${email}. If it was you, enter this confirmation code in the app: ${verify}`
+
+            const sendEmail = await fetch('http://localhost:4000/sendEmail', {
                 method: "POST",
                 headers: {
                     'Content-type': "application/json"
                 },
-                body: JSON.stringify({name, email, password})
+                body: JSON.stringify({email, subject, text})
             })
 
-            if(signupInfo.status > 499) {
-                throw new Error("Create user error")
+            if(sendEmail.status > 499) {
+                throw new Error("Send email error")
+                errorType = 2
             }
 
-            const signUpResults = await signupInfo.json()
-
-            //userID is the key
-            sessionStorage.setItem('userID', signUpResults.id)
-            navigate("/Dashboard")
+            handleOpen()
 
         } catch (error) {
             console.error(error)
             setEmailError(true)
-            setErrorType("Email is already being used by an existing account")
+            if(errorType === 1) {
+                setErrorType("Email is already being used by an existing account")
+            }
+            else if(errorType === 2) {
+                setErrorType("The email verification code could not be sent to your email")
+            }
+            else {
+                setErrorType("An unknown error has occured, retry again later")
+            }
         }
+    }
+    
+    const handleAddUser = async () => {
+        const signupInfo = await fetch('http://localhost:4000/addUser', {
+            method: "POST",
+            headers: {
+                'Content-type': "application/json"
+            },
+            body: JSON.stringify({name, email, password})
+        })
+    
+        if(signupInfo.status > 499) {
+            throw new Error("Create user error")
+        }
+    
+        const signUpResults = await signupInfo.json()
+    
+        //userID is the key
+        sessionStorage.setItem('userID', signUpResults.id)
+        navigate("/Dashboard")
     }
 
     return (
@@ -101,26 +153,26 @@ const SignUp = () => {
             justifyContent: "center",
             alignItems: "center",
             paddingBottom: "10%",
-            paddingTop: "2%"
+            paddingTop: "2%",
+            backgroundColor: "black"
         }}
         >
-            <Box
-                sx={{
-                    mt: 1,
+            <Box sx={{
+                mt: 1,
                 minWidth: "350px",
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
-                backgroundColor: "lightgray",
-                border: "2px solid gray"
-                }}
+                backgroundColor: "black",
+                border: "1px solid gray"
+            }}
             >
-                <Typography sx={{mt: 5}}
+                <Typography sx={{mt: 4, color: "white"}}
                 variant="h4">Sign Up</Typography>
                 <TextField sx={{
                     mt: 2,
                     width: "20vw",
-                    backgroundColor: "white",
+                    backgroundColor: "gray",
                     borderRadius: 1
                 }}
                     margin="normal"
@@ -138,7 +190,7 @@ const SignUp = () => {
                 <TextField sx={{
                     mt: 0.5,
                     width: "20vw",
-                    backgroundColor: "white",
+                    backgroundColor: "gray",
                     borderRadius: 1
                 }}
                     margin="normal"
@@ -156,7 +208,7 @@ const SignUp = () => {
                 <TextField sx={{
                     mt: 0.5,
                     width: "20vw",
-                    backgroundColor: "white",
+                    backgroundColor: "gray",
                     borderRadius: 1
                 }}
                     margin="normal"
@@ -189,14 +241,57 @@ const SignUp = () => {
                 flexDirection: "column",
                 alignItems: "center",
                 justifyContent: "center",
-                backgroundColor: "lightgray",
+                backgroundColor: "black",
                 border: "2px solid gray"
             }}>
-                <Typography>Have an account?
+                <Typography sx={{color: "white"}}>Have an account?
                     <> </>
                     <Link to="/">Login</Link>
                 </Typography>
                 </Box>
+                <Dialog
+                    open={open}
+                    onClose={handleClose}
+                    PaperProps={{
+                        component: 'form',
+                        onSubmit: (event: React.FormEvent<HTMLFormElement>) => {
+                            event.preventDefault()
+                            const formData = new FormData(event.currentTarget)
+                            const formJson = Object.fromEntries((formData as any).entries())
+                            const verify = formJson.verify
+                            console.log(verify)
+                            if(verify === verification) {
+                                handleAddUser()
+                            }
+                            else {
+                                alert("That code is not valid")
+                            }
+                            handleClose()
+                        }
+                    }}
+                    >
+                        <DialogTitle>Verify</DialogTitle>
+                        <DialogContent>
+                            <DialogContentText>
+                                An email has been sent with a verification code. Please submit it to verify your email.
+                            </DialogContentText>
+                            <TextField
+                                autoFocus
+                                required
+                                margin="dense"
+                                id="verify"
+                                name="verify"
+                                label="Verification"
+                                fullWidth
+                                variant="standard"
+                                />
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={handleClose}>Cancel</Button>
+                            <Button type="submit">Confirm</Button>
+                        </DialogActions>
+                    </Dialog>
+
         </div>
     )
 }

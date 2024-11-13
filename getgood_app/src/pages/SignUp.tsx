@@ -33,7 +33,6 @@ const SignUp = () => {
 
     const handleOpen = () => {
         setOpen(true)
-        console.log("In open")
     }
 
     const handleClose = () => {
@@ -70,7 +69,7 @@ const SignUp = () => {
             return
         }
 
-        var errorType = 0
+        var errortype = 0
 
         try {
 
@@ -83,8 +82,8 @@ const SignUp = () => {
             })
 
             if(existingUsers.status > 499) {
+                errortype = 1
                 throw new Error("User already exists")
-                errorType = 1
             }
 
             const verify = Math.floor(Math.random() * 999999) + 100000
@@ -102,8 +101,8 @@ const SignUp = () => {
             })
 
             if(sendEmail.status > 499) {
+                errortype = 2
                 throw new Error("Send email error")
-                errorType = 2
             }
 
             handleOpen()
@@ -111,10 +110,10 @@ const SignUp = () => {
         } catch (error) {
             console.error(error)
             setEmailError(true)
-            if(errorType === 1) {
+            if(errortype == 1) {
                 setErrorType("Email is already being used by an existing account")
             }
-            else if(errorType === 2) {
+            else if(errortype == 2) {
                 setErrorType("The email verification code could not be sent to your email")
             }
             else {
@@ -172,7 +171,7 @@ const SignUp = () => {
                 <TextField sx={{
                     mt: 2,
                     width: "20vw",
-                    backgroundColor: "gray",
+                    backgroundColor: "#121212",
                     borderRadius: 1
                 }}
                     margin="normal"
@@ -190,7 +189,7 @@ const SignUp = () => {
                 <TextField sx={{
                     mt: 0.5,
                     width: "20vw",
-                    backgroundColor: "gray",
+                    backgroundColor: "#121212",
                     borderRadius: 1
                 }}
                     margin="normal"
@@ -208,7 +207,7 @@ const SignUp = () => {
                 <TextField sx={{
                     mt: 0.5,
                     width: "20vw",
-                    backgroundColor: "gray",
+                    backgroundColor: "#121212",
                     borderRadius: 1
                 }}
                     margin="normal"
@@ -250,6 +249,7 @@ const SignUp = () => {
                 </Typography>
                 </Box>
                 <Dialog
+                    sx={{backgroundColor: "black"}}
                     open={open}
                     onClose={handleClose}
                     PaperProps={{
@@ -259,8 +259,7 @@ const SignUp = () => {
                             const formData = new FormData(event.currentTarget)
                             const formJson = Object.fromEntries((formData as any).entries())
                             const verify = formJson.verify
-                            console.log(verify)
-                            if(verify === verification) {
+                            if(verify == verification) {
                                 handleAddUser()
                             }
                             else {

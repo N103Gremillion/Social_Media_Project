@@ -11,6 +11,7 @@ import {Link, useNavigate} from "react-router-dom"
 
 const Login = () => {
 
+    
     const navigate = useNavigate()
 
     const [email, setEmail] = useState("");
@@ -102,7 +103,7 @@ const Login = () => {
                 <TextField sx={{
                     mt: 2,
                     width: "20vw",
-                    backgroundColor: "gray",
+                    backgroundColor: "#121212",
                     borderRadius: 1
                 }}
                     margin="normal"
@@ -120,7 +121,7 @@ const Login = () => {
                     <TextField sx={{
                         mt: 0.5,
                         width: "20vw",
-                        backgroundColor: "gray",
+                        backgroundColor: "#121212",
                         borderRadius: 1
                     }}
                         margin="normal"

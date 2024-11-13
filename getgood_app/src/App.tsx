@@ -8,6 +8,8 @@ import EditGoalProgress from "./pages/EditGoalProgress";
 import Explore from "./pages/Explore";
 import Home from "./pages/Home";
 import Goals from "./pages/Goals";
+import Forgot from "./pages/ForgotPassword"
+import Reset from "./pages/ResetPassword"
 import { createBrowserRouter, RouterProvider, Outlet} from "react-router-dom";
 import "./components/styles/app.css"
 
@@ -25,6 +27,8 @@ const Dashboard  = () => {
 const router = createBrowserRouter([
   { path: "/", element: <Login />, errorElement: <ErrorPage /> },
   { path: "signup", element: <SignUp /> },
+  {path: "forgot", element: <Forgot />},
+  {path: "reset-password", element: <Reset />},
   {
     path: "dashboard",
     element: <Dashboard />,
@@ -49,13 +53,3 @@ function App() {
 };
 
 export default App;
-
-
-
-
-
-
-
-
-
-

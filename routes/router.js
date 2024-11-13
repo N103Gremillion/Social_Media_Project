@@ -8,6 +8,9 @@ const { error } = require('console');
 const baseUrl = 'http://localhost:4000';
 const config = require(path.resolve(__dirname, '../../config.json'));
 
+const nodemailer = require("nodemailer")
+const jwt = require("jsonwebtoken")
+
 const storage = multer.diskStorage({
 
 	destination: (req, file, cb) => {
@@ -170,11 +173,40 @@ router.get('/getUserGoals', (req,res) => {
 	});
 });
 
-router.post('/addUser', (req,res) => {
+router.post('/sendEmail', async (req, res) => {
+	const {email, subject, text} = req.body
+
+	try {
+		const transporter = nodemailer.createTransport({
+			host: "smtp.gmail.com",
+			port: 465,
+			secure: true,
+			auth: {
+				user: "getgoalstesting@gmail.com",
+				pass: "bnqh ifyz wbsw jpet"
+			}
+		})
+
+		await transporter.sendMail({
+			from: "getgoalstesting@gmail.com",
+			to: email,
+			subject: `${subject}`,
+			text: `${text}`
+		})
+		return res.status(201).json("Success")
+
+	} catch(error) {
+		console.log("Email not sent")
+		console.log(error)
+		res.status(500).json({error: error.message})
+	}
+})
+
+router.post('/addUser', async (req,res) => {
 	const { name, email, password } = req.body;
 
 	const addUserCommand = 'insert into users (name,email,password) values (?,?,?)';
-
+	
 	pool.query(addUserCommand, [name, email, password], (error,results) => {
 		if (error) {
 			return res.status(500).json({ error: error.message });
@@ -205,18 +237,33 @@ router.post('/checkForUser', (req,res) => {
 	
 	const { email, password } = req.body;
 
-	const checkForUserCommand = 'select id from users where email = ? and password = ?';
+	if(password === undefined) {
+		const checkForUserCommand = 'select id from users where email = ?';
+		pool.query(checkForUserCommand, [email], (error, results) => {
+	
+			if (error) {
+				return res.status(500).json({ error: error.message });
+			}
+			else if(results.length !== 1) {
+				return res.status(500).json({ error: "User not found" });
+			}
+			res.status(201).json(results);
+		})
+	}
+	else {
+		const checkForUserCommand = 'select id from users where email = ? and password = ?';
+		pool.query(checkForUserCommand, [email, password], (error, results) => {
+	
+			if (error) {
+				return res.status(500).json({ error: error.message });
+			}
+			else if(results.length !== 1) {
+				return res.status(500).json({ error: "User not found" });
+			}
+			res.status(201).json(results);
+		})
+	}
 
-	pool.query(checkForUserCommand, [email, password], (error, results) => {
-
-		if (error) {
-			return res.status(500).json({ error: error.message });
-		}
-		else if(results.length !== 1) {
-			return res.status(500).json({ error: "User not found" });
-		}
-		res.status(201).json(results);
-	})
 })
 
 router.post('/changeUserName', (req,res) => {

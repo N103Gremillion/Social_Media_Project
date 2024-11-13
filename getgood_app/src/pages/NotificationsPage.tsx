@@ -3,7 +3,7 @@ import axios from "axios";
 import { Card, Button, Container, Row, Col } from 'react-bootstrap';
 import { FaUserCircle } from 'react-icons/fa';
 import 'bootstrap/dist/css/bootstrap-grid.min.css'
-import Person2Icon from "@mui/icons-material/Person2"
+import defaultProfilePic from '../defaultProfile.jpg'
 
 const PORT = 4000; 
 
@@ -107,7 +107,7 @@ const NotificationsPage: React.FC = () => {
                         <Card.Body> 
                             <div className="d-flex align-items-center mb-2"> 
                                 {notification.senderProfilePicture ? ( 
-                                    <img src={'../defaultProfile.jpg'} className="rounded-circle" width="40" height="40" />
+                                    <img src={defaultProfilePic} className="rounded-circle" width="40" height="40" />
                             ) : ( 
                                 <FaUserCircle size={40} />
                                 )} 

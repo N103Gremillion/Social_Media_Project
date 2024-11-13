@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import axios from "axios";
 import { Card, Button, Container, Row, Col } from 'react-bootstrap';
 import { FaUserCircle } from 'react-icons/fa';
 import 'bootstrap/dist/css/bootstrap-grid.min.css'
+import Person2Icon from "@mui/icons-material/Person2"
 
 const PORT = 4000; 
 
@@ -13,7 +15,7 @@ interface Notification {
     post_id?: number; 
     created_at: string;
     senderName: string;
-    senderProfilePicture: string;
+    senderProfilePicture: string | 'Person2Icon';
 }
 
 const NotificationsPage: React.FC = () => {
@@ -44,6 +46,8 @@ const NotificationsPage: React.FC = () => {
 
     fetchNotifications();
   }, []);
+
+  
 
   const acceptFollowRequest = async (notificationId: number) => {
     try {
@@ -91,29 +95,29 @@ const NotificationsPage: React.FC = () => {
 
   console.log("Notifications:", notifications);
   return (
-    <Container> 
-        <h2>Notifications</h2> 
+    <Container style={{ backgroundColor: '#000', color: '#fff', minHeight: '100vh'}}> 
+        <h2 style={{ color: '#fff' }}>Notifications</h2> 
         {error ? ( 
             <p>Error loading notifications: {error}</p> 
         ) : ( 
         <Row className="flex-column"> 
             {notifications.map((notification) => ( 
                 <Col key={notification.id} className="mb-3"> 
-                    <Card style={{ width: '100%' }}> 
+                    <Card style={{ width: '100%', backgroundColor: '#333', color: '#fff' }}> 
                         <Card.Body> 
                             <div className="d-flex align-items-center mb-2"> 
                                 {notification.senderProfilePicture ? ( 
-                                    <img src={notification.senderProfilePicture} alt={`${notification.senderName}'s profile`} className="rounded-circle" width="40" height="40" />
+                                    <img src={'../defaultProfile.jpg'} className="rounded-circle" width="40" height="40" />
                             ) : ( 
                                 <FaUserCircle size={40} />
                                 )} 
                                 <div className="ms-3"> 
-                                    <Card.Title>{notification.senderName}</Card.Title> 
-                                    <Card.Text>{new Date(notification.created_at).toLocaleString()}</Card.Text> 
+                                    <Card.Title style={{ color: '#fff'}}>{notification.senderName}</Card.Title> 
+                                    <Card.Text style={{ color: '#fff'}}>{new Date(notification.created_at).toLocaleString()}</Card.Text> 
                                 </div> 
                             </div> 
                                 {notification.type === 'like' && notification.post_id && ( 
-                                    <Card.Text>Liked your post (ID: {notification.post_id})</Card.Text> 
+                                    <Card.Text style={{ color: '#fff'}}>Liked your post</Card.Text> 
                                 )} 
                                 {notification.type === 'follow_request' && ( 
                                     <div> 

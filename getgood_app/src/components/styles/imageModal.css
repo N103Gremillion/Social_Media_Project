@@ -1,10 +1,10 @@
-.modal-dialog.image-modal {
+.image-modal {
     max-width: 90vw; 
     max-height: 70vh;
     min-height: 70vh;
     width: 90vw;     
     height: 70vh;
-    display: flex;   
+    margin-top: 10vh;
 }
 
 .modal-body {
@@ -16,7 +16,7 @@
 .goal {
     width: 30vw;
     padding: 10px;
-    height: auto;
+    max-height: 80vh;
     overflow-y: scroll;
     justify-content: center;
 }
@@ -33,10 +33,11 @@
     display: flex;
     flex-direction: column;
     max-height: 70vh;
+    color: white;
 }
 
-.comment-section.post-information {
-    color: white;
+.comment-section .post-information .image-title {
+    font-size: large;
 }
 
 .comments {

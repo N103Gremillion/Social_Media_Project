@@ -26,6 +26,15 @@ const AddGoalModal: React.FC<AddGoalModalProps> = ({
     }
     const handleAddGoal = (e: React.FormEvent) => {
         e.preventDefault();
+
+        const startDate = new Date(goalStartDate);
+        const endDate = new Date(goalEndDate);
+
+        if (startDate > endDate) {
+            alert("Start date must be after end date");
+            return;
+        }
+        
         addGoal({
             name: goalName,
             description: goalDescription,

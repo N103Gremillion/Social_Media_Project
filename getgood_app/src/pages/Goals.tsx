@@ -24,8 +24,8 @@ interface Goal {
   
   interface Post {
     id: number;
-    goalId: number;
-    checkpointId: number;
+    goal_id: number;
+    checkpoint_id: number;
     title: string;
     content: string;
     author: string;
@@ -342,6 +342,42 @@ const Goals: React.FC = () => {
     const handleCloseEditPost = () => {
         getCheckpointPosts();
         setShowEditPostModal(null);
+    };
+
+    const deleteGoal = async (goal: Goal) =>{
+        await axios.delete(`http://localhost:${PORT}/deleteGoal`, {
+            data: {
+                userId: userId,
+                goalId: goal.id
+            } 
+        })
+        getGoals();
+        setCurrGoal(null);
+        await axios.delete(`http://localhost:${PORT}/deleteCheckpoints`, {
+            data: {
+                goalId: goal.id
+            } 
+        })
+    }
+
+    const deleteCheckpoint = async (checkpoint: Checkpoint) =>{
+        await axios.delete(`http://localhost:${PORT}/deleteCheckpoint`, {
+            data: {
+                checkpointId: checkpoint.id
+            } 
+        });
+        getCheckpoints();
+        setCurrCehckpoint(null);
+    }
+
+    const deletePost = async (post: Post) =>{
+        await axios.delete(`http://localhost:${PORT}/api/posts`, {
+            data: {
+                postId: post.id
+            } 
+        });
+        getCheckpointPosts();
+        setCurrPost(null);
     }
 
     useEffect(() => {
@@ -380,9 +416,18 @@ const Goals: React.FC = () => {
                 </Stage>
                 <button className='add-checkpoint-button' onClick={() => setShowAddCheckpointModal(true)}>Add Checkpoint</button>
             </div>
-            <div className='image-container' >
+            <div className='post-display'>
+                <div className='post-title'>
+                    {currPost?.title}
+                </div>
+                <div className='post-description'>
+                    <span>{currPost?.content}</span>
+                </div>
+                <div className='image-container' >
                     {currPost && <img src={currPost.imagePath} key={currPost.id} className='img-fluid'/>}
+                </div>
             </div>
+            
             {showAddGoalModal && <AddGoalModal 
             close={() => setShowAddGoalModal(false)}
             addGoal={handleAddGoal}
@@ -391,11 +436,13 @@ const Goals: React.FC = () => {
             handleClose={() => setShowEditGoalModal(false)}
             editGoal={handleEditGoal}
             goal={currGoal}
+            deleteGoal={deleteGoal}
             />}
             {showEditCheckpointModal && <EditCheckpointModal 
             handleClose={() => setShowEditCheckpointModal(null)}
             editCheckpoint={handleEditCheckpoint}
             checkpoint={showEditCheckpointModal}
+            deleteCheckpoint={deleteCheckpoint}
             />}
             {showAddCheckpointModal && currGoal && <AddCheckpointModal 
             handleClose={() => setShowAddCheckpointModal(false)}
@@ -404,6 +451,7 @@ const Goals: React.FC = () => {
             {showEditPostModal && <EditPostModal 
             onClose={() => handleCloseEditPost()}
             post={showEditPostModal}
+            deletePost={deletePost}
             />}
         </div>
     );

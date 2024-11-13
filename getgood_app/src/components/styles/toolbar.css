@@ -37,18 +37,26 @@
   justify-content: center;
   transition: background-color 0.3s, color 0.3s;
   text-decoration: none;
-  color: white; 
+  color: white !important;
   align-items: center;
   outline: black;
   box-shadow: black;
 }
 
+.nav-item-btn {
+  width: 100%;   
+  padding: 10px 15px;  
+  text-align: center;  
+  border-radius: 10px;
+  color: white !important;
+}
+
 .nav-item:focus {
-  outline: none; 
-  box-shadow: none; 
+  outline: none;
+  box-shadow: none;
 }
 
 .nav-item:hover {
-  background-color: white;
-  color: black;
+  background-color: white !important; 
+  color: black  !important
 }

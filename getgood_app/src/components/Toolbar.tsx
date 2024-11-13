@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom"
 import './styles/toolbar.css';
-import SearchButton from "./SearchButton";
+import { SearchButton, HomeButton } from "./toolarbButtons";
 import CreatePostModal from "./CreatePostModal";
 import NotificationButton from "./NotificationButton";
 const Toolbar : React.FC = () => {
@@ -22,6 +22,7 @@ const Toolbar : React.FC = () => {
       <NotificationButton />
       <div className="nav-items">
       <SearchButton/>
+      <HomeButton/>
       <Link
         className="nav-item"
         to="goals"

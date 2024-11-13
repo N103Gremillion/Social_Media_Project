@@ -1,0 +1,19 @@
+.follow-button {
+  font-weight: bold;
+  padding: 0.5em 1.5em;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  transition: all 0.3s ease;
+}
+
+.message-button{
+  font-weight: bold;
+  padding: 0.5em 1.5em;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  transition: all 0.3s ease;
+}

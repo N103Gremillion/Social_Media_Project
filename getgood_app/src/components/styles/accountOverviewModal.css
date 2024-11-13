@@ -1,0 +1,24 @@
+.overview-body {
+  background-color: black;
+  min-height: 100vh;
+  max-height: 400px;
+  width: 100%;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  overflow: auto;
+
+}
+
+.overviewImages-display {
+  display: grid;
+  grid-template-columns: repeat(3, 250px);
+}
+
+.overviewImage {
+  width: 100%;
+  height: auto;
+  cursor: pointer;
+}

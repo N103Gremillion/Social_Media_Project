@@ -6,6 +6,7 @@ import SignUp from "./pages/SignUp";
 import AccountManagement from "./pages/AccountManagement";
 import EditGoalProgress from "./pages/EditGoalProgress";
 import Explore from "./pages/Explore";
+import Home from "./pages/Home";
 import Goals from "./pages/Goals";
 import { createBrowserRouter, RouterProvider, Outlet} from "react-router-dom";
 import "./components/styles/app.css"
@@ -17,7 +18,7 @@ const Dashboard  = () => {
     <div className="content">   
       <Toolbar />
       <NotificationButton />
-      <div className="dashboard">
+      <div className="dashboard" style={{ backgroundColor:'#000'}}>
         <Outlet />
       </div>
     </div>
@@ -31,6 +32,7 @@ const router = createBrowserRouter([
     path: "dashboard",
     element: <Dashboard />,
     children: [
+      { path: "home", element: <Home />},
       { path: "account-management", element: <AccountManagement /> },
       { path: "edit-goal-progress", element: <EditGoalProgress />},
       { path: "explore", element: <Explore />},

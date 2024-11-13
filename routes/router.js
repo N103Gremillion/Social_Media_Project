@@ -131,8 +131,8 @@ router.get('/usersWithSub', (req, res) => {
 });
 
 
-router.post('/getUsername', (req, res) => {
-	const userId = req.body.id;
+router.get('/name', (req, res) => {
+	const userId = req.query.id;
 	
 	const getUsername = 'select name from users where id = ?';
 	
@@ -140,7 +140,7 @@ router.post('/getUsername', (req, res) => {
 		if(error) {
 			return res.status(500).json({ error: error.message});
 		}
-		res.json(results);
+		res.status(200).json({ userName: results });
 	})
 })
 
@@ -272,7 +272,7 @@ router.put('/editGoal', (req,res) => {
 	});
 })
 
-router.post('/deleteGoal', (req,res) => {
+router.delete('/deleteGoal', (req,res) => {
 	const { userId, goalId } = req.body;
 
 	const deleteQuery = "delete from goals where id=?";
@@ -329,6 +329,19 @@ router.delete('/deleteCheckpoints', (req,res) => {
 		if (error) {
 			return res.status(500).json({ error: error.message });
 		}
+		res.status(200).json({results});
+	});
+});
+
+router.delete('/deleteCheckpoint', (req,res) => {
+	const { checkpointId } = req.body;
+	const deleteQuery = "delete from checkpoints where id = ?";
+
+	pool.query(deleteQuery, [checkpointId], (error, results) => {
+		if (error) {
+			return res.status(500).json({ error: error.message });
+		}
+		res.status(200).json({results});
 	});
 });
 
@@ -372,6 +385,7 @@ router.post('/getCheckpoints', (req,res) => {
 router.get('/api/checkpoints', (req,res) => {
 	const userId = req.query.userId;
 	const goalId = req.query.goalId;
+
 	const query = "select id, name, date_format(date, '%Y-%m-%d') as date from checkpoints where (id in (select checkpoint_id from goal_checkpoints where goal_id = ?) and ? in (select goal_id from user_goals where user_id = ?)) order by date asc";
 
 	pool.query(query, [goalId,goalId,userId], (error, results) => {
@@ -383,6 +397,52 @@ router.get('/api/checkpoints', (req,res) => {
 });
 
 let posts = []
+
+router.get('/api/postsOfUser', (req, res) => {
+
+	const userId = req.query.userId;
+
+	const query = `
+	SELECT 
+		id,
+		owner_id,
+		goal_id,
+		checkpoint_id,
+		title,
+		content,
+		author,
+		DATE_FORMAT(date, '%d-%m-%Y') AS formatted_date,
+		imagePath,
+		likes
+	FROM
+		mainFeedPosts
+	WHERE
+		owner_id = ?;
+	`;
+
+	pool.query(query, [userId], (error, results) => {
+		if (error){
+			console.error("error fetching the posts form database", error);
+			return res.status(500).json();
+		}
+		
+		// add all elements in the table to the posts[]
+		const formattedPosts = results.map(post => ({
+			id: post.id,
+			ownerId: post.owner_id,
+			goalId: post.goal_id,
+			checkpointId: post.checkpoint_id,
+			title: post.title,
+			content: post.content,
+			author: post.author,
+			date: post.formatted_date,
+			imagePath: post.imagePath,
+			likes: post.likes,
+		}));
+		
+		res.status(200).json(formattedPosts);
+	});
+});
 
 router.get('/api/posts', (req, res) => {
 	const offset = parseInt(req.query.offset) || 0;
@@ -473,12 +533,24 @@ router.put('/api/posts/:id', upload.single('image'), (req, res) => {
   
 });
 
+router.delete('/api/posts', (req,res) => {
+	const { postId } = req.body;
+	const deleteQuery = "delete from mainfeedposts where id = ?";
+
+	pool.query(deleteQuery, [postId], (error, results) => {
+		if (error) {
+			return res.status(500).json({ error: error.message });
+		}
+		res.status(200).json({results});
+	});
+});
+
 router.post('/api/comments', (req,res) => {
-	const { postId, content } = req.body;
+	const { postId, content, author } = req.body;
 
-	const query = 'insert into comments (post_id, content) values (?, ?)';
+	const query = 'insert into comments (post_id, content, author) values (?, ?, ?)';
 
-	pool.query(query, [postId, content], (error, results) => {
+	pool.query(query, [postId, content, author], (error, results) => {
 		if (error) {
 			return res.status(500).json({error: error});
 		}
@@ -525,7 +597,7 @@ router.get('/api/goal', (req,res) => {
 		}
 		res.status(200).json({results});
 	})
-})
+});
 
 function addGoalUserConnection(userId,goalId,query,req,res) {
 	pool.query(query, [userId, goalId], (error, results) => {
@@ -534,36 +606,209 @@ function addGoalUserConnection(userId,goalId,query,req,res) {
                 }
                 res.status(201).json({ goalId: goalId});
         });
-}
+};
 
 function addGoalCheckpointConnection(checkpointId,goalId,query,req,res) {
         pool.query(query, [goalId, checkpointId], (error, results) => {
                 if (error) {
                         return res.status(500).json({error: error.message});
                 }
-                res.status(201).json({ id: results.insertId});
+                res.status(200).json({ id: results.insertId});
         });
-}
+};
+
+router.get('/authorInfo', (req,res) => {
+	const authorId = req.query.authorId;
+
+	const query = "select name, profilePicture from users where id = ?";
+
+	pool.query(query, [authorId], (error, results) => {
+		if (error) {
+				return res.status(500).json({error: error.message});
+		}
+		res.status(200).json({ info: results });
+	});
+
+});
+
+router.get('/isFollowing', (req, res) => {
+  const { currentUserId, userIdToFollow } = req.query;  
+
+  const query = `
+    SELECT COUNT(*) AS isFollowing
+    FROM followers
+    WHERE follower_id = ? AND user_id = ?;
+  `;
+
+  pool.query(query, [currentUserId, userIdToFollow], (error, results) => {
+    if (error) {
+      return res.status(500).json({ error: error });
+    }
+
+    // If the count is greater than 0, the user is following
+    const isFollowing = results[0].isFollowing > 0;
+
+    console.log(isFollowing); 
+
+    return res.json({ isFollowing });
+  });
+});
+
 
 router.post('/follow', async (req, res) => {
-	const {followerId, userId} = req.body;
-	if (followerId == userId) {
-		return res.status(400).json({ error: "User cannot follow themselves." })
-	}
+  
+  const { followerId, userId } = req.body;
+
+  // Check if follower is trying to follow themselves
+  if (followerId == userId) {
+    return res.status(400).json({ error: "User cannot follow themselves." });
+  }
+
+  try {
+    const result = await pool.promise().query(
+      `INSERT INTO followers (follower_id, user_id) VALUES (?, ?)`,
+      [followerId, userId]
+    );
+		return res.status(201).json({ success: true});
+  } catch (error) {
+    if (error.code === `ER_DUP_ENTRY`) {
+      res.status(409).json({ error: "Already following this user." });
+    } else {
+      res.status(500).json({ error: "Database error." });
+    }
+  }
+});
+
+router.post('/unfollow', async (req, res) => {
+  const { followerId, userId } = req.body;
+
+  // Check if both followerId and userId are provided
+  if (!followerId || !userId) {
+    return res.status(400).json({ error: "Missing followerId or userId." });
+  }
+
+  try {
+    const query = `DELETE FROM followers WHERE follower_id = ? AND user_id = ?;`;
+    const [result] = await pool.promise().query(query, [followerId, userId]);
+
+    if (result.affectedRows > 0) {
+      console.log("Unfollow successful. Rows affected:", result.affectedRows);
+      return res.status(201).json({ success: true});
+    } else {
+      return res.status(404).json({ error: "Follow relationship not found." });
+    }
+  } catch (error) {
+    return res.status(500).json({ error: "Database error." });
+  }
+});
+
+router.get('/followers', async (req, res) => {
+	const { userId } = req.query;
 
 	try {
-		await db.query(
-			`INSERT INTO followers (follower_id, user_id) VALUES (?, ?)`,
-			[followerId, userId]
-		);
-		res.status(201).json({ message: "User followed successfully." });
+			// Query to count followers
+			const [[followerCount]] = await pool.promise().query(
+					`SELECT COUNT(*) AS count
+					 FROM followers f
+					 WHERE f.user_id = ?`,
+					[userId]
+			);
+
+			// Query to count following
+			const [[followingCount]] = await pool.promise().query(
+					`SELECT COUNT(*) AS count
+					 FROM followers f
+					 WHERE f.follower_id = ?`,
+					[userId]
+			);
+			// Respond with the counts
+			res.status(200).json({
+					followersCount: followerCount.count,
+					followingCount: followingCount.count
+			});
 	} catch (error) {
-		if (error.code === `ER_DUP_ENTRY`) {
-			res.status(409).json({ error: "Already following this user." })
-		} else {
-			res.status(500).json({ error: "Database error." });
-		}
+			res.status(500).json({ error: error.message || 'Database error.' });
 	}
+});
+
+router.get('/followerIds', async (req, res) => {
+	const { userId } = req.query;
+
+	query = `
+		SELECT user_id
+		FROM followers
+		WHERE follower_id = ?
+	`
+	const [followerIds] = await pool.promise().query(query, [userId]);
+	res.status(200).json(followerIds);
+});
+
+router.get('/followingInfo', async (req, res) => {
+	const { followingIds } = req.query;
+	
+	const query = `
+	  SELECT name AS name, profilePicture AS profilePicture
+	  FROM users
+	  WHERE id IN (?);
+	`;
+  
+	try {
+	  const [followingInfo] = await pool.promise().query(query, [followingIds]); // Use query, not express.query
+	  
+	  res.status(200).json({
+		followingInfo
+	  });
+	} catch (error) {
+	  console.error('Error fetching following info:', error);
+	  res.status(500).json({ error: 'Failed to fetch following information' });
+	}
+});
+
+router.get ('/api/postsOfFollowing', async (req, res) => {
+	// expects a comma separated value string in the querery 
+	const followingIds = req.query.ids ? req.query.ids.split(',').map(id => parseInt(id)) : [];
+	
+	query = `
+		SELECT
+			id,
+			owner_id,
+			goal_id,
+			checkpoint_id,
+			title,
+			content,
+			author,
+			DATE_FORMAT(date, '%d-%m-%Y') AS formatted_date,
+			imagePath,
+			likes
+		FROM
+			mainFeedPosts
+		WHERE
+			owner_id IN (?);
+	`
+
+	pool.query(query, [followingIds], (error, results) => {
+		if (error){
+			console.error("error fetching the posts form database", error);
+			return res.status(500).json();
+		}
+		
+		// add all elements in the table to the posts[]
+		const formattedPosts = results.map(post => ({
+			id: post.id,
+			ownerId: post.owner_id,
+			goalId: post.goal_id,
+			checkpointId: post.checkpoint_id,
+			title: post.title,
+			content: post.content,
+			author: post.author,
+			date: post.formatted_date,
+			imagePath: post.imagePath,
+			likes: post.likes,
+		}));
+		
+		console.log(formattedPosts);
+		res.status(200).json(formattedPosts);
+	});
 });
 
 router.post('/unfollow', async(req, res) => {
@@ -641,7 +886,7 @@ router.post('/notifications/:notificationId/accept', async (req, res) => {
 	try {
 		const { notificationId } = req.params;  
 		const notification_query = `SELECT sender_id, reciever_id FROM notifications WHERE id = ? AND type = 'follow_request'`; 
-		const follower_query = `INSERT INTO followers (follower_id, followed_id) VALUES (?, ?)`; 
+		const follower_query = `INSERT INTO followers (follower_id, user_id) VALUES (?, ?)`; 
 		
 		console.log("NotificationId:", notificationId);
 		pool.query(notification_query, [notificationId], (error,results) => {
@@ -694,6 +939,5 @@ router.post('/notifications/:notificationId/reject', async (req, res) => {
 		console.error("Unexpected error rejecting follow request:", error); 
 		res.status(500).json({ error: "Unexpected error rejecting follow request." }); 
 	} 
-});
-
+});  
 module.exports = router

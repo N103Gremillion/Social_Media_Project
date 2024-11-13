@@ -144,6 +144,19 @@ router.get('/name', (req, res) => {
 	})
 })
 
+router.post('/getUsername', (req, res) => {
+	const userId = req.body.id;
+
+	const getUsername = 'select name from users where id = ?';
+
+	pool.query(getUsername, [userId], (error, results) => {
+		if(error) {
+			return res.status(500).json({ error: error.message});
+		}
+		res.json(results);
+	})
+})
+
 router.post('/getPassword', (req, res) => {
 	const userId = req.body.id;
 	

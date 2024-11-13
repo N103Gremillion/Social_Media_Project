@@ -230,7 +230,8 @@ const AccountManagement = () => {
                         variant="contained" onClick={handleClickUser}
                         sx={{ mt: 2}}
                     >Change Username</Button>
-                    <Dialog 
+                    <Dialog
+                        sx={{backgroundColor: "black"}}
                         open={openUser}
                         onClose={handleCloseUser}
                         PaperProps={{
@@ -266,7 +267,8 @@ const AccountManagement = () => {
                         sx={{mt: 2}}
                     >Change Password</Button>
                     
-                    <Dialog 
+                    <Dialog
+                        sx={{backgroundColor: "black"}}
                         open={openPassword}
                         onClose={handleClosePassword}
                         PaperProps={{
@@ -302,7 +304,8 @@ const AccountManagement = () => {
                         sx={{ mt: 2}}
                     >Change Avatar</Button>
                     
-                    <Dialog 
+                    <Dialog
+                        sx={{backgroundColor: "black"}}
                         open={openAvatar}
                         // onClose={handleCloseAvatar}
                         PaperProps={{
@@ -313,64 +316,12 @@ const AccountManagement = () => {
                                 const formJson = Object.fromEntries((formData as any).entries())
                                 const avatar = formJson.avatar
                                 avatarValue = avatar
-                                // handleCloseAvatar(event)
-                        //         event.preventDefault()
-                        //         const formData = new FormData()
-                        //         if(id) {
-                        //             formData.append('id', id)
-                        //         }
-                        //         if(picFile) {
-                        //             formData.append('Picture', picFile)
-                        //         }
-                        //         handleCloseAvatar()
-                            } 
-                                // event.preventDefault()
-                                // const formData = new FormData()
-                                // if(id) {
-                                //     formData.append('id', id)
-                                // }
-                                // if(picFile) {
-                                //     formData.append('Picture', picFile)
-                                // }
-
-                                // const results = await fetch('http://localhost:4000/addProfilePicture', {
-                                //     method: 'POST',
-                                //     body: formData
-                                //     })
-                                // .then(results => results.json())
-
-                                // console.log(results.status)
                             }
-                        }
+                                
+                        }}
                     >
                         <DialogTitle>Change Avatar</DialogTitle>
                             <input type = "file" accept="image/*" name = "Picture" onChange={handlePictureChange}/>
-                            {/* <List sx={{pt:0, 
-                            mt: 1,
-                            display: "flex",
-                            flexDirection: "row",
-                            alignItems: "center"}}>
-                                <ListItemButton onClick={() => {setAvatar("PersonIcon"); handleCloseAvatar()}}>
-                                    <Avatar sx={{bgcolor: blue[100], color: blue[600]}}>
-                                        <PersonIcon />
-                                    </Avatar>
-                                </ListItemButton>
-                                <ListItemButton onClick={() => {setAvatar("Person2Icon"); handleCloseAvatar()}}>
-                                    <Avatar sx={{bgcolor: blue[100], color: blue[600]}}>
-                                        <Person2Icon />
-                                    </Avatar>
-                                </ListItemButton>
-                                <ListItemButton onClick={() => {setAvatar("Person3Icon"); handleCloseAvatar()}}>
-                                    <Avatar sx={{bgcolor: blue[100], color: blue[600]}}>
-                                        <Person3Icon />
-                                    </Avatar>
-                                </ListItemButton>
-                                <ListItemButton onClick={() => {setAvatar("Person4Icon"); handleCloseAvatar()}}>
-                                    <Avatar sx={{bgcolor: blue[100], color: blue[600]}}>
-                                        <Person4Icon />
-                                    </Avatar>
-                                </ListItemButton>
-                            </List> */}
                         <DialogActions>
                             <Button onClick={handleCloseAvatar}>Cancel</Button>
                             <Button type="submit" onClick={handleProfilePicSubmit}>Confirm</Button>
